@@ -1,4 +1,6 @@
-name: Deploy Fullstack App to QA
+name: Trigger Render Deploy for QA
+
+# This workflow only triggers a deploy on Render. Render will handle all builds and deployment steps.
 
 on:
   push:
@@ -6,32 +8,9 @@ on:
       - main
 
 jobs:
-  build-and-deploy:
+  trigger-render-deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install backend dependencies
-        run: cd pesaje-node-backend && npm ci
-
-      - name: Install frontend dependencies
-        run: cd pesaje-frontend && npm ci
-
-      - name: Build frontend
-        run: cd pesaje-frontend && npm run build
-
-      # At this point, pesaje-node-backend/public contains the built frontend
-
-      - name: Deploy backend (with frontend) to Render QA
+      - name: Trigger Render QA deploy
         run: |
-          curl -X POST \
-            -H "Content-Type: application/json" \
-            -d "{\"message\":\"Deploy QA from main branch\"}" \
-            "${{ secrets.RENDER_DEPLOY_HOOK_QA }}" 
+          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_QA }}" 

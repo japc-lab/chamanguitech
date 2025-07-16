@@ -116,6 +116,26 @@ This will output static files to `../pesaje-node-backend/public/`.
 
 ---
 
+## 🚀 Render Build & Start Commands
+
+Render is now responsible for building and deploying the fullstack app. Use the following commands in your Render service settings:
+
+**Build Command:**
+```bash
+cd pesaje-frontend && npm ci && npm run build:prod && cd ../pesaje-node-backend && npm ci
+```
+
+**Start Command:**
+```bash
+cd pesaje-node-backend && npm start
+```
+
+- These commands ensure the frontend is built and output to the backend's public directory before the backend starts.
+- No build artifacts are committed to git; everything is built fresh on each deploy.
+- GitHub Actions deployment workflows are now disabled.
+
+---
+
 ## 🔧 Environment Configuration
 
 - **Frontend**: In development, uses `http://localhost:8080/api` for API calls. In production, uses relative `/api` paths (served by the backend).
