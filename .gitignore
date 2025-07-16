@@ -31,7 +31,7 @@ yarn-debug.log*
 yarn-error.log*
 
 # Ignore lock files at root (handled in project if needed)
-package-lock.json
-yarn.lock
+/package-lock.json
+/yarn.lock
 
 # Ignore output from Angular/Node builds (handled in project .gitignore) 
