@@ -1,0 +1,37 @@
+# Global ignores
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+
+# Node/npm
+node_modules/
+
+# Environment files
+.env
+.env.*
+
+# Editor/project files
+.idea/
+.vscode/
+*.sublime-workspace
+*.sublime-project
+
+# Build output (handled in project .gitignore files)
+
+# Ignore coverage and test output
+coverage/
+
+# Ignore local Docker files
+*.local.yml
+
+# Ignore npm debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Ignore lock files at root (handled in project if needed)
+package-lock.json
+yarn.lock
+
+# Ignore output from Angular/Node builds (handled in project .gitignore) 

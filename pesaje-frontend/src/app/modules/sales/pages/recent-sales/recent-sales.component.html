@@ -1,0 +1,32 @@
+<div class="card">
+  <div class="card-body">
+    <div class="d-flex flex-wrap flex-stack mb-3">
+      <h3 class="fw-bolder my-2">Buscar por número de control</h3>
+    </div>
+
+    <div class="row g-3">
+
+      <!-- Row 1: Control Number -->
+      <div class="d-flex align-items-center gap-4">
+        <!-- Control Number Input -->
+        <input type="text" id="controlNumber" name="controlNumber" class="form-control form-control-sm text-end"
+          style="max-width: 180px" placeholder="CO-0" [(ngModel)]="controlNumber" />
+
+        <!-- Search Button -->
+        <button class="btn btn-primary btn-sm d-flex align-items-center gap-2" (click)="loadRecentSales()">
+          <i class="bi bi-search"></i> Buscar
+        </button>
+
+        <button class="btn btn-secondary btn-sm px-4" (click)="clearFilters()">Limpiar Filtros</button>
+      </div>
+
+    </div>
+
+
+    <div class="mt-5">
+      <app-crud [datatableConfig]="datatableConfig" [permissionRoute]="PERMISSION_ROUTE"
+        (editEvent)="edit($event.toString())" (deleteEvent)="delete($event.toString())" [reload]="reloadEvent">
+      </app-crud>
+    </div>
+  </div>
+</div>

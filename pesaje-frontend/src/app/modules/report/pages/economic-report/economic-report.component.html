@@ -1,0 +1,279 @@
+<!-- First Section: Search Info -->
+<div class="card card-xl-stretch mb-xl-8">
+  <div class="card-header border-0 pt-5">
+    <h4 class="card-title align-items-start flex-column">
+      <span class="card-label fw-bolder fs-3 mb-1">Buscar por número de control</span>
+    </h4>
+  </div>
+
+  <div class="card-body py-3">
+    <div class="d-flex flex-column">
+      <div class="d-flex align-items-center gap-4">
+        <!-- Control Number Input -->
+        <input type="text" id="controlNumber" name="controlNumber" class="form-control form-control-sm text-end"
+          placeholder="CO-0" style="max-width: 180px" [(ngModel)]="controlNumber" />
+
+        <!-- Search Button -->
+        <button class="btn btn-outline-primary btn-sm d-flex align-items-center gap-2" (click)="loadReportInfo()">
+          <i class="bi bi-search"></i> Buscar
+        </button>
+      </div>
+
+      <!-- Required Message -->
+      <div *ngIf="searchSubmitted && !controlNumber" class="text-danger mt-1 ms-1 small">
+        El número de control es obligatorio.
+      </div>
+    </div>
+
+  </div>
+
+</div>
+<!-- end::First Section: Search Info -->
+
+<!-- Second Section: Econocmic Report -->
+<div *ngIf="economicReportModel" class="card card-xl-stretch mb-xl-8 mt-2">
+  <!-- Card Header -->
+  <div class="card-header border-0 pt-5">
+    <h3 class="card-title fw-bolder fs-2 mb-1">REPORTE ECONÓMICO</h3>
+  </div>
+
+  <!-- Card Body -->
+  <div class="card-body pt-0 fs-6">
+    <!-- Purchase Info -->
+    <div class="table-responsive">
+      <table class="table table-bordered align-middle mb-6">
+        <tbody>
+          <tr>
+            <td class="bg-light fw-bold" style="width: 15%;">Nombre de cliente</td>
+            <td style="width: 18%;">{{ economicReportModel.purchase.clientName }}</td>
+            <td class="bg-light fw-bold" style="width: 15%;">Número de control</td>
+            <td style="width: 18%;">{{ economicReportModel.purchase.controlNumber }}</td>
+            <td class="bg-light fw-bold" style="width: 15%;">Fecha de compra</td>
+            <td style="width: 18%;">{{ economicReportModel.purchase.purchaseDate | date: 'dd/MM/yyyy' }}</td>
+          </tr>
+          <tr>
+            <td class="bg-light fw-bold">Ubicación de piscina</td>
+            <td>{{ economicReportModel.purchase.shrimpFarmLocation }}</td>
+            <td class="bg-light fw-bold">Nombre de Compañía</td>
+            <td>{{ economicReportModel.purchase.companyName }}</td>
+            <td class="bg-light fw-bold">Gramo promedio 1</td>
+            <td>{{ economicReportModel.purchase.averageGram | number:'1.2-2' }}</td>
+          </tr>
+          <tr>
+            <td class="bg-light fw-bold">Nombre de piscina</td>
+            <td>{{ economicReportModel.purchase.shrimpFarm }}</td>
+            <td class="bg-light fw-bold">Periodo</td>
+            <td>{{ economicReportModel.purchase.period }}</td>
+            <td class="bg-light fw-bold">Número de factura</td>
+            <td>{{ economicReportModel.purchase.invoiceNumber }}</td>
+          </tr>
+          <tr>
+            <td class="bg-light fw-bold">Comprador responsable</td>
+            <td>{{ economicReportModel.purchase.responsibleBuyer }}</td>
+            <td class="bg-light fw-bold">Nombre de broker</td>
+            <td>{{ economicReportModel.purchase.brokerName }}</td>
+            <td class="bg-light fw-bold">Estado</td>
+            <td>{{ purchaseStatus }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+
+    <!-- VENTAS -->
+    <h5 class="fw-bold border-bottom border-gray-400 pb-2">VENTAS</h5>
+    <div class="table-responsive">
+      <!-- Company Sale -->
+      <table class="table table-bordered align-middle mb-6" *ngIf="economicReportModel.isCompanySale; else localSale">
+        <tbody>
+          <tr>
+            <td class="bg-light fw-bold" style="width: 15%">Fecha de venta</td>
+            <td style="width: 18%">{{ economicReportModel.sale.saleDate | date: 'dd/MM/yyyy' }}</td>
+            <td class="bg-light fw-bold" style="width: 15%">Libras netas recibidas</td>
+            <td style="width: 18%">{{ economicReportModel.sale.netPoundsReceived | number:'1.2-2' }}
+            </td>
+            <td class="bg-light fw-bold" style="width: 15%">Total a recibir ($)</td>
+            <td class="text-end" style="width: 18%">{{ economicReportModel.sale.totalToReceive | number:'1.2-2' }}</td>
+          </tr>
+          <tr>
+            <td class="bg-light fw-bold">Fecha de recepción</td>
+            <td>{{ economicReportModel.sale.receptionDate | date: 'dd/MM/yyyy' }}</td>
+            <td class="bg-light fw-bold">Libras recibidas cabeza</td>
+            <td>{{ economicReportModel.sale.wholePoundsReceived | number:'1.2-2' }}</td>
+            <td colspan="2"></td>
+          </tr>
+          <tr>
+            <td class="bg-light fw-bold">Lote</td>
+            <td>{{ economicReportModel.sale.batch }}</td>
+            <td class="bg-light fw-bold">Libras basura</td>
+            <td>{{ economicReportModel.sale.trashPounds | number:'1.2-2' }}</td>
+            <td colspan="2"></td>
+          </tr>
+          <tr>
+            <td class="bg-light fw-bold">Documento</td>
+            <td>{{ economicReportModel.sale.document }}</td>
+            <td class="bg-light fw-bold">Rendimiento</td>
+            <td>{{ economicReportModel.sale.performance | number:'1.2-2' }}%</td>
+            <td colspan="2"></td>
+          </tr>
+          <tr>
+            <td class="bg-light fw-bold">Gr. Promedio Lote</td>
+            <td>{{ economicReportModel.sale.averageBatchGrams | number:'1.2-2' }}</td>
+            <td colspan="4"></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Local Sale -->
+      <ng-template #localSale>
+        <table class="table table-bordered align-middle mb-6">
+          <tbody>
+            <tr>
+              <td class="bg-light fw-bold" style="width: 15%">Fecha de venta</td>
+              <td style="width: 18%">{{ economicReportModel.sale.saleDate | date: 'dd/MM/yyyy' }}</td>
+              <td class="bg-light fw-bold" style="width: 15%">Total libras Procesadas</td>
+              <td style="width: 18%">{{ economicReportModel.sale.totalProcessedPounds | number:'1.2-2'
+                }}</td>
+              <td class="bg-light fw-bold" style="width: 15%">Total a recibir ($)</td>
+              <td class="text-end" style="width: 18%">{{ economicReportModel.sale.totalToReceive | number:'1.2-2' }}
+              </td>
+            </tr>
+            <tr>
+              <td class="bg-light fw-bold">Total libras Cabeza</td>
+              <td>{{ economicReportModel.sale.wholeTotalPounds | number:'1.2-2' }}</td>
+              <td class="bg-light fw-bold">Total libras Sin Cabeza</td>
+              <td>{{ economicReportModel.sale.tailTotalPounds | number:'1.2-2' }}</td>
+              <td colspan="2"></td>
+            </tr>
+            <tr>
+              <td class="bg-light fw-bold">Lb. rechazo (Cabeza)</td>
+              <td>{{ economicReportModel.sale.wholeRejectedPounds | number:'1.2-2' }}</td>
+              <td class="bg-light fw-bold">Lb. basura</td>
+              <td>{{ economicReportModel.sale.trashPounds | number:'1.2-2' }}</td>
+              <td colspan="2"></td>
+            </tr>
+          </tbody>
+        </table>
+      </ng-template>
+    </div>
+
+
+
+    <!-- COMPRAS -->
+    <h5 class="fw-bold border-bottom border-gray-400 pb-2">COMPRAS</h5>
+    <div class="table-responsive">
+      <table class="table table-bordered align-middle mb-6">
+        <tbody>
+          <tr>
+            <td class="bg-light fw-bold" style="width: 15%;">Gramos promedio 1</td>
+            <td style="width: 18%;">{{ economicReportModel.purchase.averageGram | number:'1.2-2' }}</td>
+            <td class="bg-light fw-bold" style="width: 15%;">Gramos promedio 2</td>
+            <td style="width: 18%;">{{ economicReportModel.purchase.averageGrams2 | number:'1.2-2' }}</td>
+            <td class="bg-light fw-bold" style="width: 15%;">Total acordado ($)</td>
+            <td class="text-end" style="width: 18%;">{{ economicReportModel.purchase.totalAgreed | number:'1.2-2' }}
+            </td>
+          </tr>
+          <tr>
+            <td class="bg-light fw-bold" style="width: 15%;">Precio 1</td>
+            <td style="width: 18%;">{{ economicReportModel.purchase.price | number:'1.2-2' }}</td>
+            <td class="bg-light fw-bold" style="width: 15%;">Precio 2</td>
+            <td style="width: 18%;">{{ economicReportModel.purchase.price2 | number:'1.2-2' }}</td>
+            <td colspan="2"></td>
+          </tr>
+          <tr>
+            <td class="bg-light fw-bold" style="width: 15%;">Libras compradas 1</td>
+            <td style="width: 18%;">{{ economicReportModel.purchase.pounds | number:'1.2-2' }}</td>
+            <td class="bg-light fw-bold" style="width: 15%;">Libras compradas 2</td>
+            <td style="width: 18%;">{{ economicReportModel.purchase.pounds2 | number:'1.2-2' }}</td>
+            <td colspan="2"></td>
+          </tr>
+          <tr>
+            <td class="bg-light fw-bold" style="width: 15%;">Total libras compradas</td>
+            <td style="width: 18%;">{{ economicReportModel.purchase.totalPoundsPurchased | number:'1.2-2' }}</td>
+            <td class="bg-light fw-bold" style="width: 15%;">Total a pagar</td>
+            <td style="width: 18%;">{{ economicReportModel.purchase.totalToPay | number:'1.2-2' }}</td>
+            <td colspan="2"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+
+    <!-- LOGISTICA -->
+    <h5 class="fw-bold border-bottom border-gray-400 pb-2">LOGÍSTICA</h5>
+    <div class="table-responsive" *ngIf="economicReportModel?.logistics">
+      <!-- If logistics is an array -->
+      <ng-container *ngIf="!economicReportModel.isCompanySale; else singleLogistics">
+        <div *ngFor="let logistics of logisticsArray" class="mb-6">
+          <table class="table table-bordered align-middle">
+            <tbody>
+              <tr>
+                <td class="bg-light fw-bold" style="width: 15%;">Tipo</td>
+                <td style="width: 18%;">{{ logisticsTypeLabel(logistics.type) }}</td>
+                <td class="bg-light fw-bold" style="width: 15%;">Gastos personal</td>
+                <td style="width: 18%;">{{ logistics.personnelExpenses | number:'1.2-2' }}</td>
+                <td class="bg-light fw-bold" style="width: 15%;">Total a pagar ($)</td>
+                <td class="text-end" style=" width: 18%;">{{ logistics.totalToPay | number:'1.2-2' }}</td>
+              </tr>
+              <tr>
+                <td class="bg-light fw-bold" style="width: 15%;">Fecha de logística</td>
+                <td style="width: 18%;">{{ logistics.logisticsDate | date:'dd/MM/yyyy' }}</td>
+                <td class="bg-light fw-bold" style="width: 15%;">Gasto productos e insumos</td>
+                <td style="width: 18%;">{{ logistics.productAndSupplyExpenses | number:'1.2-2' }}</td>
+                <td colspan="2"></td>
+              </tr>
+              <tr>
+                <td class="bg-light fw-bold" style="width: 15%;">Precio por Libra ($/lb)</td>
+                <td style="width: 18%;">
+                  {{ (logistics.totalToPay / economicReportModel.purchase.pounds) | number:'1.2-4' }}
+                </td>
+                <td colspan="4"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </ng-container>
+
+      <!-- If logistics is a single object -->
+      <ng-template #singleLogistics>
+        <table class="table table-bordered align-middle mb-6" *ngIf="singleLogisticsObject">
+          <tbody>
+            <tr>
+              <td class="bg-light fw-bold" style="width: 15%;">Tipo</td>
+              <td style="width: 18%;">{{ logisticsTypeLabel(singleLogisticsObject.type) }}</td>
+              <td class="bg-light fw-bold" style="width: 15%;">Gastos personal</td>
+              <td style="width: 18%;">{{ singleLogisticsObject.personnelExpenses | number:'1.2-2' }}</td>
+              <td class="bg-light fw-bold" style="width: 15%;">Total a pagar ($)</td>
+              <td class="text-end" style="width: 18%;">{{ singleLogisticsObject.totalToPay | number:'1.2-2' }}</td>
+            </tr>
+            <tr>
+              <td class="bg-light fw-bold" style="width: 15%;">Fecha de logística</td>
+              <td style="width: 18%;">{{ singleLogisticsObject.logisticsDate | date:'dd/MM/yyyy' }}</td>
+              <td class="bg-light fw-bold" style="width: 15%;">Gasto productos e insumos</td>
+              <td style="width: 18%;">{{ singleLogisticsObject.productAndSupplyExpenses | number:'1.2-2' }}</td>
+              <td colspan="2"></td>
+            </tr>
+            <tr>
+              <td class="bg-light fw-bold" style="width: 15%;">Precio por Libra ($/lb)</td>
+              <td style="width: 18%;">
+                {{ (singleLogisticsObject.totalToPay / economicReportModel.purchase.pounds) | number:'1.2-4' }}
+              </td>
+              <td colspan="4"></td>
+            </tr>
+          </tbody>
+        </table>
+      </ng-template>
+
+      <!-- UTILIDAD BRUTA -->
+      <h5 class="fw-bold text-end mt-4">
+        UTILIDAD BRUTA ($):
+        <span class="ms-2" [ngClass]="economicReportModel.grossProfit < 0 ? 'text-danger' : 'text-primary'">
+          {{ economicReportModel.grossProfit | number:'1.2-2' }}
+        </span>
+      </h5>
+    </div>
+
+  </div>
+
+
+  <!-- end::Second Section: Econocmic Report -->

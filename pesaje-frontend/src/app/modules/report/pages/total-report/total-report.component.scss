@@ -1,0 +1,21 @@
+/* Remove spinner from input[type="number"] */
+.no-spinner::-webkit-outer-spin-button,
+.no-spinner::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.no-spinner {
+  -moz-appearance: textfield; /* Firefox */
+}
+
+.totals {
+  background-color: #c75f1a;
+  color: black;
+  font-weight: bold;
+}
+
+.taxes {
+  background-color: #fff6d8;
+  color: black;
+}

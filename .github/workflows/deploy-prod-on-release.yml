@@ -1,0 +1,37 @@
+name: Deploy Fullstack App on Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install backend dependencies
+        run: cd pesaje-node-backend && npm ci
+
+      - name: Install frontend dependencies
+        run: cd pesaje-frontend && npm ci
+
+      - name: Build frontend (production)
+        run: cd pesaje-frontend && npm run build:prod
+
+      # At this point, pesaje-node-backend/public contains the built frontend
+
+      - name: Deploy backend (with frontend) to Render Production
+        run: |
+          RELEASE_NAME="${{ github.event.release.name }}"
+          curl -X POST \
+            -H "Content-Type: application/json" \
+            -d "{\"message\":\"Release: $RELEASE_NAME\"}" \
+            "${{ secrets.RENDER_DEPLOY_HOOK_PROD }}" 

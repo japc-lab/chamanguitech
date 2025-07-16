@@ -1,0 +1,454 @@
+<div *ngIf="isLoading$ | async" class="text-center py-5">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
+
+<div *ngIf="!(isLoading$ | async)" class="card card-custom mb-5 mb-xl-10">
+  <div class="row g-0">
+    <div class="col-md-4 company-list-section">
+      <div class="card-header card-header-stretch">
+        <h4 class="card-title mb-3">Compañías</h4>
+      </div>
+      <div class="company-list px-2 pb-2">
+        <div *ngFor="let company of companies" (click)="selectCompany(company)"
+          [class.selected]="selectedCompany && selectedCompany.id === company.id"
+          class="company-list-item d-flex align-items-center justify-content-between">
+          <span>
+            {{ company.code ? (company.code + ' - ') : '' }}{{ company.name }}
+          </span>
+          <i class="bi bi-trash text-muted ms-2" (click)="deleteCompany(company, $event)" title="Eliminar"></i>
+        </div>
+        <!-- Show a message if no companies are available -->
+        <div *ngIf="!companies.length" class="text-muted text-center py-4">
+          No hay compañías registradas.
+        </div>
+      </div>
+    </div>
+    <div class="col-md-8 company-details-section d-flex align-items-center justify-content-center"
+      [ngClass]="{'empty-section': !selectedCompany}">
+      <ng-container *ngIf="selectedCompany; else noCompanySelected">
+        <div class="w-100">
+          <div class="card-header card-header-stretch overflow-auto">
+            <h3 class="card-title">{{ selectedCompany.name || 'Detalles de la Compañía' }}</h3>
+          </div>
+          <div class="card-body">
+            <form #companyForm="ngForm" (ngSubmit)="onSubmit(companyForm)" class="company-form">
+              <!-- Información por Compañía section -->
+              <div class="mb-4">
+                <h5 class="mb-3 fw-bold">Información por Compañía</h5>
+                <div class="row">
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label required">Nombre</label>
+                    <input name="name" class="form-control" [(ngModel)]="selectedCompany.name" required #name="ngModel"
+                      [ngClass]="{'is-invalid': name.invalid && name.touched}" />
+                    <div class="invalid-feedback" *ngIf="name.invalid && name.touched">
+                      El nombre es requerido.
+                    </div>
+                  </div>
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label required">Código</label>
+                    <input type="text" name="code" class="form-control" [(ngModel)]="selectedCompany.code" required
+                      #code="ngModel" [ngClass]="{'is-invalid': code.invalid && code.touched}"
+                      (keypress)="validateWholeNumber($event)" />
+                    <div class="invalid-feedback" *ngIf="code.invalid && code.touched">
+                      El código es requerido.
+                    </div>
+                  </div>
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label ">Dirección</label>
+                    <input name="address" class="form-control" [(ngModel)]="selectedCompany.address" />
+                  </div>
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label required">Ciudad</label>
+                    <input name="city" class="form-control" [(ngModel)]="selectedCompany.city" required #city="ngModel"
+                      [ngClass]="{'is-invalid': city.invalid && city.touched}" />
+                    <div class="invalid-feedback" *ngIf="city.invalid && city.touched">
+                      La ciudad es requerida.
+                    </div>
+                  </div>
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label required">Teléfono principal</label>
+                    <input name="mainTelephone" class="form-control" [(ngModel)]="selectedCompany.mainTelephone"
+                      required #mainTelephone="ngModel"
+                      [ngClass]="{'is-invalid': mainTelephone.invalid && mainTelephone.touched}" />
+                    <div class="invalid-feedback" *ngIf="mainTelephone.invalid && mainTelephone.touched">
+                      El teléfono principal es requerido.
+                    </div>
+                  </div>
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">Email de facturación</label>
+                    <input name="invoiceEmail" class="form-control" [(ngModel)]="selectedCompany.invoiceEmail" />
+                  </div>
+                </div>
+              </div>
+              <!-- Información Personal section -->
+              <div class="mb-4">
+                <h5 class="mb-3 fw-bold">Información Personal</h5>
+                <div class="row">
+
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label required">Persona principal</label>
+                    <input name="mainPersonName" class="form-control" [(ngModel)]="selectedCompany.mainPersonName"
+                      required #mainPersonName="ngModel"
+                      [ngClass]="{'is-invalid': mainPersonName.invalid && mainPersonName.touched}" />
+                    <div class="invalid-feedback" *ngIf="mainPersonName.invalid && mainPersonName.touched">
+                      La persona principal es requerida.
+                    </div>
+                  </div>
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">Nombre del gerente</label>
+                    <input name="managerName" class="form-control" [(ngModel)]="selectedCompany.managerName" />
+                  </div>
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">Teléfono celular del gerente</label>
+                    <input name="managerCellPhone" class="form-control"
+                      [(ngModel)]="selectedCompany.managerCellPhone" />
+                  </div>
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">Email del gerente</label>
+                    <input name="managerEmail" class="form-control" [(ngModel)]="selectedCompany.managerEmail" />
+                  </div>
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">Nombre del asesor comercial</label>
+                    <input name="commercialAdvisorName" class="form-control"
+                      [(ngModel)]="selectedCompany.commercialAdvisorName" />
+                  </div>
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">Teléfono celular del asesor comercial</label>
+                    <input name="commercialAdvisorCellPhone" class="form-control"
+                      [(ngModel)]="selectedCompany.commercialAdvisorCellPhone" />
+                  </div>
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">Email del asesor comercial</label>
+                    <input name="commercialAdvisorEmail" class="form-control"
+                      [(ngModel)]="selectedCompany.commercialAdvisorEmail" />
+                  </div>
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">Nombre del personal adicional</label>
+                    <input name="aditionalStaffName" class="form-control"
+                      [(ngModel)]="selectedCompany.aditionalStaffName" />
+                  </div>
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">Posición en la empresa</label>
+                    <input name="positionInCompany" class="form-control"
+                      [(ngModel)]="selectedCompany.positionInCompany" />
+                  </div>
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">Teléfono celular del personal adicional</label>
+                    <input name="aditionalStaffCellPhone" class="form-control"
+                      [(ngModel)]="selectedCompany.aditionalStaffCellPhone" />
+                  </div>
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">Email del personal adicional</label>
+                    <input name="aditionalStaffEmail" class="form-control"
+                      [(ngModel)]="selectedCompany.aditionalStaffEmail" />
+                  </div>
+                </div>
+              </div>
+              <!-- Información Camarón section -->
+              <div class="mb-4">
+                <h5 class="mb-3 fw-bold">Información Camarón</h5>
+                <div class="row">
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">Lista de precios por email</label>
+                    <div class="form-check">
+                      <input type="checkbox" name="priceListByEmail" class="form-check-input"
+                        [(ngModel)]="selectedCompany.priceListByEmail" />
+                    </div>
+                  </div>
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">Lista de precios por mensajes o WhatsApp</label>
+                    <div class="form-check">
+                      <input type="checkbox" name="priceListByMessagesOrWhatsApp" class="form-check-input"
+                        [(ngModel)]="selectedCompany.priceListByMessagesOrWhatsApp" />
+                    </div>
+                  </div>
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">Recibe camarones enteros</label>
+                    <div class="form-check">
+                      <input type="checkbox" name="receivesWholeShrimp" class="form-check-input"
+                        [(ngModel)]="selectedCompany.receivesWholeShrimp" />
+                    </div>
+                  </div>
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">Recibe camarones cola</label>
+                    <div class="form-check">
+                      <input type="checkbox" name="receivesShrimpTails" class="form-check-input"
+                        [(ngModel)]="selectedCompany.receivesShrimpTails" />
+                    </div>
+                  </div>
+
+                  <!-- Especificaciones de Producto section -->
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">Porcentaje máximo de sabor permitido en camarones enteros</label>
+                    <div class="input-group input-group-sm">
+                      <input type="text" id="maxFlavorPercentReceived" name="maxFlavorPercentReceived"
+                        [(ngModel)]="selectedCompany.maxFlavorPercentReceived" #maxFlavorPercentReceived="ngModel"
+                        class="form-control text-end" (keypress)="validateNumber($event)"
+                        (blur)="formatDecimal('maxFlavorPercentReceived')" />
+                      <span class="input-group-text">%</span>
+                    </div>
+                  </div>
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">Porcentaje máximo de muda y suavidad permitido</label>
+                    <div class="input-group input-group-sm">
+                      <input type="text" id="maxMoultingAndSoftnessPercentReceived"
+                        name="maxMoultingAndSoftnessPercentReceived"
+                        [(ngModel)]="selectedCompany.maxMoultingAndSoftnessPercentReceived"
+                        #maxMoultingAndSoftnessPercentReceived="ngModel" class="form-control text-end"
+                        (keypress)="validateNumber($event)"
+                        (blur)="formatDecimal('maxMoultingAndSoftnessPercentReceived')" />
+                      <span class="input-group-text">%</span>
+                    </div>
+                  </div>
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">Peso promedio del empaque de camarones enteros (Kg)</label>
+                    <input type="text" name="avgWholeShrimpPackagingWeight"
+                      [(ngModel)]="selectedCompany.avgWholeShrimpPackagingWeight"
+                      #avgWholeShrimpPackagingWeight="ngModel" class="form-control" (keypress)="validateNumber($event)"
+                      (blur)="formatDecimal('avgWholeShrimpPackagingWeight')" />
+                  </div>
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">Peso promedio del empaque de colas de camarón (Kg)</label>
+                    <input type="text" name="avgShrimpTailPackagingWeight"
+                      [(ngModel)]="selectedCompany.avgShrimpTailPackagingWeight" #avgShrimpTailPackagingWeight="ngModel"
+                      class="form-control" (keypress)="validateNumber($event)"
+                      (blur)="formatDecimal('avgShrimpTailPackagingWeight')" />
+                  </div>
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">Porcentaje máximo de sabor ligero permitido en camarones enteros</label>
+                    <div class="input-group input-group-sm">
+                      <input type="text" id="maxLightFlavorPercentAllowedInWholeShrimp"
+                        name="maxLightFlavorPercentAllowedInWholeShrimp"
+                        [(ngModel)]="selectedCompany.maxLightFlavorPercentAllowedInWholeShrimp"
+                        #maxLightFlavorPercentAllowedInWholeShrimp="ngModel" class="form-control text-end"
+                        (keypress)="validateNumber($event)"
+                        (blur)="formatDecimal('maxLightFlavorPercentAllowedInWholeShrimp')" />
+                      <span class="input-group-text">%</span>
+                    </div>
+                  </div>
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">Cupo máximo y mínimo por aguage a recibir (lb)</label>
+                    <input type="text" name="maxTideQuota" [(ngModel)]="selectedCompany.maxAndMinTideQuotaReceived!.max"
+                      placeholder="Máx" #maxTideQuota="ngModel" class="form-control" (keypress)="validateNumber($event)"
+                      (blur)="formatDecimal('maxTideQuota')" />
+                    <input type="text" name="minTideQuota" [(ngModel)]="selectedCompany.maxAndMinTideQuotaReceived!.min"
+                      placeholder="Mín" #minTideQuota="ngModel" class="form-control" (keypress)="validateNumber($event)"
+                      (blur)="formatDecimal('minTideQuota')" />
+                  </div>
+                </div>
+              </div>
+              <!-- Información de Pago section -->
+              <div class="mb-4">
+                <h5 class="mb-3 fw-bold">Información de Pago</h5>
+                <div class="row">
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">Método de pago 1</label>
+                    <input name="paymentMethod1" class="form-control" [(ngModel)]="selectedCompany.paymentMethod1" />
+                  </div>
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">Método de pago 2</label>
+                    <input name="paymentMethod2" class="form-control" [(ngModel)]="selectedCompany.paymentMethod2" />
+                  </div>
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">Banco 1</label>
+                    <input name="bank1" class="form-control" [(ngModel)]="selectedCompany.bank1" />
+                  </div>
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">Banco 2</label>
+                    <input name="bank2" class="form-control" [(ngModel)]="selectedCompany.bank2" />
+                  </div>
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">Porcentaje del primer pago</label>
+                    <input type="number" name="firstPaymentPercent" class="form-control"
+                      [(ngModel)]="selectedCompany.firstPaymentPercent" />
+                  </div>
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">Días hasta el primer pago</label>
+                    <input type="number" name="daysUntilFirstPayment" class="form-control"
+                      [(ngModel)]="selectedCompany.daysUntilFirstPayment" />
+                  </div>
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">Porcentaje del segundo pago</label>
+                    <input type="number" name="secondPaymentPercent" class="form-control"
+                      [(ngModel)]="selectedCompany.secondPaymentPercent" />
+                  </div>
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">Días hasta el segundo pago</label>
+                    <input type="number" name="daysUntilSecondPayment" class="form-control"
+                      [(ngModel)]="selectedCompany.daysUntilSecondPayment" />
+                  </div>
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">Porcentaje del tercer pago</label>
+                    <input type="number" name="thirdPaymentPercent" class="form-control"
+                      [(ngModel)]="selectedCompany.thirdPaymentPercent" />
+                  </div>
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">Días hasta el tercer pago</label>
+                    <input type="number" name="daysUntilThirdPayment" class="form-control"
+                      [(ngModel)]="selectedCompany.daysUntilThirdPayment" />
+                  </div>
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">Porcentaje de fiabilidad en el pago</label>
+                    <input type="number" name="paymentReliabilityPercent" class="form-control"
+                      [(ngModel)]="selectedCompany.paymentReliabilityPercent" />
+                  </div>
+                </div>
+              </div>
+              <!-- Información de Pesca section -->
+              <div class="mb-4">
+                <h5 class="mb-3 fw-bold">Información de Pesca</h5>
+                <div class="row">
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">¿Se envía logística?</label>
+                    <div class="form-check">
+                      <input type="checkbox" class="form-check-input" id="isLogisticsSent"
+                        [(ngModel)]="selectedCompany.isLogisticsSent" name="isLogisticsSent" />
+                      <label class="form-check-label ms-2" for="isLogisticsSent">
+                        {{ selectedCompany.isLogisticsSent ? 'Sí' : 'No' }}
+                      </label>
+                    </div>
+                  </div>
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">Cantidad mínima recibida (lb)</label>
+                    <input type="number" name="minimumQuantityReceivedLb" class="form-control"
+                      [(ngModel)]="selectedCompany.minimumQuantityReceivedLb" />
+                  </div>
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">Custodia cubierta</label>
+                    <div class="form-check">
+                      <input type="checkbox" name="custodyCovered" class="form-check-input"
+                        [(ngModel)]="selectedCompany.custodyCovered" />
+                    </div>
+                  </div>
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">Seguro de pesca cubierto</label>
+                    <div class="form-check">
+                      <input type="checkbox" name="fishingInsuranceCovered" class="form-check-input"
+                        [(ngModel)]="selectedCompany.fishingInsuranceCovered" />
+                    </div>
+                  </div>
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">Clasificador de empresa conocido</label>
+                    <div class="form-check">
+                      <input type="checkbox" name="companyClassifierKnown" class="form-check-input"
+                        [(ngModel)]="selectedCompany.companyClassifierKnown" />
+                    </div>
+                  </div>
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">Persona puede ser enviada para clasificación</label>
+                    <div class="form-check">
+                      <input type="checkbox" name="personCanBeSentForClassification" class="form-check-input"
+                        [(ngModel)]="selectedCompany.personCanBeSentForClassification" />
+                    </div>
+                  </div>
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">Información Extra</label>
+                    <input name="bank2" class="form-control" [(ngModel)]="selectedCompany.extraInformation" />
+                  </div>
+
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">¿Se paga logística?</label>
+                    <div class="form-check">
+                      <input type="checkbox" class="form-check-input" id="isLogisticsPayed"
+                        [(ngModel)]="selectedCompany.isLogisticsPayed" name="isLogisticsPayed"
+                        (change)="onLogisticsPayedChange()" />
+                      <label class="form-check-label ms-2" for="isLogisticsPayed">
+                        {{ selectedCompany.isLogisticsPayed ? 'Sí' : 'No' }}
+                      </label>
+                    </div>
+                  </div>
+                  <div class="col-md-6 mb-3 form-row" *ngIf="selectedCompany.isLogisticsPayed">
+                    <label class="form-label required">Monto a pagar por entero</label>
+                    <div class="input-group">
+                      <span class="input-group-text">$</span>
+                      <input type="text" id="wholeAmountToPay" name="wholeAmountToPay"
+                        [(ngModel)]="selectedCompany.wholeAmountToPay" #wholeAmountToPay="ngModel"
+                        [ngClass]="{'is-invalid': wholeAmountToPay.invalid && wholeAmountToPay.touched}"
+                        class="form-control form-control-sm text-end" required (keypress)="validateNumber($event)"
+                        (blur)="formatDecimal('wholeAmountToPay')" />
+                      <div class="invalid-feedback" *ngIf="wholeAmountToPay.invalid && wholeAmountToPay.touched">
+                        El monto es requerido.
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6 mb-3 form-row" *ngIf="selectedCompany.isLogisticsPayed">
+                    <label class="form-label required">Monto a pagar por cola</label>
+                    <div class="input-group">
+                      <span class="input-group-text">$</span>
+                      <input type="text" id="tailAmountToPay" name="tailAmountToPay"
+                        [(ngModel)]="selectedCompany.tailAmountToPay" #tailAmountToPay="ngModel"
+                        [ngClass]="{'is-invalid': tailAmountToPay.invalid && tailAmountToPay.touched}"
+                        class="form-control form-control-sm text-end" required (keypress)="validateNumber($event)"
+                        (blur)="formatDecimal('tailAmountToPay')" />
+                      <div class="invalid-feedback" *ngIf="tailAmountToPay.invalid && tailAmountToPay.touched">
+                        El monto es requerido.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Detalles Adicionales de la Empresa section -->
+              <div class="mb-4">
+                <h5 class="mb-3 fw-bold">Detalles Adicionales de la Empresa</h5>
+                <div class="row">
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">Calidad de Clasificación</label>
+                    <select name="classificationQuality" class="form-control"
+                      [(ngModel)]="selectedCompany.classificationQuality">
+                      <option [ngValue]="undefined">Seleccione una opción</option>
+                      <option value="BAD">MALA</option>
+                      <option value="GOOD">BUENA</option>
+                      <option value="EXCELLENT">EXCELENTE</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">¿Pagos al día?</label>
+                    <input type="checkbox" name="arePaymentsOnTime" class="form-check-input ms-2"
+                      [(ngModel)]="selectedCompany.arePaymentsOnTime" />
+                  </div>
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">Observación 1</label>
+                    <input name="observation1" class="form-control" [(ngModel)]="selectedCompany.observation1" />
+                  </div>
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">Observación 2</label>
+                    <input name="observation2" class="form-control" [(ngModel)]="selectedCompany.observation2" />
+                  </div>
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">Observación 3</label>
+                    <input name="observation3" class="form-control" [(ngModel)]="selectedCompany.observation3" />
+                  </div>
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">Observación 4</label>
+                    <input name="observation4" class="form-control" [(ngModel)]="selectedCompany.observation4" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-4">
+                <div class="row">
+                  <div class="col-12">
+                    <div class="d-flex justify-content-end">
+                      <button type="submit" class="btn btn-primary" [disabled]="companyForm.invalid">
+                        Guardar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </ng-container>
+      <ng-template #noCompanySelected>
+        <div class="w-100 text-center text-muted py-5 no-company-selected-message">
+          <i class="bi bi-building" style="font-size: 2rem;"></i>
+          <div class="mt-3">Selecciona una compañía para ver o editar sus detalles.</div>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>

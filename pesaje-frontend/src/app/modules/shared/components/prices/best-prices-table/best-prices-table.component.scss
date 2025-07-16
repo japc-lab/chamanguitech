@@ -1,0 +1,71 @@
+.table-container {
+  overflow-x: auto;
+  margin-top: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+th {
+  font-weight: 600;
+}
+
+.highest-price {
+  font-weight: bold;
+  color: #28a745;
+}
+
+/* Agrega esto a los estilos de tu componente */
+.table-responsive {
+  position: relative;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  /* Suavizado en iOS */
+  max-width: 100%;
+  border: 1px solid #b0b3b8;
+  border-radius: 4px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+}
+
+.table {
+  width: 100%;
+  margin-bottom: 0;
+  min-width: 600px;
+  /* Ancho mínimo para evitar compresión excesiva */
+}
+
+.sticky-column {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  box-shadow: 2px 0 3px -1px rgba(0, 0, 0, 0.1);
+}
+
+.table-bordered {
+  border: 1px solid #b0b3b8; // Neutral gray, works well on both dark and light themes
+}
+
+.table-bordered th,
+.table-bordered td {
+  border: 1px solid #b0b3b8;
+  padding: 12px;
+}
+
+.highest-price {
+  font-weight: bold;
+  color: #28a745;
+  background-color: rgba(40, 167, 69, 0.1) !important;
+}
+
+.text-nowrap {
+  white-space: nowrap;
+}

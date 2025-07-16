@@ -1,0 +1,8 @@
+
+node_modules/
+mongo/
+!models/mongo/
+
+.env
+# Ignore Angular build output in public/chamanguitech
+public/chamanguitech/

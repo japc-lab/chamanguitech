@@ -1,0 +1,47 @@
+<div *ngFor="let option of menuOptions" class="menu-item" [ngClass]="{
+    'menu-accordion': option.suboptions.length > 0,'here show': option.suboptions.length > 0 && isOptionActive(option)
+  }" [attr.data-kt-menu-trigger]="option.suboptions.length > 0 ? 'click' : null">
+
+  <!-- ✅ Main Option with Route -->
+  <a *appCanRead="option.route || ''" class="menu-link without-sub" [routerLink]="option.route"
+    routerLinkActive="active">
+    <!-- <a *appCanRead="option.route || ''" class="menu-link without-sub" [routerLink]="option.route"
+      routerLinkActive="active"> -->
+
+    <span class="menu-icon" *ngIf="option.icon">
+      <app-keenicon [name]="option.icon" class="fs-2"></app-keenicon>
+    </span>
+
+    <span *ngIf="!option.icon" class="menu-bullet">
+      <span class="bullet bullet-dot"></span>
+    </span>
+
+    <span class="menu-title" [attr.data-link]="option.route">
+      {{ option.name }}
+    </span>
+  </a>
+
+
+  <!-- ✅ If Option Has Suboptions (Collapsible) -->
+  <span *ngIf="!option.route" class="menu-link">
+    <span class="menu-icon" *ngIf="option.icon">
+      <app-keenicon [name]="option.icon" class="fs-2"></app-keenicon>
+    </span>
+
+    <span *ngIf="!option.icon" class="menu-bullet">
+      <span class="bullet bullet-dot"></span>
+    </span>
+
+    <span class="menu-title" [attr.data-link]="option.route">
+      {{ option.name }}
+    </span>
+    <span class="menu-arrow" *ngIf="option.suboptions?.length"></span>
+  </span>
+
+  <!-- ✅ Render Suboptions -->
+  <div class="menu-sub menu-sub-accordion" [ngClass]="{
+    'menu-active-bg': option.suboptions.length > 0 && isOptionActive(option)
+  }" *ngIf="option.suboptions?.length">
+    <app-sidebar-dynamic-menu [menuOptions]="option.suboptions"></app-sidebar-dynamic-menu>
+  </div>
+</div>

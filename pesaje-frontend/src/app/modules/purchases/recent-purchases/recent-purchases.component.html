@@ -1,0 +1,66 @@
+<div class="card">
+  <div class="card-body">
+    <div class="d-flex flex-wrap flex-stack mb-3">
+      <h3 class="fw-bolder my-2">Buscar por</h3>
+    </div>
+
+    <div class="row g-3">
+
+      <!-- Row 1: Control Number + Cliente -->
+      <div class="col-md-3">
+        <label for="controlNumber" class="fw-semibold fs-6 mb-2">Número de control</label>
+        <input type="text" id="controlNumber" name="controlNumber" placeholder="0" class="form-control form-control-sm"
+          [(ngModel)]="controlNumber" />
+      </div>
+
+      <div class="col-md-5">
+        <label for="client" class="fw-semibold fs-6 mb-2">Cliente</label>
+        <select id="client" name="client" class="form-select form-select-sm" [(ngModel)]="selectedClient">
+          <option value="" selected>Seleccione una opción</option>
+          <option *ngFor="let client of clients" [value]="client.id">
+            {{ client.person.names }} {{ client.person.lastNames }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Spacer to keep layout tidy -->
+      <div class="col-md-4"></div>
+
+      <!-- Row 2: Compañía + Periodo + Buttons -->
+      <div class="col-md-4">
+        <label for="company" class="fw-semibold fs-6 mb-2">Compañía</label>
+        <select id="company" name="company" class="form-select form-select-sm" [(ngModel)]="selectedCompany"
+          (change)="onCompanyChange()">
+          <option value="" selected>Seleccione una opción</option>
+          <option *ngFor="let company of companies" [value]="company.id">
+            {{ company.name }}
+          </option>
+        </select>
+      </div>
+
+      <div class="col-md-4">
+        <label for="period" class="fw-semibold fs-6 mb-2">Período</label>
+        <select id="period" name="period" class="form-select form-select-sm" [(ngModel)]="selectedPeriod">
+          <option value="" selected>Seleccione una opción</option>
+          <option *ngFor="let period of existingPeriods" [value]="period.id">
+            {{ period.name }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Button Group -->
+      <div class="col-md-4 d-flex align-items-end justify-content-end gap-2">
+        <button class="btn btn-primary btn-sm px-4" (click)="loadRecentPurchases()">Buscar</button>
+        <button class="btn btn-secondary btn-sm px-4" (click)="clearFilters()">Limpiar Filtros</button>
+      </div>
+
+    </div>
+
+
+    <div class="mt-5">
+      <app-crud [datatableConfig]="datatableConfig" [permissionRoute]="PERMISSION_ROUTE"
+        (editEvent)="edit($event.toString())" (deleteEvent)="delete($event.toString())" [reload]="reloadEvent">
+      </app-crud>
+    </div>
+  </div>
+</div>

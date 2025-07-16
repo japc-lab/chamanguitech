@@ -1,0 +1,87 @@
+<div class="card mb-5 mb-xl-10" id="kt_profile_details_view">
+  <div class="card-header">
+    <div class="card-title m-0">
+      <h3 class="fw-bolder m-0">Detalles de Perfil</h3>
+    </div>
+    <button *appCanEdit="PERMISSION_ROUTE" (click)="toggleEditMode()" class="btn align-self-center cursor-pointer"
+      [ngClass]="isEditing ? 'btn-danger' : 'btn-primary' ">
+      {{ isEditing ? 'Cancelar' : 'Editar Perfil' }}
+    </button>
+  </div>
+
+  <div class="card-body p-9">
+    <div *ngIf="isLoading$ | async" class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+    <div *ngIf="!isEditing && !(isLoading$ | async)">
+      <div class="row mb-7">
+        <label class="col-lg-4 fw-bold text-muted">Nombre Completo</label>
+        <div class="col-lg-8">
+          <span class="fw-bolder fs-6 text-gray-900">
+            {{ (user!.person.names || '') + ' ' + (user!.person.lastNames || '') }}
+          </span>
+        </div>
+      </div>
+
+      <div class="row mb-7">
+        <label class="col-lg-4 fw-bold text-muted">Identificación</label>
+        <div class="col-lg-8">
+          <span class="fw-bolder fs-6 text-gray-900">{{ user!.person.identification || 'N/D' }}</span>
+        </div>
+      </div>
+
+      <div class="row mb-7">
+        <label class="col-lg-4 fw-bold text-muted">Fecha de Nacimiento</label>
+        <div class="col-lg-8">
+          <span class="fw-bolder fs-6 text-gray-900"> {{ user?.person?.birthDate ? (user!.person.birthDate |
+            date:'dd/MM/yyyy') : 'N/D' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="row mb-7">
+        <label class="col-lg-4 fw-bold text-muted">Dirección</label>
+        <div class="col-lg-8">
+          <span class="fw-bolder fs-6 text-gray-900">{{ user!.person.address || 'N/D' }}</span>
+        </div>
+      </div>
+
+      <div class="row mb-7">
+        <label class="col-lg-4 fw-bold text-muted">Contacto</label>
+        <div class="col-lg-8">
+          <div class="fw-bolder fs-6 text-gray-900">
+            <div>{{ user!.person.phone ? 'Teléfono: ' + user!.person.phone : '' }}</div>
+            <div>{{ user!.person.mobilePhone ? 'Celular 1: ' + user!.person.mobilePhone : '' }}</div>
+            <div>{{ user!.person.mobilePhone2 ? 'Celular 2: ' + user!.person.mobilePhone2 : '' }}</div>
+            <div *ngIf="!user!.person.phone && !user!.person.mobilePhone && !user!.person.mobilePhone2">N/D</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mb-7">
+        <label class="col-lg-4 fw-bold text-muted">Correo Electrónico</label>
+        <div class="col-lg-8">
+          <a href="mailto:{{ user!.person.email }}" class="fw-bolder fs-6 text-gray-900 text-hover-primary">
+            {{ user!.person.email || 'N/D' }}
+          </a>
+        </div>
+      </div>
+
+      <div class="row mb-7">
+        <label class="col-lg-4 fw-bold text-muted">Contacto de Emergencia</label>
+        <div class="col-lg-8">
+          <div class="fw-bolder fs-6 text-gray-900">
+            <div>{{ user!.person.emergencyContactName || '' }}</div>
+            <div>{{ user!.person.emergencyContactPhone || '' }}</div>
+            <div *ngIf="!user!.person.emergencyContactName && !user!.person.emergencyContactPhone">N/D</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <app-personal-profile-details *ngIf="isEditing" [user]="user"
+      (saveCompleted)="onSaveCompleted()"></app-personal-profile-details>
+  </div>
+</div>

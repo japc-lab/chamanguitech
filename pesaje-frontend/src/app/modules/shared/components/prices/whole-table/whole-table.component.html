@@ -1,0 +1,58 @@
+<!-- begin::Header -->
+<div class="card-header border-0 pt-5">
+  <h3 class="card-title align-items-start flex-column">
+    <span class="card-label fw-bolder fs-3 mb-1">Entero</span>
+  </h3>
+</div>
+<!-- end::Header -->
+
+<!-- Loading Spinner -->
+<div *ngIf="isLoading$ | async" class="text-center py-5">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
+
+<!-- begin::Body -->
+<div class="card-body py-3">
+  <!-- begin::Table container -->
+  <div class="table-responsive" *ngIf="!(isLoading$ | async)">
+    <form [formGroup]="form">
+      <!-- begin::Table -->
+      <table class="table align-middle gs-0 gy-3">
+        <thead>
+          <tr class="border-bottom border-gray-300">
+            <th class="p-3 text-start text-muted fw-semibold text-uppercase fs-7 pb-2 min-w-100px">
+              Talla
+            </th>
+            <th class="p-3 text-end text-muted fw-semibold text-uppercase fs-7 pb-2 min-w-100px">
+              Precio ($)
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let size of sizes">
+            <td class="text-gray-900 fw-bolder text-start fs-6">
+              {{ size.size }}
+            </td>
+            <td class="text-end">
+              <div class="input-group">
+                <span class="input-group-text">$</span>
+                <input type="text" class="form-control form-control-sm text-end" [formControlName]="size.id"
+                  (blur)="formatPrice(size.id)" (keypress)="validateNumber($event)" placeholder="0.00" />
+              </div>
+              <!-- Show validation error -->
+              <div *ngIf="form.controls[size.id]?.invalid && form.controls[size.id]?.touched"
+                class="text-danger small mt-1">
+                Ingrese un número válido
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <!-- end::Table -->
+    </form>
+  </div>
+  <!-- end::Table container -->
+</div>
+<!-- end::Body -->

@@ -1,0 +1,352 @@
+<!-- Loading Spinner -->
+<div *ngIf="isLoading$ | async" class="text-center py-5">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
+
+<div *ngIf="!(isLoading$ | async)" class="card card-custom mb-5 mb-xl-10">
+  <!-- begin::Header -->
+  <div class="card-header card-header-stretch overflow-auto">
+    <ul class="
+        nav nav-stretch nav-line-tabs
+        fw-bold
+        border-transparent
+        flex-nowrap
+      " role="tablist">
+
+      <!-- 🔹 Back Button Tab -->
+      <li class="nav-item">
+        <a class="nav-link cursor-pointer" (click)="goBack()">
+          <i class="bi bi-arrow-left me-2"></i> Volver
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link cursor-pointer" [ngClass]="{ active: activeTab === 'Details' }"
+          (click)="setActiveTab('Details')" role="tab">
+          Detalles
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link cursor-pointer" [ngClass]="{ active: activeTab === 'Payment Info' }"
+          (click)="setActiveTab('Payment Info')" role="tab">
+          Informaciòn de pago
+        </a>
+      </li>
+    </ul>
+  </div>
+  <!-- end::Header -->
+
+  <!-- begin::Body -->
+  <div class="card-body">
+    <div class="tab-content pt-3">
+
+      <!-- begin::Details -->
+      <div class="tab-pane fade" [ngClass]="{'show active': activeTab === 'Details'}">
+        <div class="card mb-5 mb-xl-10">
+          <div id="kt_account_broker_details" class="collapse show">
+            <form novalidate class="form" #userForm="ngForm">
+              <div class="card-body border-top p-9">
+
+                <!-- Nombre Completo -->
+                <div class="row mb-6">
+                  <label class="col-lg-4 col-form-label required fw-bold fs-6">Nombre Completo</label>
+                  <div class="col-lg-8">
+                    <div class="row">
+                      <!-- Nombres -->
+                      <div class="col-lg-6 fv-row">
+                        <input type="text" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
+                          placeholder="Nombres" name="names" [(ngModel)]="userData.person.names" #names="ngModel"
+                          required minlength="3">
+                        <div *ngIf="(userForm.submitted || names.dirty || names.touched) && names.errors?.['required']"
+                          class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                          <div>El nombre es obligatorio.</div>
+                        </div>
+                        <div *ngIf="(userForm.submitted || names.dirty || names.touched) && names.errors?.['minlength']"
+                          class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                          <div>Debe tener al menos 3 caracteres.</div>
+                        </div>
+                      </div>
+                      <!-- Apellidos -->
+                      <div class="col-lg-6 fv-row">
+                        <input type="text" class="form-control form-control-lg form-control-solid"
+                          placeholder="Apellidos" name="lastNames" [(ngModel)]="userData.person.lastNames"
+                          #lastNames="ngModel" required minlength="3">
+                        <div
+                          *ngIf="(userForm.submitted || lastNames.dirty || lastNames.touched) && lastNames.errors?.['required']"
+                          class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                          <div>Los apellidos son obligatorios.</div>
+                        </div>
+                        <div
+                          *ngIf="(userForm.submitted || lastNames.dirty || lastNames.touched) && lastNames.errors?.['minlength']"
+                          class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                          <div>Debe tener al menos 3 caracteres.</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Identificación -->
+                <div class="row mb-6">
+                  <label class="col-lg-4 col-form-label required fw-bold fs-6">Identificación</label>
+                  <div class="col-lg-8 fv-row">
+                    <input type="text" class="form-control form-control-lg form-control-solid"
+                      placeholder="Identificación" name="identification" [(ngModel)]="userData.person.identification"
+                      #identification="ngModel" required>
+                    <div
+                      *ngIf="(userForm.submitted || identification.dirty || identification.touched) && identification.errors?.['required']"
+                      class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                      <div>La identificación es obligatoria.</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Fecha de Nacimiento -->
+                <div class="row mb-6">
+                  <label class="col-lg-4 col-form-label fw-bold fs-6">Fecha de Nacimiento</label>
+                  <div class="col-lg-8 fv-row">
+                    <input type="date" class="form-control form-control-lg form-control-solid" name="birthDate"
+                      [(ngModel)]="formattedBirthDate" (ngModelChange)="onChangeBirthDate($event)" #birthDate="ngModel">
+                  </div>
+                </div>
+
+                <!-- Dirección -->
+                <div class="row mb-6">
+                  <label class="col-lg-4 col-form-label required fw-bold fs-6">Dirección</label>
+                  <div class="col-lg-8 fv-row">
+                    <input type="text" class="form-control form-control-lg form-control-solid" placeholder="Dirección"
+                      name="address" [(ngModel)]="userData.person.address" #address="ngModel" required minlength="3">
+                    <div
+                      *ngIf="(userForm.submitted || address.dirty || address.touched) && address.errors?.['required']"
+                      class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                      <div>La dirección es obligatoria.</div>
+                    </div>
+                    <div
+                      *ngIf="(userForm.submitted || address.dirty || address.touched) && address.errors?.['minlength']"
+                      class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                      <div>Debe tener al menos 3 caracteres.</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Teléfonos -->
+                <div class="row mb-6">
+                  <label class="col-lg-4 col-form-label required fw-bold fs-6">Teléfonos</label>
+                  <div class="col-lg-8">
+                    <div class="row">
+                      <!-- Teléfono fijo (opcional) -->
+                      <div class="col-lg-4 fv-row">
+                        <input type="tel" class="form-control form-control-lg form-control-solid mb-3"
+                          placeholder="Teléfono fijo" name="phone" [(ngModel)]="userData.person.phone">
+                      </div>
+                      <!-- Celular 1 (requerido) -->
+                      <div class="col-lg-4 fv-row">
+                        <input type="tel" class="form-control form-control-lg form-control-solid mb-3"
+                          placeholder="Celular 1" name="mobilePhone" [(ngModel)]="userData.person.mobilePhone"
+                          #mobilePhone="ngModel" required pattern="^\+?[0-9\s\-\(\)]{7,15}$">
+                        <div
+                          *ngIf="(userForm.submitted || mobilePhone.dirty || mobilePhone.touched) && mobilePhone.errors?.['required']"
+                          class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                          <div>El teléfono móvil es obligatorio.</div>
+                        </div>
+                        <div
+                          *ngIf="(userForm.submitted || mobilePhone.dirty || mobilePhone.touched) && mobilePhone.errors?.['pattern']"
+                          class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                          <div>Ingrese un número de teléfono válido.</div>
+                        </div>
+                      </div>
+                      <!-- Celular 2 (opcional) -->
+                      <div class="col-lg-4 fv-row">
+                        <input type="tel" class="form-control form-control-lg form-control-solid"
+                          placeholder="Celular 2" name="mobilePhone2" [(ngModel)]="userData.person.mobilePhone2">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Correo Electrónico -->
+                <div class="row mb-6">
+                  <label class="col-lg-4 col-form-label fw-bold fs-6">Correo Electrónico</label>
+                  <div class="col-lg-8 fv-row">
+                    <input type="email" class="form-control form-control-lg form-control-solid"
+                      placeholder="Correo electrónico" name="email" [(ngModel)]="userData.person.email"
+                      (ngModelChange)="onChangeEmail($event)" #email="ngModel"
+                      pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$">
+                    <div *ngIf="(userForm.submitted || email.dirty || email.touched) && email.errors?.['pattern']"
+                      class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                      <div>Debe ingresar un correo válido.</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Contacto de Emergencia -->
+                <div class="row mb-6">
+                  <label class="col-lg-4 col-form-label fw-bold fs-6">Contacto de Emergencia</label>
+                  <div class="col-lg-8">
+                    <div class="row">
+                      <!-- Nombre del contacto -->
+                      <div class="col-lg-6 fv-row">
+                        <input type="text" class="form-control form-control-lg form-control-solid mb-3"
+                          placeholder="Nombre contacto" name="emergencyContactName"
+                          [(ngModel)]="userData.person.emergencyContactName" #emergencyContactName="ngModel"
+                          minlength="3">
+                        <div
+                          *ngIf="(userForm.submitted || emergencyContactName.dirty || emergencyContactName.touched) && emergencyContactName.errors?.['minlength']"
+                          class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                          <div>Debe tener al menos 3 caracteres.</div>
+                        </div>
+                      </div>
+                      <!-- Teléfono del contacto -->
+                      <div class="col-lg-6 fv-row">
+                        <input type="tel" class="form-control form-control-lg form-control-solid"
+                          placeholder="Teléfono contacto" name="emergencyContactPhone"
+                          [(ngModel)]="userData.person.emergencyContactPhone" #emergencyContactPhone="ngModel"
+                          pattern="^\+?[0-9\s\-\(\)]{7,15}$">
+                        <div
+                          *ngIf="(userForm.submitted || emergencyContactPhone.dirty || emergencyContactPhone.touched) && emergencyContactPhone.errors?.['pattern']"
+                          class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                          <div>Ingrese un número de teléfono válido.</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row mb-6">
+                  <label class="col-lg-4 col-form-label required fw-bold fs-6">Roles</label>
+                  <div class="col-lg-8">
+                    <div *ngFor="let role of availableRoles" class="form-check">
+                      <input type="checkbox" class="form-check-input" [value]="role.id" (change)="onRoleChange($event)"
+                        [checked]="selectedRoles.includes(role.id)" id="{{ role.id }}">
+                      <label class="form-check-label" for="role-{{ role.id }}">{{ role.name }}</label>
+                    </div>
+                    <div *ngIf="userForm.submitted && selectedRoles.length === 0"
+                      class="fv-plugins-message-container invalid-feedback">
+                      <div>Debe seleccionar al menos un rol.</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row mb-6">
+                  <label class="col-lg-4 col-form-label required fw-bold fs-6">Estado</label>
+                  <div class="col-lg-8">
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="checkbox" id="isActiveCheckbox" name="isActive"
+                        [(ngModel)]="isActive">
+                      <label class="form-check-label" for="isActiveCheckbox">
+                        Activo
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Botón para guardar -->
+              <div class="card-footer d-flex justify-content-end py-6 px-9">
+                <button type="button" class="btn btn-primary" [disabled]="isLoading$ | async" (click)="saveUser()">
+                  <span *ngIf="!(isLoading$ | async)">Guardar Cambios</span>
+                  <span *ngIf="isLoading$ | async" class="indicator-progress">
+                    Por favor, espere...
+                    <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                  </span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <!-- end::Details -->
+
+      <!-- begin::Payment Info -->
+      <div class="tab-pane fade" [ngClass]="{'show active': activeTab === 'Payment Info'}"
+        *ngIf="activeTab === 'Payment Info'">
+        <app-payment-information [permissionRoute]="PERMISSION_ROUTE" [personId]="personId" />
+      </div>
+      <!-- end::Payment Info -->
+
+    </div>
+  </div>
+  <!-- end::Body -->
+</div>
+
+<div class="card mb-5 mb-xl-10">
+  <div class="card-header border-0 cursor-pointer" role="button" data-bs-toggle="collapse"
+    data-bs-target="#kt_account_signin_method">
+    <div class="card-title m-0">
+      <h3 class="fw-bolder m-0">Credenciales</h3>
+    </div>
+  </div>
+  <div id="kt_account_signin_method" class="collapse show">
+    <div class="card-body border-top p-9">
+
+      <ng-container *ngIf="!showChangePasswordForm">
+        <div class="mb-6">
+          <div class="fs-6 fw-bolder mb-1">Nombre de usuario</div>
+          <div class="fw-bold text-gray-600">{{userData.username}}</div>
+        </div>
+        <div class="d-flex flex-wrap align-items-center mb-10">
+          <div id="kt_signin_password" class="false">
+            <div class="fs-6 fw-bolder mb-1">Contraseña</div>
+            <div class="fw-bold text-gray-600">************</div>
+          </div>
+          <div id="kt_signin_password_button" class="ms-auto false">
+            <button class="btn btn-light btn-active-light-primary" (click)="togglePasswordForm(true)">
+              Cambiar Contraseña
+            </button>
+          </div>
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="showChangePasswordForm">
+        <div class="d-flex flex-wrap align-items-center mb-10">
+          <div id="kt_signin_password_edit" class="flex-row-fluid false">
+            <form id="kt_signin_change_password" class="form" novalidate="">
+              <div class="row mb-5">
+                <div class="col-lg-4">
+                  <div class="fv-row mb-0">
+                    <label for="newpassword" class="form-label fs-6 fw-bolder mb-3 required">Nueva Contraseña</label>
+
+                    <input type="password" class="form-control form-control-lg form-control-solid" id="newpassword"
+                      name="newPassword" [(ngModel)]="userData.password" #newPassword="ngModel" required
+                      minlength="6" />
+
+                    <!-- Validation messages -->
+                    <div *ngIf="newPassword.invalid && newPassword.touched" class="text-danger mt-1 fs-7">
+                      <div *ngIf="newPassword.errors?.['required']">La contraseña es obligatoria.</div>
+                      <div *ngIf="newPassword.errors?.['minlength']">La contraseña debe tener al menos 6 caracteres.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="d-flex">
+                <button id="kt_password_submit" type="button" class="btn btn-primary me-2 px-6"
+                  (click)="savePassword()">
+                  <ng-container *ngIf="!(isLoading$ | async)">Actualizar</ng-container>
+                  <ng-container *ngIf="(isLoading$ | async)">
+                    <span class="indicator-progress" [style.display]="'block'">
+                      Please wait...{{ " " }}
+                      <span class="
+                          spinner-border spinner-border-sm
+                          align-middle
+                          ms-2
+                        "></span>
+                    </span>
+                  </ng-container></button><button id="kt_password_cancel" type="button"
+                  class="btn btn-color-gray-500 btn-active-light-primary px-6" (click)="togglePasswordForm(false)">
+                  Cancelar
+                </button>
+              </div>
+            </form>
+          </div>
+          <div id="kt_signin_password_button" class="ms-auto d-none">
+            <button class="btn btn-light btn-active-light-primary">
+              Reset Password
+            </button>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</div>

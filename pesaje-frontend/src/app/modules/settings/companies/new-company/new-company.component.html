@@ -1,0 +1,58 @@
+<div *ngIf="isLoading$ | async" class="text-center py-5">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
+
+<div *ngIf="!(isLoading$ | async)" class="card card-custom mb-5 mb-xl-10">
+  <div class="card-header card-header-stretch overflow-auto">
+    <h3 class="card-title">Crear Nueva Compañía</h3>
+  </div>
+  <div class="card-body">
+    <form #companyForm="ngForm" (ngSubmit)="onSubmit(companyForm)" autocomplete="off">
+      <div class="row mb-5">
+        <div class="col-md-6 mb-3">
+          <label class="form-label required">Nombre de compañía</label>
+          <input type="text" class="form-control" name="name" required [(ngModel)]="company.name" #name="ngModel"
+            [ngClass]="{'is-invalid': name.invalid && name.touched}" placeholder="Ingrese el nombre de la compañía" />
+          <div class="invalid-feedback" *ngIf="name.invalid && name.touched">
+            El nombre de la compañía es requerido.
+          </div>
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label required">Ciudad</label>
+          <input type="text" class="form-control" name="city" required [(ngModel)]="company.city" #city="ngModel"
+            [ngClass]="{'is-invalid': city.invalid && city.touched}" placeholder="Ingrese la ciudad" />
+          <div class="invalid-feedback" *ngIf="city.invalid && city.touched">
+            La ciudad es requerida.
+          </div>
+        </div>
+      </div>
+      <div class="row mb-5">
+        <div class="col-md-6 mb-3">
+          <label class="form-label required">Persona principal</label>
+          <input type="text" class="form-control" name="mainPersonName" required [(ngModel)]="company.mainPersonName"
+            #mainPersonName="ngModel" [ngClass]="{'is-invalid': mainPersonName.invalid && mainPersonName.touched}"
+            placeholder="Ingrese el nombre de la persona principal" />
+          <div class="invalid-feedback" *ngIf="mainPersonName.invalid && mainPersonName.touched">
+            La persona principal es requerida.
+          </div>
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label required">Teléfono principal</label>
+          <input type="tel" class="form-control" name="mainTelephone" required [(ngModel)]="company.mainTelephone"
+            #mainTelephone="ngModel" [ngClass]="{'is-invalid': mainTelephone.invalid && mainTelephone.touched}"
+            placeholder="Ingrese el teléfono principal" />
+          <div class="invalid-feedback" *ngIf="mainTelephone.invalid && mainTelephone.touched">
+            El teléfono principal es requerido.
+          </div>
+        </div>
+      </div>
+      <div class="text-end">
+        <button type="submit" class="btn btn-primary" [disabled]="companyForm.invalid || (isLoading$ | async)">
+          Guardar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

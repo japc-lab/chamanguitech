@@ -1,0 +1,120 @@
+.company-list-details-container {
+  display: flex;
+  height: 100%;
+}
+
+.company-list-details-card {
+  padding: 0;
+  min-height: 500px;
+}
+
+.company-list-section {
+  border-right: 1px solid #e5e5e5;
+  min-height: 100%;
+  max-height: 700px;
+  display: flex;
+  flex-direction: column;
+}
+
+.company-list {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  max-height: 600px;
+  width: 250px;
+  border-right: none;
+  padding: 0.5rem;
+}
+
+.company-list-item {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  border-radius: 4px;
+  margin-bottom: 2px;
+  transition: background 0.2s;
+}
+
+.company-list-item.selected,
+.company-list-item:hover {
+  background: #e0e0e0;
+  color: #222;
+  font-weight: bold;
+}
+
+.company-details-section {
+  min-height: 100%;
+  padding: 0;
+  min-height: 500px;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+}
+
+.company-details-section.empty-section {
+  border-left: 1px solid #e5e5e5;
+}
+
+.no-company-selected-message {
+  color: #b5b5c3;
+  font-size: 1.1rem;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-header {
+  background: transparent;
+  border-bottom: 1px solid #e5e5e5;
+  padding: 1.25rem 1.5rem 1rem 1.5rem;
+}
+
+.card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0;
+}
+
+.card-body {
+  padding: 2rem;
+}
+
+.company-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem 2rem;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 300px;
+  margin-bottom: 1rem;
+}
+
+.form-row label {
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.form-row input,
+.form-row textarea,
+.form-row select {
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.card-footer {
+  margin-top: 2rem;
+  background: transparent;
+  border-top: none;
+  padding: 0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-primary {
+  min-width: 120px;
+}

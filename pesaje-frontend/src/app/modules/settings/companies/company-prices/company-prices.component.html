@@ -1,0 +1,46 @@
+<div class="card card-custom mb-5 mb-xl-10">
+  <div class="row g-0">
+
+    <div *ngIf="isLoading$ | async" class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+
+    <div *ngIf="!(isLoading$ | async)" class="col-md-4 company-list-section">
+      <div class="card-header card-header-stretch">
+        <h4 class="card-title mb-3">Compañías</h4>
+      </div>
+      <div class="company-list px-2 pb-2">
+        <div *ngFor="let company of companies" (click)="selectCompany(company)"
+          [class.selected]="selectedCompany && selectedCompany.id === company.id" class="company-list-item">
+          {{ company.code ? (company.code + ' - ') : '' }}{{ company.name }}
+        </div>
+        <!-- Show a message if no companies are available -->
+        <div *ngIf="!companies.length" class="text-muted text-center py-4">
+          No hay compañías registradas.
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-8 company-details-section d-flex align-items-center justify-content-center"
+      [ngClass]="{'empty-section': !selectedCompany}">
+      <ng-container *ngIf="selectedCompany; else noCompanySelected">
+        <div class="w-100">
+          <div class="card-header card-header-stretch overflow-auto">
+            <h3 class="card-title">{{ selectedCompany.name || 'Detalles de la Compañía' }}</h3>
+          </div>
+          <div class="card-body">
+            <app-size-price [selectedCompany]="selectedCompanyInput"></app-size-price>
+          </div>
+        </div>
+      </ng-container>
+      <ng-template #noCompanySelected>
+        <div class="w-100 text-center text-muted py-5 no-company-selected-message">
+          <i class="bi bi-building" style="font-size: 2rem;"></i>
+          <div class="mt-3">Selecciona una compañía para ver o editar sus detalles.</div>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>

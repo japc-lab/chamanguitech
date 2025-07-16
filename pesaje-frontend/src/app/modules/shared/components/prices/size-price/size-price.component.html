@@ -1,0 +1,231 @@
+<!-- begin::Row -->
+<div class="row g-5 g-xl-8">
+
+  <!-- begin::Col -->
+  <div class="col-xl-12">
+    <!-- Search & Add Period Container -->
+    <div *ngIf="!isAdding" class="card">
+      <div class="card-body">
+        <div class="d-flex flex-wrap flex-stack mb-3">
+          <h3 class="fw-bolder my-2">Períodos</h3>
+        </div>
+
+        <div class="d-flex align-items-end justify-content-between">
+          <div class="d-flex align-items-end">
+            <!-- Company Selector -->
+            <div *ngIf="showCompany" class="w-180px me-2 position-relative">
+              <label for="company" class="required fw-semibold fs-6 mb-2">Compañía</label>
+              <select id="company" name="company" class="form-select form-select-sm" [(ngModel)]="selectedCompany"
+                (change)="onCompanyChange()" required [disabled]="isEditing">
+                <option value="" disabled selected>Seleccione una opción</option>
+                <option *ngFor="let company of companies" [value]="company.id">
+                  {{ company.name }}
+                </option>
+              </select>
+              <small *ngIf="showErrors && !selectedCompany" class="text-danger small mt-1 position-absolute">
+                Debe seleccionar una compañía
+              </small>
+            </div>
+
+            <!-- Period Selector -->
+            <div class="w-180px me-2 position-relative">
+              <label for="period" class="required fw-semibold fs-6 mb-2">Período</label>
+              <select id="period" name="period" class="form-select form-select-sm" [(ngModel)]="selectedPeriod"
+                (change)="onPeriodChange()" required [disabled]="isEditing">
+                <option value="" disabled selected>Seleccione una opción</option>
+                <option *ngFor="let period of existingPeriods" [value]="period.id">
+                  {{ period.name }}
+                </option>
+              </select>
+              <small *ngIf="showErrors && !selectedPeriod" class="text-danger small mt-1 position-absolute">
+                Debe seleccionar un mes
+              </small>
+            </div>
+
+            <!-- Search Button -->
+            <button *ngIf="!isEditing" class="btn btn-primary btn-sm px-4" (click)="search()">
+              Buscar
+            </button>
+          </div>
+
+          <!-- Buttons Section -->
+          <div *ngIf="!isEditing" class="d-flex align-items-end ms-auto">
+            <!-- Add Period Button (Nuevo) -->
+            <button *appCanCreate="PERMISSION_ROUTE" class="btn btn-success btn-sm me-2" (click)="toggleAddPeriod()">
+              Nuevo
+            </button>
+
+            <!-- Edit Period Button -->
+            <div *ngIf="showEditButton">
+              <button *appCanEdit="PERMISSION_ROUTE" class="btn btn-warning btn-sm" (click)="editPeriod()">
+                Editar
+              </button>
+            </div>
+          </div>
+
+          <div *ngIf="isEditing" class="d-flex align-items-end ms-auto">
+            <button class="btn btn-primary btn-sm me-2" (click)="confirmSave()">
+              Guardar
+            </button>
+            <button class="btn btn-danger btn-sm" (click)="cancelEditing()">Cancelar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Add New Period Form (Only Shown When Adding) -->
+    <div *ngIf="isAdding" class="card mt-3">
+      <div class="card-body">
+        <div class="d-flex flex-wrap flex-stack mb-3">
+          <h3 class="fw-bolder my-2">Nuevo Periodo</h3>
+        </div>
+
+        <div class="d-flex align-items-end justify-content-between">
+          <div class="d-flex justify-content-between">
+            <!-- Company Input -->
+            <div *ngIf="showCompany" class="w-160px me-2 position-relative">
+              <label for="company" class="required fw-semibold fs-6 mb-2">Compañía</label>
+              <select id="company" name="company" class="form-select form-select-sm" [(ngModel)]="selectedCompany"
+                (change)="onCompanyChange()" required>
+                <option value="" disabled selected>Seleccione una opción</option>
+                <option *ngFor="let company of companies" [value]="company.id">
+                  {{ company.name }}
+                </option>
+              </select>
+              <small *ngIf="showErrors && !selectedCompany" class="text-danger small mt-1 position-absolute">
+                Debe seleccionar una compañía
+              </small>
+            </div>
+
+            <!-- Year Input -->
+            <div class="w-160px me-2 position-relative">
+              <label for="year" class="required fw-semibold fs-6 mb-2">Año</label>
+              <select id="year" name="year" class="form-select form-select-sm" [(ngModel)]="selectedYear">
+                <option value="" disabled selected>Seleccione una opción</option>
+                <option *ngFor="let year of years" [value]="year">{{ year }}</option>
+              </select>
+              <small *ngIf="showErrors && !selectedYear" class="text-danger small mt-1 position-absolute">
+                Debe seleccionar un año
+              </small>
+            </div>
+
+            <!-- Period Number Input -->
+            <div class="w-100px me-2 position-relative">
+              <label for="periodNumber" class="required fw-semibold fs-6 mb-2">Periodo</label>
+              <input type="text" id="periodNumber" name="periodNumber" [(ngModel)]="periodNumber"
+                class="form-control form-control-sm" required (keypress)="validateNumber($event)" placeholder="0"
+                required />
+              <small *ngIf="showErrors && !periodNumber" class="text-danger small mt-1 position-absolute">
+                Debe ingresar un periodo
+              </small>
+            </div>
+          </div>
+
+          <div class="d-flex align-items-end ms-auto">
+            <!-- Save Button -->
+            <button class="btn btn-primary btn-sm me-2" (click)="confirmSave()">
+              Guardar
+            </button>
+
+            <!-- Cancel Button (Aligned with dropdowns) -->
+            <button class="btn btn-danger btn-sm" (click)="toggleAddPeriod()">Cancelar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- end::Col -->
+  </div>
+  <!-- end::Row -->
+
+  <!-- begin::Row -->
+  <div class="row g-5 g-xl-8 mt-1">
+
+    <!-- begin::Col -->
+    <div class="col-xl-12">
+      <div class="card card-xl-stretch mb-xl-8 p-3">
+
+        <!-- Date & Time Pickers in One Row -->
+        <div class="row g-3 align-items-center">
+
+          <!-- Date Picker -->
+          <div class="col-md-12">
+            <label for="receivedDate" class="required fw-semibold fs-6 mb-2">Fecha de recibido</label>
+            <input type="date" class="form-control form-control-sm" id="receivedDate" name="receivedDate"
+              [(ngModel)]="receivedDate" [disabled]="!isEditing && !isAdding" required>
+            <small *ngIf="showErrors && !receivedDate && !isSearching" class="text-danger small">
+              La fecha de recibido es obligatoria.
+            </small>
+          </div>
+
+          <!-- Time Picker -->
+          <!-- <div class="col-md-6">
+            <label for="receivedTime" class="required fw-semibold fs-6 mb-2">Hora de recibido</label>
+            <input type="time" class="form-control form-control-sm" [(ngModel)]="receivedTime" id="receivedTime"
+              name="receivedTime" [disabled]="!isEditing && !isAdding" required>
+            <small *ngIf="showErrors && !receivedTime && !isSearching" class="text-danger small">
+              La hora de recibido es obligatoria.
+            </small>
+          </div> -->
+
+          <!-- Fecha inicio periodo -->
+          <div class="col-md-6">
+            <label for="fromDate" class="required fw-semibold fs-6 mb-2">Fecha inicio periodo</label>
+            <input type="date" class="form-control form-control-sm" id="fromDate" name="fromDate" [(ngModel)]="fromDate"
+              [disabled]="!isEditing && !isAdding" required>
+            <small *ngIf="showErrors && !fromDate && !isSearching" class="text-danger small">
+              La fecha de inicio del periodo es obligatoria.
+            </small>
+          </div>
+
+          <!-- Fecha inicio periodo -->
+          <div class="col-md-6">
+            <label for="toDate" class="required fw-semibold fs-6 mb-2">Fecha fin periodo</label>
+            <input type="date" class="form-control form-control-sm" id="toDate" name="toDate" [(ngModel)]="toDate"
+              [disabled]="!isEditing && !isAdding" required>
+            <small *ngIf="showErrors && !toDate && !isSearching" class="text-danger small">
+              La fecha de fin del periodo es obligatoria.
+            </small>
+          </div>
+
+          <!-- Time of Day Selector -->
+          <!-- <div class="col-md-6">
+            <label for="timeOfDay" class="required fw-semibold fs-6 mb-2">Hora del día</label>
+            <select id="timeOfDay" name="timeOfDay" class="form-select form-select-sm" [(ngModel)]="timeOfDay"
+              [disabled]="!isEditing && !isAdding" required>
+              <option value="" disabled selected>Seleccione una opción</option>
+              <option value="DAY">Día</option>
+              <option value="NIGHT">Noche</option>
+            </select>
+            <small *ngIf="showErrors && !timeOfDay && !isSearching" class="text-danger small">
+              La hora del día es obligatoria.
+            </small>
+          </div> -->
+
+        </div>
+      </div>
+    </div>
+    <!-- end::Col -->
+  </div>
+  <!-- end::Row -->
+
+
+  <!-- begin::Row -->
+  <div class="row g-5 g-xl-8 mt-1">
+    <!-- begin::Col -->
+    <div class="col-xl-12">
+      <app-headless-table class="card card-xl-stretch mb-xl-8" [sizePrices]="headlessSizePrices"></app-headless-table>
+    </div>
+    <!-- end::Col -->
+    <!-- begin::Col -->
+    <div class="col-xl-6">
+      <app-whole-table class="card card-xl-stretch mb-xl-8" [sizePrices]="wholeSizePrices"></app-whole-table>
+    </div>
+    <!-- end::Col -->
+    <!-- begin::Col -->
+    <div class="col-xl-6">
+      <app-residual-table class="card card-xl-stretch mb-xl-8" [sizePrices]="residualSizePrices"></app-residual-table>
+    </div>
+    <!-- end::Col -->
+  </div>
+  <!-- end::Row -->

@@ -1,0 +1,70 @@
+<!-- begin::Header -->
+<div class="card-header border-0 pt-5">
+  <h3 class="card-title align-items-start flex-column">
+    <span class="card-label fw-bolder fs-3 mb-1">{{title}}</span>
+  </h3>
+</div>
+<!-- end::Header -->
+
+<!-- begin::Body -->
+<div class="card-body py-3">
+  <!-- begin::Table container -->
+  <div class="table-responsive">
+    <form *ngIf="form?.get('items')" [formGroup]="form">
+      <div formArrayName="items">
+        <!-- begin::Table -->
+        <table class="table align-middle gs-0 gy-3">
+          <thead>
+            <tr class="border-bottom border-gray-300">
+              <th class="p-3 text-start text-muted fw-semibold text-uppercase fs-7 pb-2">Nombre</th>
+              <th *ngIf="hasDescription" class="p-3 text-start text-muted fw-semibold text-uppercase fs-7 pb-2">
+                Descripción</th>
+              <th class="p-3 text-end text-muted fw-semibold text-uppercase fs-7 pb-2">Unidad (u)</th>
+              <th class="p-3 text-end text-muted fw-semibold text-uppercase fs-7 pb-2">Costo ($)</th>
+              <th class="p-3 text-end text-muted fw-semibold text-uppercase fs-7 pb-2">Total ($)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let group of formArray.controls; let i = index" [formGroupName]="i">
+              <td class="text-start text-gray-900 fw-bolder fs-6">{{ logisticsCategories[i].name }}</td>
+
+              <td *ngIf="hasDescription">
+                <input type="text" class="form-control form-control-sm" formControlName="description" />
+              </td>
+
+              <td class="text-end" style="width: 90px;">
+                <input type="number" class="form-control form-control-sm text-end no-spinner" formControlName="unit"
+                  (input)="calculateTotal(i)" (blur)="calculateTotal(i)" (keypress)="validateWholeNumber($event)"
+                  placeholder="0" />
+              </td>
+
+              <td class="text-end" style="width: 150px;">
+                <div class="input-group input-group-sm">
+                  <span class="input-group-text">$</span>
+                  <input type="number" class="form-control text-end no-spinner" formControlName="cost"
+                    (input)="calculateTotal(i)" (blur)="onCostBlur(i, group.get('cost'))"
+                    (keypress)="validateNumber($event)" placeholder="0.00" />
+                </div>
+              </td>
+
+              <td class="text-end" style="width: 120px;">
+                <span class="fw-bold">$ {{ group.get('total')?.value | number: '1.2-2' }}</span>
+              </td>
+            </tr>
+
+            <tr class="border-top">
+              <td [attr.colspan]="hasDescription ? 4 : 3" class="text-end fw-bold">Total a pagar</td>
+              <td class="text-end fw-bold">$ {{ total | number: '1.2-2' }}</td>
+              <td *ngIf="hasDescription"></td>
+            </tr>
+
+          </tbody>
+
+        </table>
+        <!-- end::Table -->
+      </div>
+    </form>
+  </div>
+  <!-- end::Table container -->
+</div>
+<!-- end::Body -->

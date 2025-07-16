@@ -1,0 +1,84 @@
+<!-- local-sale-details.component.html -->
+<div class="card card-xl-stretch mb-6">
+  <div class="card-header border-0 pt-5 d-flex justify-content-between align-items-center">
+    <h3 class="card-title fw-bolder fs-3 mb-1">Venta Local Camarón {{title}}</h3>
+    <button type="button" class="btn btn-primary btn-sm" (click)="addDetail()">
+      <i class="bi bi-plus-circle me-1"></i> Agregar Detalle
+    </button>
+  </div>
+
+  <div class="card-body pt-0">
+    <div *ngFor="let detail of localSaleDetails; let detailIndex = index" class="mb-6">
+      <!-- Detail Header -->
+      <div class="d-flex justify-content-between align-items-center border-bottom border-gray-400 pb-2 mb-2">
+        <input type="text" class="form-control form-control-sm fw-bold text-warning border-0 p-0 bg-transparent"
+          [(ngModel)]="detail.merchat" (ngModelChange)="emitChanges()"
+          placeholder="Comerciante {{ detailIndex + 1 }}" />
+        <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeDetail(detailIndex)">
+          <i class="bi bi-trash"></i> Eliminar Detalle
+        </button>
+      </div>
+
+      <!-- Detail Items Table -->
+      <div class="table-responsive">
+        <table class="table table-bordered align-middle">
+          <thead>
+            <tr class="bg-light text-muted fw-bold">
+              <th class="text-start">Talla</th>
+              <th class="text-end">Libras (lb)</th>
+              <th class="text-end">Precio ($)</th>
+              <th class="text-end">Total ($)</th>
+              <th class="text-center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of detail.items; let itemIndex = index">
+              <td>
+                <input type="text" [(ngModel)]="item.size" [placeholder]="sizePlaceholder"
+                  class="form-control form-control-sm" (keypress)="validateSizeFormat($event)" />
+              </td>
+
+              <td>
+                <input type="number" [(ngModel)]="item.pounds" name="pounds{{ detailIndex }}{{ itemIndex }}"
+                  #poundsCtrl="ngModel" (ngModelChange)="recalculateTotals(detail)" (keypress)="validateNumber($event)"
+                  (blur)="formatDecimal(poundsCtrl)" class="form-control form-control-sm text-end no-spinner" />
+              </td>
+
+              <td>
+                <div class="input-group input-group-sm">
+                  <span class="input-group-text">$</span>
+                  <input type="number" [(ngModel)]="item.price" name="price{{ detailIndex }}{{ itemIndex }}"
+                    #priceCtrl="ngModel" (ngModelChange)="recalculateTotals(detail)" (keypress)="validateNumber($event)"
+                    (blur)="formatDecimal(priceCtrl)" class="form-control form-control-sm text-end no-spinner" />
+                </div>
+              </td>
+
+              <td class="text-end">${{ item.total | number: '1.2-2' }}</td>
+
+              <td class="text-center">
+                <button class="btn btn-sm btn-outline-danger" (click)="removeItem(detailIndex, itemIndex)">
+                  <i class="bi bi-x"></i>
+                </button>
+              </td>
+            </tr>
+
+            <!-- Totals Row -->
+            <tr class="fw-bold bg-light">
+              <td>Total General</td>
+              <td class="text-end">{{ detail.poundsGrandTotal | number: '1.2-2' }}</td>
+              <td></td>
+              <td class="text-end">${{ detail.grandTotal | number: '1.2-2' }}</td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Add Item Button -->
+      <button class="btn btn-outline-success btn-sm" (click)="addItem(detailIndex)">
+        <i class="bi bi-plus-circle"></i> Agregar Item
+      </button>
+    </div>
+  </div>
+
+</div>

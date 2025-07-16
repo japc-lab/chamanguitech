@@ -1,0 +1,14 @@
+.symbol {
+  width: 50px; /* Set a fixed width for the container */
+  height: 50px; /* Set a fixed height for the container */
+  overflow: hidden; /* Ensures the image does not overflow the container */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.symbol img {
+  width: 100%; /* Ensures the image fills the container's width */
+  height: 100%; /* Ensures the image fills the container's height */
+  object-fit: cover; /* Maintains the aspect ratio while filling the container */
+}

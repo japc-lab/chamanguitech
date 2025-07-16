@@ -1,0 +1,36 @@
+<div *ngIf="processedData.length > 0">
+  <div class="mt-4 mb-5">
+    <h5 class="fw-bold border-bottom border-gray-400 pb-2">{{typeSize.type}}</h5>
+  </div>
+
+  <div *ngFor="let group of processedData" class="mb-5">
+    <h6 *ngIf="typeSize.type === 'COLA'" class="fw-semibold mb-3">
+      {{ getGroupTypeLabel(group.type) }}</h6>
+
+    <div class="table-responsive">
+      <table class="table table-bordered align-middle">
+        <thead>
+          <tr>
+            <th class="sticky-column">Tamaño</th>
+            <th *ngFor="let company of group.sizes[0]?.companies" class="text-nowrap">
+              {{company.company.name}}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let size of group.sizes">
+            <td class="sticky-column">{{size.name}}</td>
+            <td *ngFor="let companyData of size.companies" [class.highest-price]="companyData.highest"
+              class="text-nowrap">
+              {{companyData.price | currency:'USD':'symbol':'1.2-2'}}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="processedData.length === 0" class="text-center text-muted py-5">
+  No hay datos disponibles para mostrar
+</div>

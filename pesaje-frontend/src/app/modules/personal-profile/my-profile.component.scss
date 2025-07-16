@@ -1,0 +1,7 @@
+.profile-image {
+  width: 100%; /* Ensures the image fills the container's width */
+  height: 100%; /* Ensures the image fills the container's height */
+  object-fit: contain; /* Ensures the image fits within the container while maintaining aspect ratio */
+  background-color: #f0f0f0; /* Optional: Adds a background color to fill empty space */
+}
+
