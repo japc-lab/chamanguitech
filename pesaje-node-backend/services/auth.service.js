@@ -79,7 +79,7 @@ const revalidateAuthToken = async (refreshToken) => {
 }
 
 const getUserById = async (id) => {
-    try {console.log('test')
+    try {
         // Fetch user from database
         const user = await dbAdapter.userAdapter.getByIdWithRelations(id, ['person', 'roles']);
         if (!user) {
