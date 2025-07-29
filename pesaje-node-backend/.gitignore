@@ -4,5 +4,6 @@ mongo/
 !models/mongo/
 
 .env
+!.env.template
 # Ignore Angular build output in public/chamanguitech
 public/chamanguitech/
