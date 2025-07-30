@@ -111,16 +111,6 @@
                   </div>
                 </div>
 
-                <!-- Fecha de Nacimiento -->
-                <div class="row mb-6">
-                  <label class="col-lg-4 col-form-label fw-bold fs-6">Fecha de Nacimiento</label>
-                  <div class="col-lg-8 fv-row">
-                    <input type="date" class="form-control form-control-lg form-control-solid" name="birthDate"
-                      [(ngModel)]="formattedBirthDate" (ngModelChange)="onChangeBirthDate($event)" #birthDate="ngModel"
-                      [disabled]="isOnlyBuyer">
-                  </div>
-                </div>
-
                 <!-- Dirección -->
                 <div class="row mb-6">
                   <label class="col-lg-4 col-form-label required fw-bold fs-6">Dirección</label>
@@ -141,19 +131,13 @@
                   </div>
                 </div>
 
-                <!-- Teléfonos -->
+                <!-- Celular -->
                 <div class="row mb-6">
-                  <label class="col-lg-4 col-form-label required fw-bold fs-6">Teléfonos</label>
+                  <label class="col-lg-4 col-form-label required fw-bold fs-6">Celular</label>
                   <div class="col-lg-8">
                     <div class="row">
-                      <!-- Teléfono fijo (opcional) -->
-                      <div class="col-lg-4 fv-row">
-                        <input type="tel" class="form-control form-control-lg form-control-solid mb-3"
-                          placeholder="Teléfono fijo" name="phone" [(ngModel)]="clientData.person.phone"
-                          [disabled]="isOnlyBuyer">
-                      </div>
                       <!-- Celular 1 (requerido) -->
-                      <div class="col-lg-4 fv-row">
+                      <div class="col-lg-6 fv-row">
                         <input type="tel" class="form-control form-control-lg form-control-solid mb-3"
                           placeholder="Celular 1" name="mobilePhone" [(ngModel)]="clientData.person.mobilePhone"
                           #mobilePhone="ngModel" required pattern="^\+?[0-9\s\-\(\)]{7,15}$" [disabled]="isOnlyBuyer">
@@ -167,12 +151,6 @@
                           class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
                           <div>Ingrese un número de teléfono válido.</div>
                         </div>
-                      </div>
-                      <!-- Celular 2 (opcional) -->
-                      <div class="col-lg-4 fv-row">
-                        <input type="tel" class="form-control form-control-lg form-control-solid"
-                          placeholder="Celular 2" name="mobilePhone2" [(ngModel)]="clientData.person.mobilePhone2"
-                          [disabled]="isOnlyBuyer">
                       </div>
                     </div>
                   </div>
@@ -189,40 +167,6 @@
                     <div *ngIf="(clientForm.submitted || email.dirty || email.touched) && email.errors?.['pattern']"
                       class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
                       <div>Debe ingresar un correo válido.</div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Contacto de Emergencia -->
-                <div class="row mb-6">
-                  <label class="col-lg-4 col-form-label fw-bold fs-6">Contacto de Emergencia</label>
-                  <div class="col-lg-8">
-                    <div class="row">
-                      <!-- Nombre del contacto -->
-                      <div class="col-lg-6 fv-row">
-                        <input type="text" class="form-control form-control-lg form-control-solid mb-3"
-                          placeholder="Nombre contacto" name="emergencyContactName"
-                          [(ngModel)]="clientData.person.emergencyContactName" #emergencyContactName="ngModel"
-                          minlength="3" [disabled]="isOnlyBuyer">
-                        <div
-                          *ngIf="(clientForm.submitted || emergencyContactName.dirty || emergencyContactName.touched) && emergencyContactName.errors?.['minlength']"
-                          class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-                          <div>Debe tener al menos 3 caracteres.</div>
-                        </div>
-                      </div>
-
-                      <!-- Teléfono del contacto -->
-                      <div class="col-lg-6 fv-row">
-                        <input type="tel" class="form-control form-control-lg form-control-solid"
-                          placeholder="Teléfono contacto" name="emergencyContactPhone"
-                          [(ngModel)]="clientData.person.emergencyContactPhone" #emergencyContactPhone="ngModel"
-                          pattern="^\+?[0-9\s\-\(\)]{7,15}$" [disabled]="isOnlyBuyer">
-                        <div
-                          *ngIf="(clientForm.submitted || emergencyContactPhone.dirty || emergencyContactPhone.touched) && emergencyContactPhone.errors?.['pattern']"
-                          class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-                          <div>Ingrese un número de teléfono válido.</div>
-                        </div>
-                      </div>
                     </div>
                   </div>
                 </div>

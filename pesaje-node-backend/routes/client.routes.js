@@ -26,17 +26,21 @@ router.post(
         check('person.address', 'Address is required').notEmpty(),
         check('person.mobilePhone', 'Mobile phone is required').notEmpty(),
         check('person.email')
-            .optional({ nullable: true }) // Allows missing or null values
-            .isEmail()
+            .optional({ nullable: true })
+            .custom(value => {
+                if (value === '' || value === null || value === undefined) {
+                    return true; // Allow empty, null, or undefined values
+                }
+                // If a value is provided, it must be a valid email
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(value)) {
+                    throw new Error('Invalid email format');
+                }
+                return true;
+            })
             .withMessage('Invalid email format'),
-        check('person.emergencyContactName')
-            .optional({ nullable: true }) // Allows missing or null values
-            .notEmpty()
-            .withMessage('Emergency contact name cannot be empty'),
-        check('person.emergencyContactPhone')
-            .optional({ nullable: true }) // Allows missing or null values
-            .notEmpty()
-            .withMessage('Emergency contact phone cannot be empty'),
+        check('person.emergencyContactName').optional(),
+        check('person.emergencyContactPhone').optional(),
 
         // Optional Fields Validation
         check('person.photo').optional().isString(),
@@ -75,17 +79,21 @@ router.put(
         check('person.address').optional().notEmpty().withMessage('Address cannot be empty'),
         check('person.mobilePhone').optional().notEmpty().withMessage('Mobile phone cannot be empty'),
         check('person.email')
-            .optional({ nullable: true }) // Allows missing or null values
-            .isEmail()
+            .optional({ nullable: true })
+            .custom(value => {
+                if (value === '' || value === null || value === undefined) {
+                    return true; // Allow empty, null, or undefined values
+                }
+                // If a value is provided, it must be a valid email
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(value)) {
+                    throw new Error('Invalid email format');
+                }
+                return true;
+            })
             .withMessage('Invalid email format'),
-        check('person.emergencyContactName')
-            .optional({ nullable: true }) // Allows missing or null values
-            .notEmpty()
-            .withMessage('Emergency contact name cannot be empty'),
-        check('person.emergencyContactPhone')
-            .optional({ nullable: true }) // Allows missing or null values
-            .notEmpty()
-            .withMessage('Emergency contact phone cannot be empty'),
+        check('person.emergencyContactName').optional(),
+        check('person.emergencyContactPhone').optional(),
 
         // Optional Fields Validation
         check('person.photo').optional().isString(),
