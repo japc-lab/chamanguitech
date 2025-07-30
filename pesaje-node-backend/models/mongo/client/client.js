@@ -12,6 +12,10 @@ const ClientSchema = Schema({
     ref: 'User',
     required: true
   }],
+  description: {
+    type: String,
+    default: null
+  },
   createdBy: {
     type: Schema.Types.ObjectId,
     ref: 'User',

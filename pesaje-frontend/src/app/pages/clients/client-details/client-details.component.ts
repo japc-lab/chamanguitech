@@ -155,6 +155,7 @@ export class ClientDetailsComponent
     const payload: ICreateUpdateClientModel = {
       buyersItBelongs: this.clientData.buyersItBelongs,
       person: this.clientData.person,
+      description: this.clientData.description,
     };
 
     const updateSub = this.clientService

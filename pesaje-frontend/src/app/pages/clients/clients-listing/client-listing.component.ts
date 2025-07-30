@@ -47,6 +47,7 @@ export class ClientListingComponent
   createClientModel: ICreateUpdateClientModel = {
     person: {} as IPersonModel,
     buyersItBelongs: [],
+    description: '',
   };
 
   clients: IReadClientModel[] = [];

@@ -117,6 +117,13 @@
             </div>
           </div>
 
+          <!-- Descripción -->
+          <div class="mb-3">
+            <label for="description" class="fw-semibold fs-6 mb-2">Descripción</label>
+            <textarea class="form-control" id="description" name="description" rows="3"
+              [(ngModel)]="createClientModel.description" #description="ngModel"></textarea>
+          </div>
+
           <!-- Multi-select de Compradores -->
           <div *ngIf="!isOnlyBuyer" class="mb-3">
             <label for="compradores" class="required fw-semibold fs-6 mb-2">Compradores Asociados</label>
