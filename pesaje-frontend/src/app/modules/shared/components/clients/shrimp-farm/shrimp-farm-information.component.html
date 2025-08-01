@@ -108,6 +108,13 @@
             </div>
           </div>
 
+          <!-- Descripción -->
+          <div class="fv-row mb-7">
+            <label class="fw-semibold fs-6 mb-2">Descripción</label>
+            <textarea class="form-control form-control-solid" name="description"
+              [(ngModel)]="shrimpFarmInfo.description" #description="ngModel"></textarea>
+          </div>
+
           <!-- Tiempo desde Pedernales -->
           <div class="fv-row mb-7">
             <label class="required fw-semibold fs-6 mb-2">Tiempo desde Pedernales</label>

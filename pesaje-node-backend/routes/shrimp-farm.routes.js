@@ -82,6 +82,8 @@ router.post(
             .withMessage('Distance to gate must be a numeric value')
             .isFloat({ min: 0 })
             .withMessage('Distance to gate must be at least 0'),
+        check('description')
+            .optional(),
         check('timeFromPedernales')
             .isNumeric()
             .withMessage('Time from Pedernales must be a numeric value')
@@ -126,6 +128,8 @@ router.put(
             .withMessage('Distance to gate must be a numeric value')
             .isFloat({ min: 0 })
             .withMessage('Distance to gate must be at least 0'),
+        check('description')
+            .optional(),
         check('timeFromPedernales')
             .optional()
             .isNumeric()

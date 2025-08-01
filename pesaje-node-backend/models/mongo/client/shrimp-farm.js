@@ -25,6 +25,10 @@ const ShrimpFarmSchema = Schema({
     type: Number,
     required: true
   },
+  description: {
+    type: String,
+    default: null
+  },
   timeFromPedernales: { //minutes
     type: Number,
     required: true
