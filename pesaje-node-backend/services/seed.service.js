@@ -207,8 +207,9 @@ const seedOptions = async () => {
             { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f20"), name: 'Gestionar Brokers', route: '/settings/brokers', parentName: 'Administración' },
             { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f21"), name: 'Gestionar Clientes', route: '/settings/clients', parentName: 'Administración' },
             { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f22"), name: 'Gestionar Compañías', route: '/settings/companies', parentName: 'Administración' },
-            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f23"), name: 'Reporte Económico', route: '/reports/economic', parentName: 'Reportes' },
-            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f24"), name: 'Reporte Total', route: '/reports/total', parentName: 'Reportes' },
+            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f23"), name: 'Gestionar de Activos', route: '/settings/assets', parentName: 'Administración' },
+            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f24"), name: 'Reporte Económico', route: '/reports/economic', parentName: 'Reportes' },
+            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f25"), name: 'Reporte Total', route: '/reports/total', parentName: 'Reportes' },
         ];
 
         // Fetch existing options in one query
@@ -423,6 +424,14 @@ const seedPermissions = async () => {
                         break;
 
                     case 'Gestionar Compañías':
+                        if (role.name === 'Admin' || role.name === 'Secretaria') {
+                            actions = [Permission.VIEW, Permission.EDIT, Permission.ADD, Permission.DELETE];
+                        } else if (role.name === 'Comprador') {
+                            actions = [];
+                        }
+                        break;
+
+                    case 'Gestionar de Activos':
                         if (role.name === 'Admin' || role.name === 'Secretaria') {
                             actions = [Permission.VIEW, Permission.EDIT, Permission.ADD, Permission.DELETE];
                         } else if (role.name === 'Comprador') {
