@@ -28,5 +28,6 @@ export const PERMISSION_ROUTES = {
     BROKERS: '/settings/brokers',
     CLIENTS: '/settings/clients',
     COMPANIES: '/settings/companies',
+    ASSETS: '/settings/assets',
   },
 };
