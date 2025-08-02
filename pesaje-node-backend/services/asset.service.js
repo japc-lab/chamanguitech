@@ -53,6 +53,10 @@ const update = async (id, data) => {
         updateData.quantity = data.quantity;
     }
 
+    if (data.deletedAt !== undefined) {
+        updateData.deletedAt = data.deletedAt;
+    }
+
     return await dbAdapter.assetAdapter.update(id, updateData);
 };
 
