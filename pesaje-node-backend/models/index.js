@@ -56,6 +56,7 @@ const LocalSaleDetailItem = require(`${saleModelsPath}/local-sale-detail-item`);
 
 // Import admin models
 const Company = require(`${adminModelsPath}/company`);
+const Asset = require(`${adminModelsPath}/asset`);
 
 // Import report models
 const TotalReport = require(`${reportModelsPath}/total-report`);
@@ -91,4 +92,5 @@ module.exports = {
     LocalSaleDetail,
     LocalSaleDetailItem,
     TotalReport,
+    Asset,
 };
