@@ -163,11 +163,11 @@
                     <input type="email" class="form-control form-control-lg form-control-solid"
                       placeholder="Correo electrónico" name="email" [(ngModel)]="clientData.person.email"
                       (ngModelChange)="onChangeEmail($event)" #email="ngModel"
-                      pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" [disabled]="isOnlyBuyer">
-                    <div *ngIf="(clientForm.submitted || email.dirty || email.touched) && email.errors?.['pattern']"
-                      class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-                      <div>Debe ingresar un correo válido.</div>
-                    </div>
+                      [disabled]="isOnlyBuyer">
+                                          <div *ngIf="(clientForm.submitted || email.dirty || email.touched) && email.invalid"
+                        class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                        <div>Debe ingresar un correo válido.</div>
+                      </div>
                   </div>
                 </div>
 
