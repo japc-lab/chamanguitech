@@ -24,6 +24,7 @@ const RolePermission = require(`${accountModelsPath}/role-permission`);
 // Import profile models
 const Person = require(`${profileModelsPath}/person`);
 const Broker = require(`${profileModelsPath}/broker`);
+const Merchant = require(`${profileModelsPath}/merchant`);
 const PaymentInfo = require(`${profileModelsPath}/payment-info`);
 
 // Import client models
@@ -71,6 +72,7 @@ module.exports = {
     RolePermission,
     Person,
     Broker,
+    Merchant,
     Client,
     PaymentInfo,
     ShrimpFarm,
