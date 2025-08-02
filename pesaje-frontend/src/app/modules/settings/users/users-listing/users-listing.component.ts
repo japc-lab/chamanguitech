@@ -29,7 +29,7 @@ import { DateUtilsService } from 'src/app/utils/date-utils.service';
   templateUrl: './users-listing.component.html',
 })
 export class UsersListingComponent implements OnInit, AfterViewInit, OnDestroy {
-  PERMISSION_ROUTE = PERMISSION_ROUTES.SETTINGS.USERS;
+  PERMISSION_ROUTE = PERMISSION_ROUTES.SETTINGS.PEOPLE;
 
   isLoading = false;
 

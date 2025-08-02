@@ -78,7 +78,7 @@ export class ClientDetailsComponent
     this.isOnlyBuyer = this.authService.isOnlyBuyer;
 
     if (!this.isOnlyBuyer) {
-      this.PERMISSION_ROUTE = PERMISSION_ROUTES.SETTINGS.CLIENTS;
+      this.PERMISSION_ROUTE = PERMISSION_ROUTES.SETTINGS.PEOPLE;
     }
   }
 

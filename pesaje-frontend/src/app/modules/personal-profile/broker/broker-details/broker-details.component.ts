@@ -69,7 +69,7 @@ export class BrokerDetailsComponent
     this.isOnlyBuyer = this.authService.isOnlyBuyer;
 
     if (!this.isOnlyBuyer) {
-      this.PERMISSION_ROUTE = PERMISSION_ROUTES.SETTINGS.BROKERS;
+      this.PERMISSION_ROUTE = PERMISSION_ROUTES.SETTINGS.PEOPLE;
     }
 
     const routeSub = this.route.paramMap.subscribe((params) => {

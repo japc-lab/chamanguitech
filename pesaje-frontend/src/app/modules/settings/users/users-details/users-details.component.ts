@@ -28,7 +28,7 @@ type Tabs = 'Details' | 'Payment Info';
   templateUrl: './users-details.component.html',
 })
 export class UsersDetailsComponent implements OnInit, AfterViewInit, OnDestroy {
-  PERMISSION_ROUTE = PERMISSION_ROUTES.SETTINGS.USERS;
+  PERMISSION_ROUTE = PERMISSION_ROUTES.SETTINGS.PEOPLE;
 
   @ViewChild('userForm') userForm!: NgForm;
 
