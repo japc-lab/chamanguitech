@@ -43,6 +43,11 @@ import { PersonManagementComponent } from './person-management.component';
             loadChildren: () =>
               import('../../../pages/clients/client.module').then((m) => m.ClientModule),
           },
+          {
+            path: 'merchants',
+            loadChildren: () =>
+              import('../merchant/merchant.module').then((m) => m.MerchantModule),
+          },
           { path: '', redirectTo: 'users', pathMatch: 'full' },
         ],
       },
