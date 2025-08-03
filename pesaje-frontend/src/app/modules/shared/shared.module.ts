@@ -16,6 +16,7 @@ import { MaterialModule } from 'src/app/material.module';
 import { ResidualTableComponent } from './components/prices/residual-table/residual-table.component';
 import { BestPricesTableComponent } from './components/prices/best-prices-table/best-prices-table.component';
 import { SizePriceComponent } from './components/prices/size-price/size-price.component';
+import { CompanyBestPricesComponent } from '../settings/companies/company-best-prices/company-best-prices.component';
 
 @NgModule({
   declarations: [
@@ -30,6 +31,7 @@ import { SizePriceComponent } from './components/prices/size-price/size-price.co
     ShrimpFarmInformationComponent,
     SizePriceComponent,
     BestPricesTableComponent,
+    CompanyBestPricesComponent,
   ],
   imports: [
     CommonModule,
@@ -52,6 +54,7 @@ import { SizePriceComponent } from './components/prices/size-price/size-price.co
     ShrimpFarmInformationComponent,
     SizePriceComponent,
     BestPricesTableComponent,
+    CompanyBestPricesComponent,
   ], // ✅ Export so all modules can use them
 })
 export class SharedModule {}

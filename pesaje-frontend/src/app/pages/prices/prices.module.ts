@@ -14,6 +14,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { SharedModule } from 'src/app/modules/shared/shared.module';
 import { MaterialModule } from 'src/app/material.module';
 import { SizePriceComponent } from 'src/app/modules/shared/components/prices/size-price/size-price.component';
+import { CompanyBestPricesComponent } from 'src/app/modules/settings/companies/company-best-prices/company-best-prices.component';
 
 @NgModule({
   declarations: [],
@@ -23,8 +24,17 @@ import { SizePriceComponent } from 'src/app/modules/shared/components/prices/siz
     ReactiveFormsModule,
     RouterModule.forChild([
       {
-        path: '',
+        path: 'by-company',
         component: SizePriceComponent,
+      },
+      {
+        path: 'best-prices',
+        component: CompanyBestPricesComponent,
+      },
+      {
+        path: '',
+        redirectTo: 'by-company',
+        pathMatch: 'full',
       },
     ]),
     CrudModule,
