@@ -75,11 +75,11 @@
             <input type="checkbox" class="form-check-input" id="isActive" name="isActive"
               [ngModel]="isActive" (ngModelChange)="isActive = $event">
             <label class="form-check-label" for="isActive">
-              Activo
+              {{ isActive ? 'Activo' : 'Inactivo' }}
             </label>
           </div>
           <small class="form-text text-muted">
-            Desmarque esta opción para marcar el activo como inactivo
+            Marque esta opción para activar el activo, desmárquela para inactivarlo
           </small>
         </div>
       </div>

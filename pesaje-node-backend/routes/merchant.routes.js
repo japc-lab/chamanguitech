@@ -91,6 +91,14 @@ router.put(
             .withMessage('Invalid email format'),
         check('person.emergencyContactName').optional(),
         check('person.emergencyContactPhone').optional(),
+
+        // Validate deletedAt field
+        check('deletedAt')
+            .optional({ nullable: true })
+            .isISO8601()
+            .toDate()
+            .withMessage('deletedAt must be a valid ISO 8601 date string or null'),
+
         validateFields,
     ],
     updateMerchant

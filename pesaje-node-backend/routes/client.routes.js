@@ -114,6 +114,13 @@ router.put(
         // Prevent Updating `createdBy`
         check('createdBy').not().exists().withMessage('createdBy cannot be updated'),
 
+        // Validate deletedAt field
+        check('deletedAt')
+            .optional({ nullable: true })
+            .isISO8601()
+            .toDate()
+            .withMessage('deletedAt must be a valid ISO 8601 date string or null'),
+
         validateFields
     ],
     updateClient

@@ -105,7 +105,7 @@ export class MerchantListingComponent implements OnInit, AfterViewInit, OnDestro
         data: 'deletedAt',
         render: function (data) {
           if (data) {
-            return `<span class="badge bg-danger">Inactivo</span>`;
+            return `<span class="badge bg-warning">Inactivo</span>`;
           } else {
             return `<span class="badge bg-success">Activo</span>`;
           }

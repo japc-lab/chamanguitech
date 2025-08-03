@@ -35,6 +35,7 @@ export class MerchantDetailsComponent
 
   merchantData: IReadMerchantModel = {} as IReadMerchantModel;
   personId: string = '';
+  isActive: boolean = true;
 
   /** Stores all active subscriptions */
   private unsubscribe: Subscription[] = [];
@@ -69,6 +70,7 @@ export class MerchantDetailsComponent
       next: (merchant) => {
         this.merchantData = merchant;
         this.personId = merchant.person?.id ?? '';
+        this.isActive = !merchant.deletedAt;
 
         this.changeDetectorRef.detectChanges();
       },
@@ -92,6 +94,7 @@ export class MerchantDetailsComponent
     const payload: IUpdateMerchantModel = {
       id: this.merchantData.id,
       person: this.merchantData.person,
+      deletedAt: this.isActive ? null : new Date(),
     };
 
     const updateSub = this.merchantService

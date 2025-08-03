@@ -115,6 +115,13 @@ router.put(
         check('person.emergencyContactName').optional(),
         check('person.emergencyContactPhone').optional(),
 
+        // Validate deletedAt field
+        check('deletedAt')
+            .optional({ nullable: true })
+            .isISO8601()
+            .toDate()
+            .withMessage('deletedAt must be a valid ISO 8601 date string or null'),
+
         // Validate buyer ID
         check('buyerItBelongs', 'User ID is required').optional().isMongoId(),
         validateFields,

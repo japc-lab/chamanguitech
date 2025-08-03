@@ -4,6 +4,7 @@ export interface ICreateUpdateClientModel {
   person: IPersonModel;
   buyersItBelongs: string[];
   description?: string;
+  deletedAt?: Date | null;
 }
 
 export interface IReadClientModel {
@@ -18,4 +19,5 @@ export interface IReadClientModel {
   createdBy: string;
   deletedBy: string;
   id: string;
+  deletedAt?: Date;
 }

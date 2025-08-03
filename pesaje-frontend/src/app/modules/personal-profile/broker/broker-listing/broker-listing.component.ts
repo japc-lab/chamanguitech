@@ -107,6 +107,17 @@ export class BrokerListingComponent
           return data ? data : '-';
         },
       },
+      {
+        title: 'Estado',
+        data: 'deletedAt',
+        render: function (data) {
+          if (data) {
+            return `<span class="badge bg-warning">Inactivo</span>`;
+          } else {
+            return `<span class="badge bg-success">Activo</span>`;
+          }
+        },
+      },
       // {
       //   title: 'Comprador',
       //   data: 'buyerItBelongs.fullName',
@@ -197,8 +208,8 @@ export class BrokerListingComponent
   delete(id: string): void {
     const deleteSub = this.brokerService.deleteBroker(id).subscribe({
       next: () => {
-        this.brokers = this.brokers.filter((item) => item.id !== id);
-        this.reloadEvent.emit(true);
+        this.alertService.showTranslatedAlert({ alertType: 'success' });
+        this.loadBrokers(); // Reload data from server
       },
       error: () => {
         this.alertService.showTranslatedAlert({ alertType: 'error' });

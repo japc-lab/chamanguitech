@@ -120,6 +120,11 @@ const update = async (id, data) => {
     const updateData = { ...data };
     delete updateData.person; // Avoid modifying `person` separately
 
+    // Handle deletedAt property for soft delete
+    if (data.deletedAt !== undefined) {
+        updateData.deletedAt = data.deletedAt;
+    }
+
     return await dbAdapter.clientAdapter.update(id, updateData);
 };
 

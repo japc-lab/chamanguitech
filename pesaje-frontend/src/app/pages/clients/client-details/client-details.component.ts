@@ -42,6 +42,7 @@ export class ClientDetailsComponent
   personId: string = '';
   clientId: string = '';
   formattedBirthDate: string = '';
+  isActive: boolean = true;
 
   isOnlyBuyer = false;
 
@@ -90,6 +91,7 @@ export class ClientDetailsComponent
         this.clientData = client;
         this.personId = this.clientData.person?.id ?? '';
         this.clientId = this.clientData.id ?? '';
+        this.isActive = !client.deletedAt;
 
         if (this.clientData.person?.birthDate) {
           this.formattedBirthDate = new Date(this.clientData.person.birthDate)
@@ -156,6 +158,7 @@ export class ClientDetailsComponent
       buyersItBelongs: this.clientData.buyersItBelongs,
       person: this.clientData.person,
       description: this.clientData.description,
+      deletedAt: this.isActive ? null : new Date(),
     };
 
     const updateSub = this.clientService
