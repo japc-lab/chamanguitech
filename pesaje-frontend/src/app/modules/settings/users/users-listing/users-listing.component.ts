@@ -29,7 +29,7 @@ import { DateUtilsService } from 'src/app/utils/date-utils.service';
   templateUrl: './users-listing.component.html',
 })
 export class UsersListingComponent implements OnInit, AfterViewInit, OnDestroy {
-  PERMISSION_ROUTE = PERMISSION_ROUTES.SETTINGS.USERS;
+  PERMISSION_ROUTE = PERMISSION_ROUTES.SETTINGS.PEOPLE;
 
   isLoading = false;
 
@@ -106,7 +106,7 @@ export class UsersListingComponent implements OnInit, AfterViewInit, OnDestroy {
         data: 'deletedAt',
         render: function (data) {
           if (data) {
-            return `<span class="badge bg-danger">Inactivo</span>`;
+            return `<span class="badge bg-warning">Inactivo</span>`;
           } else {
             return `<span class="badge bg-success">Activo</span>`;
           }

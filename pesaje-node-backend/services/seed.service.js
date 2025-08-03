@@ -203,12 +203,11 @@ const seedOptions = async () => {
             { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f16"), name: 'Compañía', route: '/sales/company', parentName: 'Ventas' },
             { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f17"), name: 'Local', route: '/sales/local', parentName: 'Ventas' },
             { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f18"), name: 'Ventas Recientes', route: '/sales/list', parentName: 'Ventas' },
-            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f19"), name: 'Gestionar Usuarios', route: '/settings/users', parentName: 'Administración' },
-            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f20"), name: 'Gestionar Brokers', route: '/settings/brokers', parentName: 'Administración' },
-            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f21"), name: 'Gestionar Clientes', route: '/settings/clients', parentName: 'Administración' },
-            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f22"), name: 'Gestionar Compañías', route: '/settings/companies', parentName: 'Administración' },
-            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f23"), name: 'Reporte Económico', route: '/reports/economic', parentName: 'Reportes' },
-            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f24"), name: 'Reporte Total', route: '/reports/total', parentName: 'Reportes' },
+            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f19"), name: 'Gestionar de Personas', route: '/settings/people', parentName: 'Administración' },
+            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f20"), name: 'Gestionar Compañías', route: '/settings/companies', parentName: 'Administración' },
+            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f21"), name: 'Gestionar de Activos', route: '/settings/assets', parentName: 'Administración' },
+            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f22"), name: 'Reporte Económico', route: '/reports/economic', parentName: 'Reportes' },
+            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f23"), name: 'Reporte Total', route: '/reports/total', parentName: 'Reportes' },
         ];
 
         // Fetch existing options in one query
@@ -394,27 +393,7 @@ const seedPermissions = async () => {
                         }
                         break;
 
-                    case 'Gestionar Usuarios':
-                        if (role.name === 'Admin') {
-                            actions = [Permission.VIEW, Permission.ADD, Permission.EDIT, Permission.DELETE];
-                        } else if (role.name === 'Secretaria') {
-                            actions = [Permission.VIEW, Permission.ADD, Permission.EDIT];
-                        } else if (role.name === 'Comprador') {
-                            actions = [];
-                        }
-                        break;
-
-                    case 'Gestionar Brokers':
-                        if (role.name === 'Admin') {
-                            actions = [Permission.VIEW, Permission.ADD, Permission.EDIT, Permission.DELETE];
-                        } else if (role.name === 'Secretaria') {
-                            actions = [Permission.VIEW, Permission.ADD, Permission.EDIT];
-                        } else if (role.name === 'Comprador') {
-                            actions = [];
-                        }
-                        break;
-
-                    case 'Gestionar Clientes':
+                    case 'Gestionar de Personas':
                         if (role.name === 'Admin' || role.name === 'Secretaria') {
                             actions = [Permission.VIEW, Permission.EDIT, Permission.ADD, Permission.DELETE];
                         } else if (role.name === 'Comprador') {
@@ -423,6 +402,14 @@ const seedPermissions = async () => {
                         break;
 
                     case 'Gestionar Compañías':
+                        if (role.name === 'Admin' || role.name === 'Secretaria') {
+                            actions = [Permission.VIEW, Permission.EDIT, Permission.ADD, Permission.DELETE];
+                        } else if (role.name === 'Comprador') {
+                            actions = [];
+                        }
+                        break;
+
+                    case 'Gestionar de Activos':
                         if (role.name === 'Admin' || role.name === 'Secretaria') {
                             actions = [Permission.VIEW, Permission.EDIT, Permission.ADD, Permission.DELETE];
                         } else if (role.name === 'Comprador') {

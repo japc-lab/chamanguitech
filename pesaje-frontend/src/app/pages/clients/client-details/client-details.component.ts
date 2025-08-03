@@ -42,6 +42,7 @@ export class ClientDetailsComponent
   personId: string = '';
   clientId: string = '';
   formattedBirthDate: string = '';
+  isActive: boolean = true;
 
   isOnlyBuyer = false;
 
@@ -78,7 +79,7 @@ export class ClientDetailsComponent
     this.isOnlyBuyer = this.authService.isOnlyBuyer;
 
     if (!this.isOnlyBuyer) {
-      this.PERMISSION_ROUTE = PERMISSION_ROUTES.SETTINGS.CLIENTS;
+      this.PERMISSION_ROUTE = PERMISSION_ROUTES.SETTINGS.PEOPLE;
     }
   }
 
@@ -90,6 +91,7 @@ export class ClientDetailsComponent
         this.clientData = client;
         this.personId = this.clientData.person?.id ?? '';
         this.clientId = this.clientData.id ?? '';
+        this.isActive = !client.deletedAt;
 
         if (this.clientData.person?.birthDate) {
           this.formattedBirthDate = new Date(this.clientData.person.birthDate)
@@ -155,6 +157,8 @@ export class ClientDetailsComponent
     const payload: ICreateUpdateClientModel = {
       buyersItBelongs: this.clientData.buyersItBelongs,
       person: this.clientData.person,
+      description: this.clientData.description,
+      deletedAt: this.isActive ? null : new Date(),
     };
 
     const updateSub = this.clientService

@@ -9,6 +9,7 @@ export interface IUpdateBrokerModel {
   id: string;
   person: IPersonModel;
   buyerItBelongs: string;
+  deletedAt?: Date | null;
 }
 
 export interface IReadBrokerModel {

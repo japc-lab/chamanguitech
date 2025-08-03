@@ -24,9 +24,8 @@ export const PERMISSION_ROUTES = {
     TOTAL: '/reports/total',
   },
   SETTINGS: {
-    USERS: '/settings/users',
-    BROKERS: '/settings/brokers',
-    CLIENTS: '/settings/clients',
+    PEOPLE: '/settings/people',
     COMPANIES: '/settings/companies',
+    ASSETS: '/settings/assets',
   },
 };

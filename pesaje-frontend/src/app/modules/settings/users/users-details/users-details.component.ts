@@ -28,7 +28,7 @@ type Tabs = 'Details' | 'Payment Info';
   templateUrl: './users-details.component.html',
 })
 export class UsersDetailsComponent implements OnInit, AfterViewInit, OnDestroy {
-  PERMISSION_ROUTE = PERMISSION_ROUTES.SETTINGS.USERS;
+  PERMISSION_ROUTE = PERMISSION_ROUTES.SETTINGS.PEOPLE;
 
   @ViewChild('userForm') userForm!: NgForm;
 
@@ -134,7 +134,6 @@ export class UsersDetailsComponent implements OnInit, AfterViewInit, OnDestroy {
       roles: this.selectedRoles,
       deletedAt: this.isActive ? undefined : new Date(),
     };
-    console.log(payload);
 
     const updateSub = this.userService
       .updateUser(this.userData.id, payload)
@@ -170,6 +169,12 @@ export class UsersDetailsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onChangeEmail(value: string): void {
     this.userData.person.email = value.trim() === '' ? null : value;
+  }
+
+  isValidEmail(email: string): boolean {
+    if (!email) return true; // Allow empty emails
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailRegex.test(email);
   }
 
   togglePasswordForm(show: boolean) {

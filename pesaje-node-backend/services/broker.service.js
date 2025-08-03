@@ -105,9 +105,14 @@ const update = async (id, data) => {
         await dbAdapter.personAdapter.update(broker.person, data.person);
     }
 
-    // Prevent updating `buyerItBelongs`
+    // Handle deletedAt property for soft delete
     const updateData = { ...data };
     delete updateData.person;
+
+    // If deletedAt is provided, ensure it's properly handled
+    if (data.deletedAt !== undefined) {
+        updateData.deletedAt = data.deletedAt;
+    }
 
     return await dbAdapter.brokerAdapter.update(id, updateData);
 };

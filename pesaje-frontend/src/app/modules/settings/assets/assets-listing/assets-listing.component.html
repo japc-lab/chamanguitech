@@ -1,0 +1,99 @@
+<div class="card">
+  <div class="card-header border-0 pt-6">
+    <!--begin::Card title-->
+    <div class="card-title">
+      <!--begin::Search-->
+      <div class="d-flex align-items-center position-relative my-1">
+        <app-keenicon name="magnifier" class="fs-3 position-absolute ms-5"></app-keenicon>
+        <input type="text" data-action="filter" class="form-control form-control-solid w-250px ps-12"
+          placeholder="Buscar Activos">
+      </div>
+      <!--end::Search-->
+    </div>
+    <!--begin::Card title-->
+
+    <!--begin::Card toolbar-->
+    <div class="card-toolbar">
+      <!--begin::Toolbar-->
+      <div class="d-flex justify-content-end">
+        <!--begin::Add asset-->
+        <button *appCanCreate="PERMISSION_ROUTE" type="button" class="btn btn-primary" data-action="create"
+          (click)="create()">
+          Agregar Activo
+        </button>
+        <!--end::Add asset-->
+      </div>
+      <!--end::Toolbar-->
+    </div>
+    <!--end::Card toolbar-->
+  </div>
+
+  <div class="card-body pt-0">
+    <app-crud [datatableConfig]="datatableConfig" permissionRoute="{{PERMISSION_ROUTE}}"
+      (deleteEvent)="delete($event.toString())" (editEvent)="edit($event.toString())" (createEvent)="create()"
+      [reload]="reloadEvent" [modal]="formModal"></app-crud>
+  </div>
+</div>
+
+<ng-template #formModal let-modal>
+  <form #myForm="ngForm" (ngSubmit)="onSubmit($event, myForm)">
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">{{ isEditing ? 'Editar Activo' : 'Nuevo Activo' }}</h4>
+      <button type="button" class="btn-close" aria-label="Cerrar" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <div class="modal-body">
+      <div class="d-flex flex-column scroll-y me-n7 pe-7 mw-650px">
+        <!-- Nombre del Activo -->
+        <div class="mb-3">
+          <label for="name" class="required fw-semibold fs-6 mb-2">Nombre del Activo</label>
+          <input type="text" class="form-control" id="name" name="name" [(ngModel)]="assetModel.name"
+            required #name="ngModel">
+          <div *ngIf="(myForm.submitted || name.dirty || name.touched) && name.errors?.['required']"
+            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+            <div>El nombre del activo es obligatorio.</div>
+          </div>
+        </div>
+
+        <!-- Cantidad -->
+        <div class="mb-3">
+          <label for="quantity" class="required fw-semibold fs-6 mb-2">Cantidad</label>
+          <input type="number" class="form-control" id="quantity" name="quantity" [(ngModel)]="assetModel.quantity"
+            required min="0" #quantity="ngModel">
+          <div *ngIf="(myForm.submitted || quantity.dirty || quantity.touched) && quantity.errors?.['required']"
+            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+            <div>La cantidad es obligatoria.</div>
+          </div>
+          <div *ngIf="(myForm.submitted || quantity.dirty || quantity.touched) && quantity.errors?.['min']"
+            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+            <div>La cantidad debe ser mayor o igual a 0.</div>
+          </div>
+        </div>
+
+        <!-- Estado del Activo (solo visible al editar) -->
+        <div class="mb-3" *ngIf="isEditing">
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="isActive" name="isActive"
+              [ngModel]="isActive" (ngModelChange)="isActive = $event">
+            <label class="form-check-label" for="isActive">
+              {{ isActive ? 'Activo' : 'Inactivo' }}
+            </label>
+          </div>
+          <small class="form-text text-muted">
+            Marque esta opción para activar el activo, desmárquela para inactivarlo
+          </small>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer flex-center">
+      <button type="reset" class="btn btn-light me-3" (click)="modal.dismiss('cancel')">
+        Cancelar
+      </button>
+      <button type="submit" class="btn btn-primary" [attr.data-kt-indicator]="isLoading ? 'on' : 'off'">
+        <span class="indicator-label">{{ isEditing ? 'Actualizar' : 'Guardar' }}</span>
+        <span class="indicator-progress">
+          Por favor, espera... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+        </span>
+      </button>
+    </div>
+  </form>
+</ng-template>

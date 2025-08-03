@@ -47,6 +47,7 @@ export class BrokerDetailsComponent
   brokerData: IReadBrokerModel = {} as IReadBrokerModel;
   personId: string = '';
   formattedBirthDate: string = '';
+  isActive: boolean = true;
 
   /** Stores all active subscriptions */
   private unsubscribe: Subscription[] = [];
@@ -69,7 +70,7 @@ export class BrokerDetailsComponent
     this.isOnlyBuyer = this.authService.isOnlyBuyer;
 
     if (!this.isOnlyBuyer) {
-      this.PERMISSION_ROUTE = PERMISSION_ROUTES.SETTINGS.BROKERS;
+      this.PERMISSION_ROUTE = PERMISSION_ROUTES.SETTINGS.PEOPLE;
     }
 
     const routeSub = this.route.paramMap.subscribe((params) => {
@@ -89,6 +90,7 @@ export class BrokerDetailsComponent
       next: (broker) => {
         this.brokerData = broker;
         this.personId = broker.person?.id ?? '';
+        this.isActive = !broker.deletedAt;
 
         if (this.brokerData.person?.birthDate) {
           this.formattedBirthDate = this.dateUtils.formatISOToDateInput(
@@ -146,6 +148,7 @@ export class BrokerDetailsComponent
       id: this.brokerData.id,
       buyerItBelongs: this.brokerData.buyerItBelongs as string,
       person: this.brokerData.person,
+      deletedAt: this.isActive ? null : new Date(),
     };
 
     const updateSub = this.brokerService

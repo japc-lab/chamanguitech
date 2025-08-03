@@ -47,6 +47,7 @@ export class ClientListingComponent
   createClientModel: ICreateUpdateClientModel = {
     person: {} as IPersonModel,
     buyersItBelongs: [],
+    description: '',
   };
 
   clients: IReadClientModel[] = [];
@@ -107,6 +108,17 @@ export class ClientListingComponent
           return data ? data : '-';
         },
       },
+      {
+        title: 'Estado',
+        data: 'deletedAt',
+        render: function (data) {
+          if (data) {
+            return `<span class="badge bg-warning">Inactivo</span>`;
+          } else {
+            return `<span class="badge bg-success">Activo</span>`;
+          }
+        },
+      },
     ],
     language: {
       url: 'https://cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json',
@@ -132,7 +144,7 @@ export class ClientListingComponent
     this.isOnlyBuyer = this.authService.isOnlyBuyer;
 
     if (!this.isOnlyBuyer) {
-      this.PERMISSION_ROUTE = PERMISSION_ROUTES.SETTINGS.CLIENTS;
+      this.PERMISSION_ROUTE = PERMISSION_ROUTES.SETTINGS.PEOPLE;
     }
 
     this.loadUsers();
@@ -181,8 +193,8 @@ export class ClientListingComponent
   delete(id: string): void {
     const deleteSub = this.clientService.deleteClient(id).subscribe({
       next: () => {
-        this.clients = this.clients.filter((item) => item.id !== id);
-        this.reloadEvent.emit(true);
+        this.alertService.showTranslatedAlert({ alertType: 'success' });
+        this.loadUsers(); // Reload data from server
       },
       error: () => {
         this.alertService.showTranslatedAlert({ alertType: 'error' });

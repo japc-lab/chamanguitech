@@ -24,6 +24,7 @@ const RolePermission = require(`${accountModelsPath}/role-permission`);
 // Import profile models
 const Person = require(`${profileModelsPath}/person`);
 const Broker = require(`${profileModelsPath}/broker`);
+const Merchant = require(`${profileModelsPath}/merchant`);
 const PaymentInfo = require(`${profileModelsPath}/payment-info`);
 
 // Import client models
@@ -56,6 +57,7 @@ const LocalSaleDetailItem = require(`${saleModelsPath}/local-sale-detail-item`);
 
 // Import admin models
 const Company = require(`${adminModelsPath}/company`);
+const Asset = require(`${adminModelsPath}/asset`);
 
 // Import report models
 const TotalReport = require(`${reportModelsPath}/total-report`);
@@ -70,6 +72,7 @@ module.exports = {
     RolePermission,
     Person,
     Broker,
+    Merchant,
     Client,
     PaymentInfo,
     ShrimpFarm,
@@ -91,4 +94,5 @@ module.exports = {
     LocalSaleDetail,
     LocalSaleDetailItem,
     TotalReport,
+    Asset,
 };

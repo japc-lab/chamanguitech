@@ -172,9 +172,8 @@
                   <div class="col-lg-8 fv-row">
                     <input type="email" class="form-control form-control-lg form-control-solid"
                       placeholder="Correo electrónico" name="email" [(ngModel)]="userData.person.email"
-                      (ngModelChange)="onChangeEmail($event)" #email="ngModel"
-                      pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$">
-                    <div *ngIf="(userForm.submitted || email.dirty || email.touched) && email.errors?.['pattern']"
+                      (ngModelChange)="onChangeEmail($event)" #email="ngModel">
+                    <div *ngIf="(userForm.submitted || email.dirty || email.touched) && userData.person.email && !isValidEmail(userData.person.email)"
                       class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
                       <div>Debe ingresar un correo válido.</div>
                     </div>
@@ -235,7 +234,7 @@
                       <input class="form-check-input" type="checkbox" id="isActiveCheckbox" name="isActive"
                         [(ngModel)]="isActive">
                       <label class="form-check-label" for="isActiveCheckbox">
-                        Activo
+                        {{ isActive ? 'Activo' : 'Inactivo' }}
                       </label>
                     </div>
                   </div>

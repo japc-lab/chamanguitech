@@ -97,7 +97,7 @@
             </label>
             <!--end::Label-->
             <!--begin::Input-->
-            <input type="email" class="form-control form-control-solid" name="email" [(ngModel)]="userModel.email" #email="ngModel" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" />
+                         <input type="email" class="form-control form-control-solid" name="email" [(ngModel)]="userModel.email" #email="ngModel" required />
             <div *ngIf="myForm.submitted && myForm.invalid" class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
               <div *ngIf="email.errors?.['required']">Email is required</div>
               <div *ngIf="email.errors?.['pattern']">Email is not valid</div>

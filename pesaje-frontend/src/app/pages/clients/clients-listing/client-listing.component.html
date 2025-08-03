@@ -83,14 +83,6 @@
             </div>
           </div>
 
-          <!-- Fecha de Nacimiento -->
-          <div class="mb-3">
-            <label for="birthDate" class="fw-semibold fs-6 mb-2">Fecha de Nacimiento</label>
-            <input type="date" class="form-control" id="birthDate" name="birthDate"
-              [(ngModel)]="createClientModel.person.birthDate" #birthDate="ngModel">
-            <!-- Si necesitas validar el formato ISO8601, deberás implementar un validador personalizado -->
-          </div>
-
           <!-- Dirección -->
           <div class="mb-3">
             <label for="address" class="required fw-semibold fs-6 mb-2">Dirección</label>
@@ -102,16 +94,9 @@
             </div>
           </div>
 
-          <!-- Teléfono (opcional) -->
+          <!--Celular -->
           <div class="mb-3">
-            <label for="phone" class="fw-semibold fs-6 mb-2">Teléfono</label>
-            <input type="text" class="form-control" id="phone" name="phone"
-              [(ngModel)]="createClientModel.person.phone">
-          </div>
-
-          <!-- Teléfono Celular -->
-          <div class="mb-3">
-            <label for="mobilePhone" class="required fw-semibold fs-6 mb-2">Teléfono Celular</label>
+            <label for="mobilePhone" class="required fw-semibold fs-6 mb-2">Celular</label>
             <input type="text" class="form-control" id="mobilePhone" name="mobilePhone"
               [(ngModel)]="createClientModel.person.mobilePhone" required #mobilePhone="ngModel">
             <div
@@ -119,13 +104,6 @@
               class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
               <div>El teléfono celular es obligatorio.</div>
             </div>
-          </div>
-
-          <!-- Teléfono Celular Secundario (opcional) -->
-          <div class="mb-3">
-            <label for="mobilePhone2" class="fw-semibold fs-6 mb-2">Teléfono Celular Secundario</label>
-            <input type="text" class="form-control" id="mobilePhone2" name="mobilePhone2"
-              [(ngModel)]="createClientModel.person.mobilePhone2">
           </div>
 
           <!-- Correo Electrónico -->
@@ -139,18 +117,11 @@
             </div>
           </div>
 
-          <!-- Contacto de Emergencia -->
+          <!-- Descripción -->
           <div class="mb-3">
-            <label for="emergencyContactName" class="fw-semibold fs-6 mb-2">Contacto de Emergencia</label>
-            <input type="text" class="form-control" id="emergencyContactName" name="emergencyContactName"
-              [(ngModel)]="createClientModel.person.emergencyContactName" #emergencyContactName="ngModel">
-          </div>
-
-          <!-- Teléfono de Emergencia -->
-          <div class="mb-3">
-            <label for="emergencyContactPhone" class="fw-semibold fs-6 mb-2">Teléfono de Emergencia</label>
-            <input type="text" class="form-control" id="emergencyContactPhone" name="emergencyContactPhone"
-              [(ngModel)]="createClientModel.person.emergencyContactPhone" #emergencyContactPhone="ngModel">
+            <label for="description" class="fw-semibold fs-6 mb-2">Descripción</label>
+            <textarea class="form-control" id="description" name="description" rows="3"
+              [(ngModel)]="createClientModel.description" #description="ngModel"></textarea>
           </div>
 
           <!-- Multi-select de Compradores -->
