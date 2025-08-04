@@ -37,6 +37,8 @@ import { IReadPeriodModel } from '../../shared/interfaces/period.interface';
 import { PeriodService } from '../../shared/services/period.service';
 import { ICompany } from '../../settings/interfaces/company.interfaces';
 import { CompanyService } from '../../settings/services/company.service';
+import { IReadFishermanModel } from '../../settings/interfaces/fisherman.interface';
+import { FishermanService } from '../../settings/services/fisherman.service';
 
 type Tabs = 'Details' | 'Payment Info';
 
@@ -57,6 +59,7 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
 
   buyersList: IReadUserModel[];
   brokersList: IReadBrokerModel[];
+  fishermenList: IReadFishermanModel[];
   clientsList: IReadClientModel[];
   shrimpFarmsList: IReadShrimpFarmModel[];
   companiesList: ICompany[];
@@ -86,6 +89,7 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
     private brokerService: BrokerService,
     private clientService: ClientService,
     private shrimpFarmService: ShrimpFarmService,
+    private fishermanService: FishermanService,
     private modalService: NgbModal,
     private formUtils: FormUtilsService,
     private inputUtils: InputUtilsService,
@@ -116,6 +120,7 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
       this.loadClients(this.createPurchaseModel.buyer);
     } else {
       this.loadBuyers();
+      this.loadFishermen();
     }
 
     const companiesSub = this.loadCompanies().subscribe({
@@ -268,6 +273,20 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
     this.unsubscribe.push(shrimpFarmSub);
   }
 
+  loadFishermen(): void {
+    const fishermanSub = this.fishermanService.getAll(false).subscribe({
+      next: (fishermen: IReadFishermanModel[]) => {
+        this.fishermenList = fishermen;
+        this.changeDetectorRef.detectChanges();
+      },
+      error: (error) => {
+        console.error('Error fetching fishermen:', error);
+      },
+    });
+
+    this.unsubscribe.push(fishermanSub);
+  }
+
   onCompanyChange(event: Event) {
     this.createPurchaseModel.period = undefined;
 
@@ -338,7 +357,6 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
         .updatePurchase(this.purchaseId, this.createPurchaseModel)
         .subscribe({
           next: (response) => {
-            console.log('Purchase updated successfully:', response);
             this.alertService.showTranslatedAlert({ alertType: 'success' });
           },
           error: (error) => {

@@ -167,7 +167,7 @@
 
         <div class="row g-5 g-xl-8 mt-1">
           <!-- Buyer -->
-          <div *ngIf="!isOnlyBuyer" class="col-md-4">
+          <div *ngIf="!isOnlyBuyer" class="col-md-6">
             <label for="buyer" class="required fw-semibold fs-6 mb-2">Comprador</label>
             <select id="buyer" name="buyer" class="form-select form-select-sm" [(ngModel)]="createPurchaseModel.buyer"
               #buyer="ngModel" required (change)="onBuyerChange($event)">
@@ -183,7 +183,7 @@
           </div>
 
           <!-- Broker -->
-          <div class="col-md-4">
+          <div class="col-md-6">
             <label for="broker" class="required fw-semibold fs-6 mb-2">Bróker</label>
             <select id="broker" name="broker" class="form-select form-select-sm"
               [(ngModel)]="createPurchaseModel.broker" #broker="ngModel" required>
@@ -198,8 +198,24 @@
             </div>
           </div>
 
+          <!-- Fisherman -->
+          <div class="col-md-6">
+            <label for="fisherman" class="required fw-semibold fs-6 mb-2">Recibidor de Pesca</label>
+            <select id="fisherman" name="fisherman" class="form-select form-select-sm"
+              [(ngModel)]="createPurchaseModel.fisherman" #fisherman="ngModel" required>
+              <option value="" disabled selected>Seleccione una opción</option>
+              <option *ngFor="let fisherman of fishermenList" [value]="fisherman.id">
+                {{ fisherman.person.names }} {{ fisherman.person.lastNames }}
+              </option>
+            </select>
+            <div *ngIf="purchaseForm.submitted && fisherman.invalid"
+              class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+              <div>Debe seleccionar un recibidor de pesca.</div>
+            </div>
+          </div>
+
           <!-- Client Dropdown & "Nuevo Cliente" Button -->
-          <div class="col-md-4 d-flex align-items-center">
+          <div class="col-md-6 d-flex align-items-center">
             <div class="flex-grow-1">
               <label for="client" class="required fw-semibold fs-6 mb-2">Cliente</label>
               <div class="d-flex align-items-center">

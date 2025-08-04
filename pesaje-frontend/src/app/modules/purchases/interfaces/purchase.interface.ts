@@ -1,5 +1,6 @@
 import { IReadBrokerModel } from '../../personal-profile/interfaces/broker.interface';
 import { ICompany } from '../../settings/interfaces/company.interfaces';
+import { IReadFishermanModel } from '../../settings/interfaces/fisherman.interface';
 import {
   IReadUserModel,
   IReducedUserModel,
@@ -19,6 +20,7 @@ export interface ICreatePurchaseModel {
   company: string;
   period?: string;
   broker: string;
+  fisherman: string;
   client: string;
   status?: PurchaseStatusEnum;
   shrimpFarm: string;
@@ -69,6 +71,7 @@ export interface IDetailedPurchaseModel extends IBasePurchaseModel {
   company: ICompany;
   period: IReadPeriodModel;
   broker: IReadBrokerModel;
+  fisherman: IReadFishermanModel;
   client: IReadClientModel;
   shrimpFarm: IReadShrimpFarmModel;
 }
@@ -78,6 +81,7 @@ export interface IListPurchaseModel extends IBasePurchaseModel {
   company: string;
   period: string;
   broker: string;
+  fisherman: string;
   client: string;
   shrimpFarm: string;
   totalPayed?: number;

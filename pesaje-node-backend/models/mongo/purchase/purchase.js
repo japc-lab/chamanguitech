@@ -18,6 +18,11 @@ const PurchaseSchema = Schema({
     ref: 'Broker',
     required: true
   },
+  fisherman: {
+    type: Schema.Types.ObjectId,
+    ref: 'Fisherman',
+    required: true
+  },
   client: {
     type: Schema.Types.ObjectId,
     ref: 'Client',
