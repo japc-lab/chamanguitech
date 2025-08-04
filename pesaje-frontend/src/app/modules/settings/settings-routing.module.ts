@@ -32,7 +32,9 @@ const routes: Routes = [
   {
     path: 'people',
     loadChildren: () =>
-      import('./person-management/person-management.module').then((m) => m.PersonManagementModule),
+      import('./person-management/person-management.module').then(
+        (m) => m.PersonManagementModule
+      ),
   },
   { path: '', redirectTo: 'users', pathMatch: 'full' },
 ];

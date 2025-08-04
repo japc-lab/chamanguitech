@@ -14,9 +14,7 @@ import { SharedModule } from '../../shared/shared.module';
 import { PersonManagementComponent } from './person-management.component';
 
 @NgModule({
-  declarations: [
-    PersonManagementComponent,
-  ],
+  declarations: [PersonManagementComponent],
   imports: [
     CommonModule,
     FormsModule,
@@ -41,12 +39,23 @@ import { PersonManagementComponent } from './person-management.component';
           {
             path: 'clients',
             loadChildren: () =>
-              import('../../../pages/clients/client.module').then((m) => m.ClientModule),
+              import('../../../pages/clients/client.module').then(
+                (m) => m.ClientModule
+              ),
           },
           {
             path: 'merchants',
             loadChildren: () =>
-              import('../merchant/merchant.module').then((m) => m.MerchantModule),
+              import('../merchant/merchant.module').then(
+                (m) => m.MerchantModule
+              ),
+          },
+          {
+            path: 'fishermen',
+            loadChildren: () =>
+              import('../fisherman/fisherman.module').then(
+                (m) => m.FishermanModule
+              ),
           },
           { path: '', redirectTo: 'users', pathMatch: 'full' },
         ],
