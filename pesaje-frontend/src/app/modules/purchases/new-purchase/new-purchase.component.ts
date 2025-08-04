@@ -321,7 +321,10 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   }
 
   onHasInvoiceChange(hasInvoice: boolean) {
-    if (!hasInvoice) this.createPurchaseModel.invoice = undefined;
+    if (!hasInvoice) {
+      this.createPurchaseModel.invoiceNumber = undefined;
+      this.createPurchaseModel.invoiceName = undefined;
+    }
   }
 
   submitForm(): void {
@@ -406,7 +409,7 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
 
   addNewClient() {
     if (this.isOnlyBuyer) this.router.navigate(['clients']);
-    else this.router.navigate(['settings', 'clients']);
+    else this.router.navigate(['settings', 'people', 'clients']);
   }
 
   goBack(): void {
@@ -477,6 +480,35 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
    */
   validateNumber(event: KeyboardEvent) {
     this.inputUtils.validateNumber(event); // ✅ Use utility function
+  }
+
+  /**
+   * 👉 Formats weight sheet number to 8 digits with leading zeros when input loses focus
+   */
+  formatWeightSheetNumberOnBlur(event: Event) {
+    const input = event.target as HTMLInputElement;
+    let value = input.value.replace(/\D/g, ''); // Remove non-digits
+
+    // Pad with leading zeros to make it 8 digits
+    value = value.padStart(8, '0');
+
+    // Update the model and input value
+    this.createPurchaseModel.weightSheetNumber = value;
+    input.value = value;
+  }
+
+  /**
+   * 👉 Handles focus event to clear field if it's all zeros
+   */
+  onWeightSheetNumberFocus(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const value = input.value;
+
+    // If the field contains only zeros, clear it for easy typing
+    if (value === '00000000' || value === '') {
+      this.createPurchaseModel.weightSheetNumber = '';
+      input.value = '';
+    }
   }
 
   async openPaymentsModal(): Promise<any> {

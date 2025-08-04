@@ -33,8 +33,10 @@ export interface ICreatePurchaseModel {
   subtotal2?: number;
   grandTotal: number;
   totalAgreedToPay: number;
-  hasInvoice: boolean;
-  invoice?: string;
+  hasInvoice: 'yes' | 'no' | 'not-applicable';
+  invoiceNumber?: string;
+  invoiceName?: string;
+  weightSheetNumber?: string;
   purchaseDate: string;
   controlNumber?: string;
 }
@@ -51,8 +53,10 @@ export interface IBasePurchaseModel {
   subtotal2?: number;
   grandTotal: number;
   totalAgreedToPay: number;
-  hasInvoice: boolean;
-  invoice?: string;
+  hasInvoice: 'yes' | 'no' | 'not-applicable';
+  invoiceNumber?: string;
+  invoiceName?: string;
+  weightSheetNumber?: string;
   status: PurchaseStatusEnum;
   deletedAt: string | null;
   purchaseDate: string;
@@ -103,8 +107,10 @@ export interface IUpdatePurchaseModel {
   subtotal2?: number;
   grandTotal: number;
   totalAgreedToPay: number;
-  hasInvoice: boolean;
-  invoice?: string;
+  hasInvoice: 'yes' | 'no' | 'not-applicable';
+  invoiceNumber?: string;
+  invoiceName?: string;
+  weightSheetNumber?: string;
 }
 
 export enum PurchaseStatusEnum {
