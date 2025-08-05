@@ -94,7 +94,7 @@ export class MerchantListingComponent implements OnInit, AfterViewInit, OnDestro
         },
       },
       {
-        title: 'Teléfono',
+        title: 'Celular',
         data: 'person',
         render: function (data) {
           return data.mobilePhone || '-';
@@ -186,6 +186,9 @@ export class MerchantListingComponent implements OnInit, AfterViewInit, OnDestro
 
     const merchantPayload: ICreateMerchantModel = {
       person: this.merchantModel.person!,
+      recommendedBy: this.merchantModel.recommendedBy,
+      recommendedByPhone: this.merchantModel.recommendedByPhone,
+      description: this.merchantModel.description,
     };
 
     this.merchantService.createMerchant(merchantPayload as any).subscribe({

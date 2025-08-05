@@ -2,6 +2,18 @@ const { Schema, model } = require('mongoose');
 
 const MerchantSchema = Schema({
 
+  recommendedBy: {
+    type: String,
+    default: null
+  },
+  recommendedByPhone: {
+    type: String,
+    default: null
+  },
+  description: {
+    type: String,
+    default: null
+  },
   person: {
     type: Schema.Types.ObjectId,
     ref: 'Person',

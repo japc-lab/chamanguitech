@@ -76,12 +76,10 @@
             </div>
           </div>
 
-
-
           <div class="mb-3">
             <label for="address" class="required fw-semibold fs-6 mb-2">Dirección</label>
-            <input type="text" class="form-control" id="address" name="address" [(ngModel)]="merchantModel.person!.address"
-              required #address="ngModel">
+            <input type="text" class="form-control" id="address" name="address"
+              [(ngModel)]="merchantModel.person!.address" required #address="ngModel">
             <div *ngIf="(myForm.submitted || address.dirty || address.touched) && address.errors?.['required']"
               class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
               <div>La dirección es obligatoria.</div>
@@ -89,7 +87,7 @@
           </div>
 
           <div class="mb-3">
-            <label for="phone" class="fw-semibold fs-6 mb-2">Teléfono Fijo</label>
+            <label for="phone" class="fw-semibold fs-6 mb-2">Teléfono Compañía</label>
             <input type="text" class="form-control" id="phone" name="phone" [(ngModel)]="merchantModel.person!.phone"
               #phone="ngModel">
           </div>
@@ -116,15 +114,22 @@
           </div>
 
           <div class="mb-3">
-            <label for="emergencyContactName" class="fw-semibold fs-6 mb-2">Contacto de Emergencia</label>
-            <input type="text" class="form-control" id="emergencyContactName" name="emergencyContactName"
-              [(ngModel)]="merchantModel.person!.emergencyContactName" #emergencyContactName="ngModel">
+            <label for="recommendedBy" class="fw-semibold fs-6 mb-2">Recomendado Por</label>
+            <input type="text" class="form-control" id="recommendedBy" name="recommendedBy"
+              [(ngModel)]="merchantModel.recommendedBy" #recommendedBy="ngModel">
           </div>
 
           <div class="mb-3">
-            <label for="emergencyContactPhone" class="fw-semibold fs-6 mb-2">Teléfono de Emergencia</label>
-            <input type="text" class="form-control" id="emergencyContactPhone" name="emergencyContactPhone"
-              [(ngModel)]="merchantModel.person!.emergencyContactPhone" #emergencyContactPhone="ngModel">
+            <label for="recommendedByPhone" class="fw-semibold fs-6 mb-2">Teléfono del Recomendador</label>
+            <input type="text" class="form-control" id="recommendedByPhone" name="recommendedByPhone"
+              [(ngModel)]="merchantModel.recommendedByPhone" #recommendedByPhone="ngModel">
+          </div>
+
+          <div class="mb-3">
+            <label for="description" class="fw-semibold fs-6 mb-2">Descripción</label>
+            <textarea class="form-control" id="description" name="description"
+              [(ngModel)]="merchantModel.description" #description="ngModel" rows="3"
+              placeholder="Descripción del comerciante"></textarea>
           </div>
         </div>
       </div>

@@ -95,8 +95,8 @@
                   <label class="col-lg-4 col-form-label required fw-bold fs-6">Identificación</label>
                   <div class="col-lg-8 fv-row">
                     <input type="text" class="form-control form-control-lg form-control-solid"
-                      placeholder="Identificación" name="identification" [(ngModel)]="merchantData.person.identification"
-                      #identification="ngModel" required>
+                      placeholder="Identificación" name="identification"
+                      [(ngModel)]="merchantData.person.identification" #identification="ngModel" required>
                     <div
                       *ngIf="(merchantForm.submitted || identification.dirty || identification.touched) && identification.errors?.['required']"
                       class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
@@ -110,7 +110,8 @@
                   <label class="col-lg-4 col-form-label required fw-bold fs-6">Dirección</label>
                   <div class="col-lg-8 fv-row">
                     <input type="text" class="form-control form-control-lg form-control-solid" placeholder="Dirección"
-                      name="address" [(ngModel)]="merchantData.person.address" #address="ngModel" required minlength="3">
+                      name="address" [(ngModel)]="merchantData.person.address" #address="ngModel" required
+                      minlength="3">
                     <div
                       *ngIf="(merchantForm.submitted || address.dirty || address.touched) && address.errors?.['required']"
                       class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
@@ -129,10 +130,10 @@
                   <label class="col-lg-4 col-form-label required fw-bold fs-6">Teléfonos</label>
                   <div class="col-lg-8">
                     <div class="row">
-                      <!-- Teléfono fijo (opcional) -->
+                      <!-- Teléfono compañía (opcional) -->
                       <div class="col-lg-4 fv-row">
                         <input type="tel" class="form-control form-control-lg form-control-solid mb-3"
-                          placeholder="Teléfono fijo" name="phone" [(ngModel)]="merchantData.person.phone">
+                          placeholder="Teléfono Compañía" name="phone" [(ngModel)]="merchantData.person.phone">
                       </div>
                       <!-- Celular 1 (requerido) -->
                       <div class="col-lg-4 fv-row">
@@ -149,11 +150,6 @@
                           class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
                           <div>Ingrese un número de teléfono válido.</div>
                         </div>
-                      </div>
-                      <!-- Celular 2 (opcional) -->
-                      <div class="col-lg-4 fv-row">
-                        <input type="tel" class="form-control form-control-lg form-control-solid"
-                          placeholder="Celular 2" name="mobilePhone2" [(ngModel)]="merchantData.person.mobilePhone2">
                       </div>
                     </div>
                   </div>
@@ -173,36 +169,46 @@
                   </div>
                 </div>
 
-                <!-- Contacto de Emergencia -->
+                <!-- Recomendado Por -->
                 <div class="row mb-6">
-                  <label class="col-lg-4 col-form-label fw-bold fs-6">Contacto de Emergencia</label>
+                  <label class="col-lg-4 col-form-label fw-bold fs-6">Recomendado Por</label>
                   <div class="col-lg-8">
                     <div class="row">
-                      <!-- Nombre del contacto -->
+                      <!-- Nombre del recomendador -->
                       <div class="col-lg-6 fv-row">
                         <input type="text" class="form-control form-control-lg form-control-solid mb-3"
-                          placeholder="Nombre contacto" name="emergencyContactName"
-                          [(ngModel)]="merchantData.person.emergencyContactName" #emergencyContactName="ngModel"
+                          placeholder="Nombre recomendador" name="recommendedBy"
+                          [(ngModel)]="merchantData.recommendedBy" #recommendedBy="ngModel"
                           minlength="3">
                         <div
-                          *ngIf="(merchantForm.submitted || emergencyContactName.dirty || emergencyContactName.touched) && emergencyContactName.errors?.['minlength']"
+                          *ngIf="(merchantForm.submitted || recommendedBy.dirty || recommendedBy.touched) && recommendedBy.errors?.['minlength']"
                           class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
                           <div>Debe tener al menos 3 caracteres.</div>
                         </div>
                       </div>
-                      <!-- Teléfono del contacto -->
+                      <!-- Teléfono del recomendador -->
                       <div class="col-lg-6 fv-row">
                         <input type="tel" class="form-control form-control-lg form-control-solid"
-                          placeholder="Teléfono contacto" name="emergencyContactPhone"
-                          [(ngModel)]="merchantData.person.emergencyContactPhone" #emergencyContactPhone="ngModel"
+                          placeholder="Teléfono recomendador" name="recommendedByPhone"
+                          [(ngModel)]="merchantData.recommendedByPhone" #recommendedByPhone="ngModel"
                           pattern="^\+?[0-9\s\-\(\)]{7,15}$">
                         <div
-                          *ngIf="(merchantForm.submitted || emergencyContactPhone.dirty || emergencyContactPhone.touched) && emergencyContactPhone.errors?.['pattern']"
+                          *ngIf="(merchantForm.submitted || recommendedByPhone.dirty || recommendedByPhone.touched) && recommendedByPhone.errors?.['pattern']"
                           class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
                           <div>Ingrese un número de teléfono válido.</div>
                         </div>
                       </div>
                     </div>
+                  </div>
+                </div>
+
+                <!-- Descripción -->
+                <div class="row mb-6">
+                  <label class="col-lg-4 col-form-label fw-bold fs-6">Descripción</label>
+                  <div class="col-lg-8 fv-row">
+                    <textarea class="form-control form-control-lg form-control-solid"
+                      placeholder="Descripción del comerciante" name="description"
+                      [(ngModel)]="merchantData.description" #description="ngModel" rows="3"></textarea>
                   </div>
                 </div>
 

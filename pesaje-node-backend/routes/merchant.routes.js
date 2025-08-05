@@ -54,8 +54,9 @@ router.post(
                 return true;
             })
             .withMessage('Invalid email format'),
-        check('person.emergencyContactName').optional(),
-        check('person.emergencyContactPhone').optional(),
+        check('recommendedBy').optional(),
+        check('recommendedByPhone').optional(),
+        check('description').optional(),
         validateFields,
     ],
     createMerchant
@@ -89,8 +90,9 @@ router.put(
                 return true;
             })
             .withMessage('Invalid email format'),
-        check('person.emergencyContactName').optional(),
-        check('person.emergencyContactPhone').optional(),
+        check('recommendedBy').optional(),
+        check('recommendedByPhone').optional(),
+        check('description').optional(),
 
         // Validate deletedAt field
         check('deletedAt')

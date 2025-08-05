@@ -94,6 +94,9 @@ export class MerchantDetailsComponent
     const payload: IUpdateMerchantModel = {
       id: this.merchantData.id,
       person: this.merchantData.person,
+      recommendedBy: this.merchantData.recommendedBy,
+      recommendedByPhone: this.merchantData.recommendedByPhone,
+      description: this.merchantData.description,
       deletedAt: this.isActive ? null : new Date(),
     };
 

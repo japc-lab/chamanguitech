@@ -4,10 +4,16 @@ export interface IUpdateMerchantModel {
   id: string;
   deletedAt?: Date | null;
   person: IPersonModel;
+  recommendedBy?: string;
+  recommendedByPhone?: string;
+  description?: string;
 }
 
 export interface ICreateMerchantModel {
   person?: IPersonModel;
+  recommendedBy?: string;
+  recommendedByPhone?: string;
+  description?: string;
 }
 
 export interface IReadMerchantModel {
@@ -16,6 +22,9 @@ export interface IReadMerchantModel {
   person: IPersonModel;
   createdAt?: Date;
   updatedAt?: Date;
+  recommendedBy?: string;
+  recommendedByPhone?: string;
+  description?: string;
 }
 
 export interface IReducedMerchantModel {
