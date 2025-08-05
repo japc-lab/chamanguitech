@@ -10,7 +10,10 @@ import { Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PERMISSION_ROUTES } from '../../../../constants/routes.constants';
 import { MerchantService } from '../../services/merchant.service';
-import { IReadMerchantModel, IUpdateMerchantModel } from '../../interfaces/merchant.interface';
+import {
+  IReadMerchantModel,
+  IUpdateMerchantModel,
+} from '../../interfaces/merchant.interface';
 import { AlertService } from 'src/app/utils/alert.service';
 import { DateUtilsService } from 'src/app/utils/date-utils.service';
 import { NgForm } from '@angular/forms';
@@ -66,18 +69,20 @@ export class MerchantDetailsComponent
   ngAfterViewInit(): void {}
 
   fetchMerchantDetails(merchantId: string): void {
-    const merchantSub = this.merchantService.getMerchantById(merchantId).subscribe({
-      next: (merchant) => {
-        this.merchantData = merchant;
-        this.personId = merchant.person?.id ?? '';
-        this.isActive = !merchant.deletedAt;
+    const merchantSub = this.merchantService
+      .getMerchantById(merchantId)
+      .subscribe({
+        next: (merchant) => {
+          this.merchantData = merchant;
+          this.personId = merchant.person?.id ?? '';
+          this.isActive = !merchant.deletedAt;
 
-        this.changeDetectorRef.detectChanges();
-      },
-      error: (err) => {
-        console.error('Error fetching merchant details:', err);
-      },
-    });
+          this.changeDetectorRef.detectChanges();
+        },
+        error: (err) => {
+          console.error('Error fetching merchant details:', err);
+        },
+      });
 
     this.unsubscribe.push(merchantSub);
   }
@@ -97,6 +102,7 @@ export class MerchantDetailsComponent
       recommendedBy: this.merchantData.recommendedBy,
       recommendedByPhone: this.merchantData.recommendedByPhone,
       description: this.merchantData.description,
+      companyName: this.merchantData.companyName,
       deletedAt: this.isActive ? null : new Date(),
     };
 

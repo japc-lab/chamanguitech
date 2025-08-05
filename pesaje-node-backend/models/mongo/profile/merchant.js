@@ -2,6 +2,10 @@ const { Schema, model } = require('mongoose');
 
 const MerchantSchema = Schema({
 
+  companyName: {
+    type: String,
+    default: null
+  },
   recommendedBy: {
     type: String,
     default: null

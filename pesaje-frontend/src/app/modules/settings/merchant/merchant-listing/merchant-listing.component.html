@@ -87,9 +87,9 @@
           </div>
 
           <div class="mb-3">
-            <label for="phone" class="fw-semibold fs-6 mb-2">Teléfono Compañía</label>
-            <input type="text" class="form-control" id="phone" name="phone" [(ngModel)]="merchantModel.person!.phone"
-              #phone="ngModel">
+            <label for="companyName" class="fw-semibold fs-6 mb-2">Nombre de la Compañía</label>
+            <input type="text" class="form-control" id="companyName" name="companyName"
+              [(ngModel)]="merchantModel.companyName" #companyName="ngModel">
           </div>
 
           <div class="mb-3">
@@ -127,9 +127,8 @@
 
           <div class="mb-3">
             <label for="description" class="fw-semibold fs-6 mb-2">Descripción</label>
-            <textarea class="form-control" id="description" name="description"
-              [(ngModel)]="merchantModel.description" #description="ngModel" rows="3"
-              placeholder="Descripción del comerciante"></textarea>
+            <textarea class="form-control" id="description" name="description" [(ngModel)]="merchantModel.description"
+              #description="ngModel" rows="3" placeholder="Descripción del comerciante"></textarea>
           </div>
         </div>
       </div>

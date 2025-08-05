@@ -57,6 +57,7 @@ router.post(
         check('recommendedBy').optional(),
         check('recommendedByPhone').optional(),
         check('description').optional(),
+        check('companyName').optional(),
         validateFields,
     ],
     createMerchant
@@ -93,7 +94,7 @@ router.put(
         check('recommendedBy').optional(),
         check('recommendedByPhone').optional(),
         check('description').optional(),
-
+        check('companyName').optional(),
         // Validate deletedAt field
         check('deletedAt')
             .optional({ nullable: true })
