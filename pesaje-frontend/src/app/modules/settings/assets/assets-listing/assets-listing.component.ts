@@ -39,7 +39,17 @@ export class AssetsListingComponent
 
   assetModel: ICreateAssetModel = {
     name: '',
-    quantity: 0,
+    purchaseDate: new Date(),
+    cost: 0,
+    desiredLife: 0,
+    paymentStatus: 'pending',
+    paidAmount: 0,
+    pendingAmount: 0,
+    responsible: '',
+    location: '',
+    currentSituation: '',
+    disposalDate: undefined,
+    daysOfUse: 0,
   } as ICreateAssetModel;
 
   isEditing = false;
@@ -62,10 +72,28 @@ export class AssetsListingComponent
         },
       },
       {
-        title: 'Cantidad',
-        data: 'quantity',
+        title: 'Responsable',
+        data: 'responsible',
         render: function (data) {
-          return data ? data : '0';
+          return data ? data : '-';
+        },
+      },
+      {
+        title: 'Costo',
+        data: 'cost',
+        render: function (data) {
+          return data ? `$${data.toLocaleString()}` : '$0';
+        },
+      },
+      {
+        title: 'Estado de Pago',
+        data: 'paymentStatus',
+        render: function (data) {
+          if (data === 'paid') {
+            return `<span class="badge bg-success">Pagado</span>`;
+          } else {
+            return `<span class="badge bg-warning">Pendiente</span>`;
+          }
         },
       },
       {
@@ -73,7 +101,7 @@ export class AssetsListingComponent
         data: 'deletedAt',
         render: function (data) {
           if (data) {
-            return `<span class="badge bg-warning">Inactivo</span>`;
+            return `<span class="badge bg-danger">Inactivo</span>`;
           } else {
             return `<span class="badge bg-success">Activo</span>`;
           }
@@ -137,7 +165,17 @@ export class AssetsListingComponent
     if (asset) {
       this.assetModel = {
         name: asset.name,
-        quantity: asset.quantity,
+        purchaseDate: asset.purchaseDate,
+        cost: asset.cost,
+        desiredLife: asset.desiredLife,
+        paymentStatus: asset.paymentStatus,
+        paidAmount: asset.paidAmount,
+        pendingAmount: asset.pendingAmount,
+        responsible: asset.responsible,
+        location: asset.location,
+        currentSituation: asset.currentSituation,
+        disposalDate: asset.disposalDate,
+        daysOfUse: asset.daysOfUse,
       };
       this.isEditing = true;
       this.editingAssetId = id;
@@ -150,7 +188,17 @@ export class AssetsListingComponent
   create() {
     this.assetModel = {
       name: '',
-      quantity: 0,
+      purchaseDate: new Date(),
+      cost: 0,
+      desiredLife: 0,
+      paymentStatus: 'pending',
+      paidAmount: 0,
+      pendingAmount: 0,
+      responsible: '',
+      location: '',
+      currentSituation: '',
+      disposalDate: undefined,
+      daysOfUse: 0,
     };
     this.isEditing = false;
     this.editingAssetId = null;
@@ -168,8 +216,18 @@ export class AssetsListingComponent
       // Update existing asset
       const updatePayload: IUpdateAssetModel = {
         id: this.editingAssetId,
-        name: this.assetModel.name!,
-        quantity: this.assetModel.quantity!,
+        name: this.assetModel.name,
+        purchaseDate: this.assetModel.purchaseDate,
+        cost: this.assetModel.cost,
+        desiredLife: this.assetModel.desiredLife,
+        paymentStatus: this.assetModel.paymentStatus,
+        paidAmount: this.assetModel.paidAmount,
+        pendingAmount: this.assetModel.pendingAmount,
+        responsible: this.assetModel.responsible,
+        location: this.assetModel.location,
+        currentSituation: this.assetModel.currentSituation,
+        disposalDate: this.assetModel.disposalDate,
+        daysOfUse: this.assetModel.daysOfUse,
         deletedAt: this.isActive ? null : new Date(),
       };
 
@@ -193,8 +251,18 @@ export class AssetsListingComponent
     } else {
       // Create new asset
       const assetPayload: ICreateAssetModel = {
-        name: this.assetModel.name!,
-        quantity: this.assetModel.quantity!,
+        name: this.assetModel.name,
+        purchaseDate: this.assetModel.purchaseDate,
+        cost: this.assetModel.cost,
+        desiredLife: this.assetModel.desiredLife,
+        paymentStatus: this.assetModel.paymentStatus,
+        paidAmount: this.assetModel.paidAmount,
+        pendingAmount: this.assetModel.pendingAmount,
+        responsible: this.assetModel.responsible,
+        location: this.assetModel.location,
+        currentSituation: this.assetModel.currentSituation,
+        disposalDate: this.assetModel.disposalDate,
+        daysOfUse: this.assetModel.daysOfUse,
       };
 
       this.assetService.createAsset(assetPayload as any).subscribe({
