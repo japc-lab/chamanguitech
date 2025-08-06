@@ -17,7 +17,6 @@ import { NewCompanyComponent } from './new-company/new-company.component';
 import { CompanyListDetailsComponent } from './company-list-details/company-list-details.component';
 import { CompanyPricesComponent } from './company-prices/company-prices.component';
 import { CompanyBestPricesComponent } from './company-best-prices/company-best-prices.component';
-import { PricesModule } from 'src/app/pages/prices/prices.module';
 
 @NgModule({
   declarations: [
@@ -25,7 +24,6 @@ import { PricesModule } from 'src/app/pages/prices/prices.module';
     NewCompanyComponent,
     CompanyListDetailsComponent,
     CompanyPricesComponent,
-    CompanyBestPricesComponent,
   ],
   imports: [
     CommonModule,

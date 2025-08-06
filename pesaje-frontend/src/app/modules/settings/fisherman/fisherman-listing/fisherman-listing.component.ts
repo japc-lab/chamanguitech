@@ -14,19 +14,19 @@ import { Config } from 'datatables.net';
 import { PERMISSION_ROUTES } from '../../../../constants/routes.constants';
 import { Router } from '@angular/router';
 import { IPersonModel } from 'src/app/modules/shared/interfaces/person.interface';
-import { MerchantService } from '../../services/merchant.service';
+import { FishermanService } from '../../services/fisherman.service';
 import {
-  ICreateMerchantModel,
-  IReadMerchantModel,
-} from '../../interfaces/merchant.interface';
+  ICreateFishermanModel,
+  IReadFishermanModel,
+} from '../../interfaces/fisherman.interface';
 import { AlertService } from 'src/app/utils/alert.service';
 import { DateUtilsService } from 'src/app/utils/date-utils.service';
 
 @Component({
-  selector: 'app-merchant-listing',
-  templateUrl: './merchant-listing.component.html',
+  selector: 'app-fisherman-listing',
+  templateUrl: './fisherman-listing.component.html',
 })
-export class MerchantListingComponent implements OnInit, AfterViewInit, OnDestroy {
+export class FishermanListingComponent implements OnInit, AfterViewInit, OnDestroy {
   PERMISSION_ROUTE = PERMISSION_ROUTES.SETTINGS.PEOPLE;
 
   isLoading = false;
@@ -36,11 +36,11 @@ export class MerchantListingComponent implements OnInit, AfterViewInit, OnDestro
   // Reload emitter inside datatable
   reloadEvent: EventEmitter<boolean> = new EventEmitter();
 
-  merchantModel: ICreateMerchantModel = {
+  fishermanModel: ICreateFishermanModel = {
     person: {} as IPersonModel,
-  } as ICreateMerchantModel;
+  } as ICreateFishermanModel;
 
-  merchants: IReadMerchantModel[] = [];
+  fishermen: IReadFishermanModel[] = [];
 
   datatableConfig: Config = {
     serverSide: false,
@@ -94,7 +94,7 @@ export class MerchantListingComponent implements OnInit, AfterViewInit, OnDestro
         },
       },
       {
-        title: 'Celular',
+        title: 'Teléfono',
         data: 'person',
         render: function (data) {
           return data.mobilePhone || '-';
@@ -121,7 +121,7 @@ export class MerchantListingComponent implements OnInit, AfterViewInit, OnDestro
   };
 
   constructor(
-    private merchantService: MerchantService,
+    private fishermanService: FishermanService,
     private alertService: AlertService,
     private dateUtils: DateUtilsService,
     private router: Router,
@@ -129,20 +129,20 @@ export class MerchantListingComponent implements OnInit, AfterViewInit, OnDestro
   ) {}
 
   ngOnInit(): void {
-    this.loadMerchants();
+    this.loadFishermen();
   }
 
   ngAfterViewInit(): void {}
 
-  loadMerchants(): void {
-    const merchantObservable = this.merchantService.getAllMerchants(true);
+  loadFishermen(): void {
+    const fishermanObservable = this.fishermanService.getAll(true);
 
-    const merchantSub = merchantObservable.subscribe({
+    const fishermanSub = fishermanObservable.subscribe({
       next: (data) => {
-        this.merchants = data;
+        this.fishermen = data;
         this.datatableConfig = {
           ...this.datatableConfig,
-          data: [...this.merchants],
+          data: [...this.fishermen],
         };
 
         this.cdr.detectChanges();
@@ -153,13 +153,13 @@ export class MerchantListingComponent implements OnInit, AfterViewInit, OnDestro
       },
     });
 
-    this.unsubscribe.push(merchantSub);
+    this.unsubscribe.push(fishermanSub);
   }
 
   delete(id: string): void {
-    const deleteSub = this.merchantService.deleteMerchant(id).subscribe({
+    const deleteSub = this.fishermanService.delete(id).subscribe({
       next: () => {
-        this.loadMerchants();
+        this.loadFishermen();
       },
       error: () => {
         this.alertService.showTranslatedAlert({ alertType: 'error' });
@@ -174,7 +174,7 @@ export class MerchantListingComponent implements OnInit, AfterViewInit, OnDestro
   }
 
   create() {
-    this.merchantModel = { person: {} as IPersonModel };
+    this.fishermanModel = { person: {} as IPersonModel };
   }
 
   onSubmit(event: Event, myForm: NgForm) {
@@ -184,17 +184,14 @@ export class MerchantListingComponent implements OnInit, AfterViewInit, OnDestro
 
     this.isLoading = true;
 
-    const merchantPayload: ICreateMerchantModel = {
-      person: this.merchantModel.person!,
-      recommendedBy: this.merchantModel.recommendedBy,
-      recommendedByPhone: this.merchantModel.recommendedByPhone,
-      description: this.merchantModel.description,
+    const fishermanPayload: ICreateFishermanModel = {
+      person: this.fishermanModel.person!,
     };
 
-    this.merchantService.createMerchant(merchantPayload as any).subscribe({
+    this.fishermanService.create(fishermanPayload as any).subscribe({
       next: () => {
         this.alertService.showTranslatedAlert({ alertType: 'success' });
-        this.loadMerchants();
+        this.loadFishermen();
       },
       error: (error) => {
         this.alertService.showTranslatedAlert({ alertType: 'error' });

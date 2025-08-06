@@ -45,8 +45,8 @@
       <!-- begin::Details -->
       <div class="tab-pane" [ngClass]="{ active: activeTab === 'Details' }">
         <div class="card mb-5 mb-xl-10">
-          <div id="kt_account_merchant_details" class="collapse show">
-            <form novalidate class="form" #merchantForm="ngForm">
+          <div id="kt_account_fisherman_details" class="collapse show">
+            <form novalidate class="form" #fishermanForm="ngForm">
               <div class="card-body border-top p-9">
 
                 <!-- Nombre Completo -->
@@ -57,15 +57,15 @@
                       <!-- Nombres -->
                       <div class="col-lg-6 fv-row">
                         <input type="text" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
-                          placeholder="Nombres" name="names" [(ngModel)]="merchantData.person.names" #names="ngModel"
+                          placeholder="Nombres" name="names" [(ngModel)]="fishermanData.person.names" #names="ngModel"
                           required minlength="3">
                         <div
-                          *ngIf="(merchantForm.submitted || names.dirty || names.touched) && names.errors?.['required']"
+                          *ngIf="(fishermanForm.submitted || names.dirty || names.touched) && names.errors?.['required']"
                           class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
                           <div>El nombre es obligatorio.</div>
                         </div>
                         <div
-                          *ngIf="(merchantForm.submitted || names.dirty || names.touched) && names.errors?.['minlength']"
+                          *ngIf="(fishermanForm.submitted || names.dirty || names.touched) && names.errors?.['minlength']"
                           class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
                           <div>Debe tener al menos 3 caracteres.</div>
                         </div>
@@ -73,15 +73,15 @@
                       <!-- Apellidos -->
                       <div class="col-lg-6 fv-row">
                         <input type="text" class="form-control form-control-lg form-control-solid"
-                          placeholder="Apellidos" name="lastNames" [(ngModel)]="merchantData.person.lastNames"
+                          placeholder="Apellidos" name="lastNames" [(ngModel)]="fishermanData.person.lastNames"
                           #lastNames="ngModel" required minlength="3">
                         <div
-                          *ngIf="(merchantForm.submitted || lastNames.dirty || lastNames.touched) && lastNames.errors?.['required']"
+                          *ngIf="(fishermanForm.submitted || lastNames.dirty || lastNames.touched) && lastNames.errors?.['required']"
                           class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
                           <div>Los apellidos son obligatorios.</div>
                         </div>
                         <div
-                          *ngIf="(merchantForm.submitted || lastNames.dirty || lastNames.touched) && lastNames.errors?.['minlength']"
+                          *ngIf="(fishermanForm.submitted || lastNames.dirty || lastNames.touched) && lastNames.errors?.['minlength']"
                           class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
                           <div>Debe tener al menos 3 caracteres.</div>
                         </div>
@@ -95,10 +95,10 @@
                   <label class="col-lg-4 col-form-label required fw-bold fs-6">Identificación</label>
                   <div class="col-lg-8 fv-row">
                     <input type="text" class="form-control form-control-lg form-control-solid"
-                      placeholder="Identificación" name="identification"
-                      [(ngModel)]="merchantData.person.identification" #identification="ngModel" required>
+                      placeholder="Identificación" name="identification" [(ngModel)]="fishermanData.person.identification"
+                      #identification="ngModel" required>
                     <div
-                      *ngIf="(merchantForm.submitted || identification.dirty || identification.touched) && identification.errors?.['required']"
+                      *ngIf="(fishermanForm.submitted || identification.dirty || identification.touched) && identification.errors?.['required']"
                       class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
                       <div>La identificación es obligatoria.</div>
                     </div>
@@ -110,51 +110,50 @@
                   <label class="col-lg-4 col-form-label required fw-bold fs-6">Dirección</label>
                   <div class="col-lg-8 fv-row">
                     <input type="text" class="form-control form-control-lg form-control-solid" placeholder="Dirección"
-                      name="address" [(ngModel)]="merchantData.person.address" #address="ngModel" required
-                      minlength="3">
+                      name="address" [(ngModel)]="fishermanData.person.address" #address="ngModel" required minlength="3">
                     <div
-                      *ngIf="(merchantForm.submitted || address.dirty || address.touched) && address.errors?.['required']"
+                      *ngIf="(fishermanForm.submitted || address.dirty || address.touched) && address.errors?.['required']"
                       class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
                       <div>La dirección es obligatoria.</div>
                     </div>
                     <div
-                      *ngIf="(merchantForm.submitted || address.dirty || address.touched) && address.errors?.['minlength']"
+                      *ngIf="(fishermanForm.submitted || address.dirty || address.touched) && address.errors?.['minlength']"
                       class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
                       <div>Debe tener al menos 3 caracteres.</div>
                     </div>
                   </div>
                 </div>
 
-                <!-- Nombre de la Compañía -->
-                <div class="row mb-6">
-                  <label class="col-lg-4 col-form-label fw-bold fs-6">Nombre de la Compañía</label>
-                  <div class="col-lg-8 fv-row">
-                    <input type="text" class="form-control form-control-lg form-control-solid"
-                      placeholder="Nombre de la Compañía" name="companyName" [(ngModel)]="merchantData.companyName"
-                      #companyName="ngModel">
-                  </div>
-                </div>
-
                 <!-- Teléfonos -->
                 <div class="row mb-6">
-                  <label class="col-lg-4 col-form-label required fw-bold fs-6">Celular</label>
+                  <label class="col-lg-4 col-form-label required fw-bold fs-6">Teléfonos</label>
                   <div class="col-lg-8">
                     <div class="row">
+                      <!-- Teléfono fijo (opcional) -->
+                      <div class="col-lg-4 fv-row">
+                        <input type="tel" class="form-control form-control-lg form-control-solid mb-3"
+                          placeholder="Teléfono fijo" name="phone" [(ngModel)]="fishermanData.person.phone">
+                      </div>
                       <!-- Celular 1 (requerido) -->
                       <div class="col-lg-4 fv-row">
                         <input type="tel" class="form-control form-control-lg form-control-solid mb-3"
-                          placeholder="Celular 1" name="mobilePhone" [(ngModel)]="merchantData.person.mobilePhone"
+                          placeholder="Celular 1" name="mobilePhone" [(ngModel)]="fishermanData.person.mobilePhone"
                           #mobilePhone="ngModel" required pattern="^\+?[0-9\s\-\(\)]{7,15}$">
                         <div
-                          *ngIf="(merchantForm.submitted || mobilePhone.dirty || mobilePhone.touched) && mobilePhone.errors?.['required']"
+                          *ngIf="(fishermanForm.submitted || mobilePhone.dirty || mobilePhone.touched) && mobilePhone.errors?.['required']"
                           class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
                           <div>El teléfono móvil es obligatorio.</div>
                         </div>
                         <div
-                          *ngIf="(merchantForm.submitted || mobilePhone.dirty || mobilePhone.touched) && mobilePhone.errors?.['pattern']"
+                          *ngIf="(fishermanForm.submitted || mobilePhone.dirty || mobilePhone.touched) && mobilePhone.errors?.['pattern']"
                           class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
                           <div>Ingrese un número de teléfono válido.</div>
                         </div>
+                      </div>
+                      <!-- Celular 2 (opcional) -->
+                      <div class="col-lg-4 fv-row">
+                        <input type="tel" class="form-control form-control-lg form-control-solid"
+                          placeholder="Celular 2" name="mobilePhone2" [(ngModel)]="fishermanData.person.mobilePhone2">
                       </div>
                     </div>
                   </div>
@@ -165,54 +164,45 @@
                   <label class="col-lg-4 col-form-label fw-bold fs-6">Correo Electrónico</label>
                   <div class="col-lg-8 fv-row">
                     <input type="email" class="form-control form-control-lg form-control-solid"
-                      placeholder="Correo electrónico" name="email" [(ngModel)]="merchantData.person.email"
+                      placeholder="Correo electrónico" name="email" [(ngModel)]="fishermanData.person.email"
                       (ngModelChange)="onChangeEmail($event)" #email="ngModel">
-                    <div *ngIf="(merchantForm.submitted || email.dirty || email.touched) && email.invalid"
+                    <div *ngIf="(fishermanForm.submitted || email.dirty || email.touched) && email.invalid"
                       class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
                       <div>Debe ingresar un correo válido.</div>
                     </div>
                   </div>
                 </div>
 
-                <!-- Recomendado Por -->
+                <!-- Contacto de Emergencia -->
                 <div class="row mb-6">
-                  <label class="col-lg-4 col-form-label fw-bold fs-6">Recomendado Por</label>
+                  <label class="col-lg-4 col-form-label fw-bold fs-6">Contacto de Emergencia</label>
                   <div class="col-lg-8">
                     <div class="row">
-                      <!-- Nombre del recomendador -->
+                      <!-- Nombre del contacto -->
                       <div class="col-lg-6 fv-row">
                         <input type="text" class="form-control form-control-lg form-control-solid mb-3"
-                          placeholder="Nombre recomendador" name="recommendedBy"
-                          [(ngModel)]="merchantData.recommendedBy" #recommendedBy="ngModel" minlength="3">
+                          placeholder="Nombre contacto" name="emergencyContactName"
+                          [(ngModel)]="fishermanData.person.emergencyContactName" #emergencyContactName="ngModel"
+                          minlength="3">
                         <div
-                          *ngIf="(merchantForm.submitted || recommendedBy.dirty || recommendedBy.touched) && recommendedBy.errors?.['minlength']"
+                          *ngIf="(fishermanForm.submitted || emergencyContactName.dirty || emergencyContactName.touched) && emergencyContactName.errors?.['minlength']"
                           class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
                           <div>Debe tener al menos 3 caracteres.</div>
                         </div>
                       </div>
-                      <!-- Teléfono del recomendador -->
+                      <!-- Teléfono del contacto -->
                       <div class="col-lg-6 fv-row">
                         <input type="tel" class="form-control form-control-lg form-control-solid"
-                          placeholder="Teléfono recomendador" name="recommendedByPhone"
-                          [(ngModel)]="merchantData.recommendedByPhone" #recommendedByPhone="ngModel"
+                          placeholder="Teléfono contacto" name="emergencyContactPhone"
+                          [(ngModel)]="fishermanData.person.emergencyContactPhone" #emergencyContactPhone="ngModel"
                           pattern="^\+?[0-9\s\-\(\)]{7,15}$">
                         <div
-                          *ngIf="(merchantForm.submitted || recommendedByPhone.dirty || recommendedByPhone.touched) && recommendedByPhone.errors?.['pattern']"
+                          *ngIf="(fishermanForm.submitted || emergencyContactPhone.dirty || emergencyContactPhone.touched) && emergencyContactPhone.errors?.['pattern']"
                           class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
                           <div>Ingrese un número de teléfono válido.</div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                </div>
-
-                <!-- Descripción -->
-                <div class="row mb-6">
-                  <label class="col-lg-4 col-form-label fw-bold fs-6">Descripción</label>
-                  <div class="col-lg-8 fv-row">
-                    <textarea class="form-control form-control-lg form-control-solid"
-                      placeholder="Descripción del comerciante" name="description"
-                      [(ngModel)]="merchantData.description" #description="ngModel" rows="3"></textarea>
                   </div>
                 </div>
 
@@ -234,7 +224,7 @@
 
               <!-- Botón para guardar -->
               <div class="card-footer d-flex justify-content-end py-6 px-9">
-                <button type="button" class="btn btn-primary" [disabled]="isLoading$|async" (click)="saveMerchant()">
+                <button type="button" class="btn btn-primary" [disabled]="isLoading$|async" (click)="saveFisherman()">
                   <span *ngIf="!(isLoading$|async)">Guardar Cambios</span>
                   <span *ngIf="isLoading$|async" class="indicator-progress">
                     Por favor, espere...

@@ -2,7 +2,7 @@ const express = require('express');
 const { check, query } = require('express-validator');
 const router = express.Router();
 
-const { getAllMerchants, getMerchantById, createMerchant, updateMerchant, removeMerchant } = require('../controllers/merchant.controller');
+const { getAllFishermen, getFishermanById, createFisherman, updateFisherman, removeFisherman } = require('../controllers/fisherman.controller');
 const { validateFields } = require('../middlewares/validate-fields');
 const { validateJWT } = require('../middlewares/validate-jwt');
 
@@ -20,10 +20,10 @@ router.get(
             }),
         validateFields,
     ],
-    getAllMerchants
+    getAllFishermen
 );
 
-router.get('/:id', validateJWT, getMerchantById);
+router.get('/:id', validateJWT, getFishermanById);
 
 router.post(
     '/',
@@ -54,13 +54,11 @@ router.post(
                 return true;
             })
             .withMessage('Invalid email format'),
-        check('recommendedBy').optional(),
-        check('recommendedByPhone').optional(),
-        check('description').optional(),
-        check('companyName').optional(),
+        check('person.emergencyContactName').optional(),
+        check('person.emergencyContactPhone').optional(),
         validateFields,
     ],
-    createMerchant
+    createFisherman
 );
 
 router.put(
@@ -91,10 +89,9 @@ router.put(
                 return true;
             })
             .withMessage('Invalid email format'),
-        check('recommendedBy').optional(),
-        check('recommendedByPhone').optional(),
-        check('description').optional(),
-        check('companyName').optional(),
+        check('person.emergencyContactName').optional(),
+        check('person.emergencyContactPhone').optional(),
+
         // Validate deletedAt field
         check('deletedAt')
             .optional({ nullable: true })
@@ -104,9 +101,9 @@ router.put(
 
         validateFields,
     ],
-    updateMerchant
+    updateFisherman
 );
 
-router.delete('/:id', validateJWT, removeMerchant);
+router.delete('/:id', validateJWT, removeFisherman);
 
 module.exports = router; 

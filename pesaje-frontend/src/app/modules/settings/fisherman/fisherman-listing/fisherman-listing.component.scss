@@ -1,0 +1,27 @@
+// Fisherman listing component styles
+.table-responsive {
+  overflow-x: auto;
+}
+
+.symbol {
+  border-radius: 50%;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.btn-icon {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  i {
+    font-size: 14px;
+  }
+}

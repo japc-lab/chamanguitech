@@ -1,5 +1,6 @@
 import { IReadBrokerModel } from '../../personal-profile/interfaces/broker.interface';
 import { ICompany } from '../../settings/interfaces/company.interfaces';
+import { IReadFishermanModel } from '../../settings/interfaces/fisherman.interface';
 import {
   IReadUserModel,
   IReducedUserModel,
@@ -19,6 +20,7 @@ export interface ICreatePurchaseModel {
   company: string;
   period?: string;
   broker: string;
+  fisherman: string;
   client: string;
   status?: PurchaseStatusEnum;
   shrimpFarm: string;
@@ -33,8 +35,10 @@ export interface ICreatePurchaseModel {
   subtotal2?: number;
   grandTotal: number;
   totalAgreedToPay: number;
-  hasInvoice: boolean;
-  invoice?: string;
+  hasInvoice: 'yes' | 'no' | 'not-applicable';
+  invoiceNumber?: string;
+  invoiceName?: string;
+  weightSheetNumber?: string;
   purchaseDate: string;
   controlNumber?: string;
 }
@@ -51,8 +55,10 @@ export interface IBasePurchaseModel {
   subtotal2?: number;
   grandTotal: number;
   totalAgreedToPay: number;
-  hasInvoice: boolean;
-  invoice?: string;
+  hasInvoice: 'yes' | 'no' | 'not-applicable';
+  invoiceNumber?: string;
+  invoiceName?: string;
+  weightSheetNumber?: string;
   status: PurchaseStatusEnum;
   deletedAt: string | null;
   purchaseDate: string;
@@ -65,6 +71,7 @@ export interface IDetailedPurchaseModel extends IBasePurchaseModel {
   company: ICompany;
   period: IReadPeriodModel;
   broker: IReadBrokerModel;
+  fisherman: IReadFishermanModel;
   client: IReadClientModel;
   shrimpFarm: IReadShrimpFarmModel;
 }
@@ -74,6 +81,7 @@ export interface IListPurchaseModel extends IBasePurchaseModel {
   company: string;
   period: string;
   broker: string;
+  fisherman: string;
   client: string;
   shrimpFarm: string;
   totalPayed?: number;
@@ -103,8 +111,10 @@ export interface IUpdatePurchaseModel {
   subtotal2?: number;
   grandTotal: number;
   totalAgreedToPay: number;
-  hasInvoice: boolean;
-  invoice?: string;
+  hasInvoice: 'yes' | 'no' | 'not-applicable';
+  invoiceNumber?: string;
+  invoiceName?: string;
+  weightSheetNumber?: string;
 }
 
 export enum PurchaseStatusEnum {

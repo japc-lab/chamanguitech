@@ -63,7 +63,11 @@ router.post(
         check('subtotal', 'Subtotal must be a positive number').isFloat({ min: 0 }),
         check('grandTotal', 'Grand total must be a positive number').isFloat({ min: 0 }),
         check('totalAgreedToPay', 'Total agreed to pay must be a positive number').isFloat({ min: 0 }),
-        check('hasInvoice', 'hasInvoice is required and must be boolean').isBoolean(),
+        check('weightSheetNumber', 'weightSheetNumber is required').isString(),
+        check('hasInvoice', 'hasInvoice is required and must be one of: yes, no, not-applicable')
+            .isIn(['yes', 'no', 'not-applicable']),
+        check('invoiceNumber', 'invoiceNumber is required').if(check('hasInvoice').equals('yes')).isString(),
+        check('invoiceName', 'invoiceName is required').if(check('hasInvoice').equals('yes')).isString(),
         validateFields
     ],
     createPurchase
@@ -82,7 +86,12 @@ router.put(
         check('subtotal').optional().isFloat({ min: 0 }),
         check('grandTotal').optional().isFloat({ min: 0 }),
         check('totalAgreedToPay').optional().isFloat({ min: 0 }),
-        check('hasInvoice').optional().isBoolean(),
+        check('weightSheetNumber', 'weightSheetNumber is required').isString(),
+        check('hasInvoice', 'hasInvoice is required and must be one of: yes, no, not-applicable')
+            .optional()
+            .isIn(['yes', 'no', 'not-applicable']),
+        check('invoiceNumber', 'invoiceNumber is required').if(check('hasInvoice').equals('yes')).isString(),
+        check('invoiceName', 'invoiceName is required').if(check('hasInvoice').equals('yes')).isString(),
         validateFields
     ],
     updatePurchase

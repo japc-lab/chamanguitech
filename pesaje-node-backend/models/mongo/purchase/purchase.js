@@ -18,6 +18,11 @@ const PurchaseSchema = Schema({
     ref: 'Broker',
     required: true
   },
+  fisherman: {
+    type: Schema.Types.ObjectId,
+    ref: 'Fisherman',
+    required: true
+  },
   client: {
     type: Schema.Types.ObjectId,
     ref: 'Client',
@@ -92,12 +97,20 @@ const PurchaseSchema = Schema({
     min: 0
   },
   hasInvoice: {
-    type: Boolean,
+    type: String,
     required: true,
+    enum: ['yes', 'no', 'not-applicable']
   },
-  invoice: {
+  invoiceNumber: {
     type: String,
     sparse: true // Allows multiple `null` values while keeping uniqueness for non-null values
+  },
+  invoiceName: {
+    type: String,
+  },
+  weightSheetNumber: {
+    type: String,
+    required: true,
   },
   status: {
     type: String,
@@ -115,10 +128,10 @@ const PurchaseSchema = Schema({
 
 // 🔹 Unique index for invoice per client (only when invoice is not null)
 PurchaseSchema.index(
-  { client: 1, invoice: 1 },
+  { client: 1, invoiceNumber: 1 },
   {
     unique: true,
-    partialFilterExpression: { invoice: { $exists: true } }
+    partialFilterExpression: { invoiceNumber: { $exists: true } }
   }
 );
 

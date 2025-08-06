@@ -9,11 +9,8 @@ import {
 import { Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PERMISSION_ROUTES } from '../../../../constants/routes.constants';
-import { MerchantService } from '../../services/merchant.service';
-import {
-  IReadMerchantModel,
-  IUpdateMerchantModel,
-} from '../../interfaces/merchant.interface';
+import { FishermanService } from '../../services/fisherman.service';
+import { IReadFishermanModel, IUpdateFishermanModel } from '../../interfaces/fisherman.interface';
 import { AlertService } from 'src/app/utils/alert.service';
 import { DateUtilsService } from 'src/app/utils/date-utils.service';
 import { NgForm } from '@angular/forms';
@@ -22,21 +19,21 @@ import { Observable, Subscription } from 'rxjs';
 type Tabs = 'Details' | 'Payment Info';
 
 @Component({
-  selector: 'app-merchant-details',
-  templateUrl: './merchant-details.component.html',
-  styleUrls: ['./merchant-details.component.scss'],
+  selector: 'app-fisherman-details',
+  templateUrl: './fisherman-details.component.html',
+  styleUrls: ['./fisherman-details.component.scss'],
 })
-export class MerchantDetailsComponent
+export class FishermanDetailsComponent
   implements OnInit, AfterViewInit, OnDestroy
 {
   PERMISSION_ROUTE = PERMISSION_ROUTES.SETTINGS.PEOPLE;
 
-  @ViewChild('merchantForm') merchantForm!: NgForm;
+  @ViewChild('fishermanForm') fishermanForm!: NgForm;
 
   isLoading$: Observable<boolean>;
   activeTab: Tabs = 'Details';
 
-  merchantData: IReadMerchantModel = {} as IReadMerchantModel;
+  fishermanData: IReadFishermanModel = {} as IReadFishermanModel;
   personId: string = '';
   isActive: boolean = true;
 
@@ -44,7 +41,7 @@ export class MerchantDetailsComponent
   private unsubscribe: Subscription[] = [];
 
   constructor(
-    private merchantService: MerchantService,
+    private fishermanService: FishermanService,
     private dateUtils: DateUtilsService,
     private alertService: AlertService,
     private route: ActivatedRoute,
@@ -52,14 +49,14 @@ export class MerchantDetailsComponent
     private router: Router,
     private changeDetectorRef: ChangeDetectorRef
   ) {
-    this.isLoading$ = this.merchantService.isLoading$;
+    this.isLoading$ = this.fishermanService.isLoading$;
   }
 
   ngOnInit(): void {
     const routeSub = this.route.paramMap.subscribe((params) => {
-      const merchantId = params.get('merchantId');
-      if (merchantId) {
-        this.fetchMerchantDetails(merchantId);
+      const fishermanId = params.get('fishermanId');
+      if (fishermanId) {
+        this.fetchFishermanDetails(fishermanId);
       }
     });
 
@@ -68,52 +65,46 @@ export class MerchantDetailsComponent
 
   ngAfterViewInit(): void {}
 
-  fetchMerchantDetails(merchantId: string): void {
-    const merchantSub = this.merchantService
-      .getMerchantById(merchantId)
-      .subscribe({
-        next: (merchant) => {
-          this.merchantData = merchant;
-          this.personId = merchant.person?.id ?? '';
-          this.isActive = !merchant.deletedAt;
+  fetchFishermanDetails(fishermanId: string): void {
+    const fishermanSub = this.fishermanService.getById(fishermanId).subscribe({
+      next: (fisherman) => {
+        this.fishermanData = fisherman;
+        this.personId = fisherman.person?.id ?? '';
+        this.isActive = !fisherman.deletedAt;
 
-          this.changeDetectorRef.detectChanges();
-        },
-        error: (err) => {
-          console.error('Error fetching merchant details:', err);
-        },
-      });
+        this.changeDetectorRef.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error fetching fisherman details:', err);
+      },
+    });
 
-    this.unsubscribe.push(merchantSub);
+    this.unsubscribe.push(fishermanSub);
   }
 
   setActiveTab(tab: Tabs) {
     this.activeTab = tab;
   }
 
-  saveMerchant() {
-    if (this.merchantForm.invalid || !this.merchantData) {
+  saveFisherman() {
+    if (this.fishermanForm.invalid || !this.fishermanData) {
       return;
     }
 
-    const payload: IUpdateMerchantModel = {
-      id: this.merchantData.id,
-      person: this.merchantData.person,
-      recommendedBy: this.merchantData.recommendedBy,
-      recommendedByPhone: this.merchantData.recommendedByPhone,
-      description: this.merchantData.description,
-      companyName: this.merchantData.companyName,
+    const payload: IUpdateFishermanModel = {
+      id: this.fishermanData.id,
+      person: this.fishermanData.person,
       deletedAt: this.isActive ? null : new Date(),
     };
 
-    const updateSub = this.merchantService
-      .updateMerchant(this.merchantData.id, payload)
+    const updateSub = this.fishermanService
+      .update(this.fishermanData.id, payload)
       .subscribe({
         next: () => {
           this.alertService.showTranslatedAlert({ alertType: 'success' });
         },
         error: (error) => {
-          console.error('Error updating merchant', error);
+          console.error('Error updating fisherman', error);
           this.alertService.showTranslatedAlert({ alertType: 'error' });
         },
       });
@@ -122,7 +113,7 @@ export class MerchantDetailsComponent
   }
 
   onChangeEmail(value: string): void {
-    this.merchantData.person.email = value.trim() === '' ? null : value;
+    this.fishermanData.person.email = value.trim() === '' ? null : value;
   }
 
   goBack(): void {

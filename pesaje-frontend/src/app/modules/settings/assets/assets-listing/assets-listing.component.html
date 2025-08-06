@@ -54,18 +54,129 @@
           </div>
         </div>
 
-        <!-- Cantidad -->
+        <!-- Fecha de Compra -->
         <div class="mb-3">
-          <label for="quantity" class="required fw-semibold fs-6 mb-2">Cantidad</label>
-          <input type="number" class="form-control" id="quantity" name="quantity" [(ngModel)]="assetModel.quantity"
-            required min="0" #quantity="ngModel">
-          <div *ngIf="(myForm.submitted || quantity.dirty || quantity.touched) && quantity.errors?.['required']"
+          <label for="purchaseDate" class="required fw-semibold fs-6 mb-2">Fecha de Compra</label>
+          <input type="date" class="form-control" id="purchaseDate" name="purchaseDate"
+            [(ngModel)]="assetModel.purchaseDate" required #purchaseDate="ngModel">
+          <div *ngIf="(myForm.submitted || purchaseDate.dirty || purchaseDate.touched) && purchaseDate.errors?.['required']"
             class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-            <div>La cantidad es obligatoria.</div>
+            <div>La fecha de compra es obligatoria.</div>
           </div>
-          <div *ngIf="(myForm.submitted || quantity.dirty || quantity.touched) && quantity.errors?.['min']"
+        </div>
+
+        <!-- Costo -->
+        <div class="mb-3">
+          <label for="cost" class="required fw-semibold fs-6 mb-2">Costo</label>
+          <input type="number" class="form-control" id="cost" name="cost" [(ngModel)]="assetModel.cost"
+            required min="0" step="0.01" #cost="ngModel">
+          <div *ngIf="(myForm.submitted || cost.dirty || cost.touched) && cost.errors?.['required']"
             class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-            <div>La cantidad debe ser mayor o igual a 0.</div>
+            <div>El costo es obligatorio.</div>
+          </div>
+          <div *ngIf="(myForm.submitted || cost.dirty || cost.touched) && cost.errors?.['min']"
+            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+            <div>El costo debe ser mayor o igual a 0.</div>
+          </div>
+        </div>
+
+        <!-- Vida Útil Deseada -->
+        <div class="mb-3">
+          <label for="desiredLife" class="required fw-semibold fs-6 mb-2">Vida Útil Deseada (días)</label>
+          <input type="number" class="form-control" id="desiredLife" name="desiredLife" [(ngModel)]="assetModel.desiredLife"
+            required min="0" #desiredLife="ngModel">
+          <div *ngIf="(myForm.submitted || desiredLife.dirty || desiredLife.touched) && desiredLife.errors?.['required']"
+            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+            <div>La vida útil deseada es obligatoria.</div>
+          </div>
+          <div *ngIf="(myForm.submitted || desiredLife.dirty || desiredLife.touched) && desiredLife.errors?.['min']"
+            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+            <div>La vida útil debe ser mayor o igual a 0.</div>
+          </div>
+        </div>
+
+        <!-- Estado de Pago -->
+        <div class="mb-3">
+          <label for="paymentStatus" class="required fw-semibold fs-6 mb-2">Estado de Pago</label>
+          <select class="form-control" id="paymentStatus" name="paymentStatus" [(ngModel)]="assetModel.paymentStatus"
+            required #paymentStatus="ngModel">
+            <option value="">Seleccione un estado</option>
+            <option value="paid">Pagado</option>
+            <option value="pending">Pendiente</option>
+          </select>
+          <div *ngIf="(myForm.submitted || paymentStatus.dirty || paymentStatus.touched) && paymentStatus.errors?.['required']"
+            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+            <div>El estado de pago es obligatorio.</div>
+          </div>
+        </div>
+
+        <!-- Monto Pagado -->
+        <div class="mb-3">
+          <label for="paidAmount" class="required fw-semibold fs-6 mb-2">Monto Pagado</label>
+          <input type="number" class="form-control" id="paidAmount" name="paidAmount" [(ngModel)]="assetModel.paidAmount"
+            required min="0" step="0.01" #paidAmount="ngModel">
+          <div *ngIf="(myForm.submitted || paidAmount.dirty || paidAmount.touched) && paidAmount.errors?.['required']"
+            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+            <div>El monto pagado es obligatorio.</div>
+          </div>
+          <div *ngIf="(myForm.submitted || paidAmount.dirty || paidAmount.touched) && paidAmount.errors?.['min']"
+            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+            <div>El monto pagado debe ser mayor o igual a 0.</div>
+          </div>
+        </div>
+
+        <!-- Monto Pendiente -->
+        <div class="mb-3">
+          <label for="pendingAmount" class="required fw-semibold fs-6 mb-2">Monto Pendiente</label>
+          <input type="number" class="form-control" id="pendingAmount" name="pendingAmount" [(ngModel)]="assetModel.pendingAmount"
+            required min="0" step="0.01" #pendingAmount="ngModel">
+          <div *ngIf="(myForm.submitted || pendingAmount.dirty || pendingAmount.touched) && pendingAmount.errors?.['required']"
+            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+            <div>El monto pendiente es obligatorio.</div>
+          </div>
+          <div *ngIf="(myForm.submitted || pendingAmount.dirty || pendingAmount.touched) && pendingAmount.errors?.['min']"
+            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+            <div>El monto pendiente debe ser mayor o igual a 0.</div>
+          </div>
+        </div>
+
+        <!-- Responsable -->
+        <div class="mb-3">
+          <label for="responsible" class="required fw-semibold fs-6 mb-2">Responsable</label>
+          <input type="text" class="form-control" id="responsible" name="responsible" [(ngModel)]="assetModel.responsible"
+            required #responsible="ngModel">
+          <div *ngIf="(myForm.submitted || responsible.dirty || responsible.touched) && responsible.errors?.['required']"
+            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+            <div>El responsable es obligatorio.</div>
+          </div>
+        </div>
+
+        <!-- Ubicación (Opcional) -->
+        <div class="mb-3">
+          <label for="location" class="fw-semibold fs-6 mb-2">Ubicación</label>
+          <input type="text" class="form-control" id="location" name="location" [(ngModel)]="assetModel.location">
+        </div>
+
+        <!-- Situación Actual (Opcional) -->
+        <div class="mb-3">
+          <label for="currentSituation" class="fw-semibold fs-6 mb-2">Situación Actual</label>
+          <input type="text" class="form-control" id="currentSituation" name="currentSituation" [(ngModel)]="assetModel.currentSituation">
+        </div>
+
+        <!-- Fecha de Disposición (Opcional) -->
+        <div class="mb-3">
+          <label for="disposalDate" class="fw-semibold fs-6 mb-2">Fecha de Disposición</label>
+          <input type="date" class="form-control" id="disposalDate" name="disposalDate" [(ngModel)]="assetModel.disposalDate">
+        </div>
+
+        <!-- Días de Uso (Opcional) -->
+        <div class="mb-3">
+          <label for="daysOfUse" class="fw-semibold fs-6 mb-2">Días de Uso</label>
+          <input type="number" class="form-control" id="daysOfUse" name="daysOfUse" [(ngModel)]="assetModel.daysOfUse"
+            min="0" #daysOfUse="ngModel">
+          <div *ngIf="(myForm.submitted || daysOfUse.dirty || daysOfUse.touched) && daysOfUse.errors?.['min']"
+            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+            <div>Los días de uso deben ser mayor o igual a 0.</div>
           </div>
         </div>
 

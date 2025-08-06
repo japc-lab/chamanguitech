@@ -6,7 +6,7 @@
       <div class="d-flex align-items-center position-relative my-1">
         <app-keenicon name="magnifier" class="fs-3 position-absolute ms-5"></app-keenicon>
         <input type="text" data-action="filter" class="form-control form-control-solid w-250px ps-12"
-          placeholder="Buscar Comerciantes">
+          placeholder="Buscar Recibidores de Pesca">
       </div>
       <!--end::Search-->
     </div>
@@ -16,12 +16,12 @@
     <div class="card-toolbar">
       <!--begin::Toolbar-->
       <div class="d-flex justify-content-end">
-        <!--begin::Add merchant-->
+        <!--begin::Add fisherman-->
         <button *appCanCreate="PERMISSION_ROUTE" type="button" class="btn btn-primary" data-action="create"
           (click)="create()">
-          Agregar Comerciante
+          Agregar Pescador
         </button>
-        <!--end::Add merchant-->
+        <!--end::Add fisherman-->
       </div>
       <!--end::Toolbar-->
     </div>
@@ -38,7 +38,7 @@
 <ng-template #formModal let-modal>
   <form #myForm="ngForm" (ngSubmit)="onSubmit($event, myForm)">
     <div class="modal-header">
-      <h4 class="modal-title" id="modal-basic-title">Detalles del Comerciante</h4>
+      <h4 class="modal-title" id="modal-basic-title">Detalles del Pescador</h4>
       <button type="button" class="btn-close" aria-label="Cerrar" (click)="modal.dismiss('Cross click')"></button>
     </div>
     <div class="modal-body">
@@ -47,7 +47,7 @@
         <div class="collapse show">
           <div class="mb-3">
             <label for="names" class="required fw-semibold fs-6 mb-2">Nombres</label>
-            <input type="text" class="form-control" id="names" name="names" [(ngModel)]="merchantModel.person!.names"
+            <input type="text" class="form-control" id="names" name="names" [(ngModel)]="fishermanModel.person!.names"
               required #names="ngModel">
             <div *ngIf="(myForm.submitted || names.dirty || names.touched) && names.errors?.['required']"
               class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
@@ -58,7 +58,7 @@
           <div class="mb-3">
             <label for="lastNames" class="required fw-semibold fs-6 mb-2">Apellidos</label>
             <input type="text" class="form-control" id="lastNames" name="lastNames"
-              [(ngModel)]="merchantModel.person!.lastNames" required #lastNames="ngModel">
+              [(ngModel)]="fishermanModel.person!.lastNames" required #lastNames="ngModel">
             <div *ngIf="(myForm.submitted || lastNames.dirty || lastNames.touched) && lastNames.errors?.['required']"
               class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
               <div>Los apellidos son obligatorios.</div>
@@ -68,7 +68,7 @@
           <div class="mb-3">
             <label for="identification" class="required fw-semibold fs-6 mb-2">Identificación</label>
             <input type="text" class="form-control" id="identification" name="identification"
-              [(ngModel)]="merchantModel.person!.identification" required #identification="ngModel">
+              [(ngModel)]="fishermanModel.person!.identification" required #identification="ngModel">
             <div
               *ngIf="(myForm.submitted || identification.dirty || identification.touched) && identification.errors?.['required']"
               class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
@@ -79,7 +79,7 @@
           <div class="mb-3">
             <label for="address" class="required fw-semibold fs-6 mb-2">Dirección</label>
             <input type="text" class="form-control" id="address" name="address"
-              [(ngModel)]="merchantModel.person!.address" required #address="ngModel">
+              [(ngModel)]="fishermanModel.person!.address" required #address="ngModel">
             <div *ngIf="(myForm.submitted || address.dirty || address.touched) && address.errors?.['required']"
               class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
               <div>La dirección es obligatoria.</div>
@@ -87,15 +87,15 @@
           </div>
 
           <div class="mb-3">
-            <label for="companyName" class="fw-semibold fs-6 mb-2">Nombre de la Compañía</label>
-            <input type="text" class="form-control" id="companyName" name="companyName"
-              [(ngModel)]="merchantModel.companyName" #companyName="ngModel">
+            <label for="phone" class="fw-semibold fs-6 mb-2">Teléfono Fijo</label>
+            <input type="text" class="form-control" id="phone" name="phone" [(ngModel)]="fishermanModel.person!.phone"
+              #phone="ngModel">
           </div>
 
           <div class="mb-3">
             <label for="mobilePhone" class="required fw-semibold fs-6 mb-2">Teléfono Celular</label>
             <input type="text" class="form-control" id="mobilePhone" name="mobilePhone"
-              [(ngModel)]="merchantModel.person!.mobilePhone" required #mobilePhone="ngModel">
+              [(ngModel)]="fishermanModel.person!.mobilePhone" required #mobilePhone="ngModel">
             <div
               *ngIf="(myForm.submitted || mobilePhone.dirty || mobilePhone.touched) && mobilePhone.errors?.['required']"
               class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
@@ -105,7 +105,7 @@
 
           <div class="mb-3">
             <label for="email" class="fw-semibold fs-6 mb-2">Correo Electrónico</label>
-            <input type="email" class="form-control" id="email" name="email" [(ngModel)]="merchantModel.person!.email"
+            <input type="email" class="form-control" id="email" name="email" [(ngModel)]="fishermanModel.person!.email"
               #email="ngModel">
             <div *ngIf="(myForm.submitted || email.dirty || email.touched) && email.invalid"
               class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
@@ -114,21 +114,15 @@
           </div>
 
           <div class="mb-3">
-            <label for="recommendedBy" class="fw-semibold fs-6 mb-2">Recomendado Por</label>
-            <input type="text" class="form-control" id="recommendedBy" name="recommendedBy"
-              [(ngModel)]="merchantModel.recommendedBy" #recommendedBy="ngModel">
+            <label for="emergencyContactName" class="fw-semibold fs-6 mb-2">Contacto de Emergencia</label>
+            <input type="text" class="form-control" id="emergencyContactName" name="emergencyContactName"
+              [(ngModel)]="fishermanModel.person!.emergencyContactName" #emergencyContactName="ngModel">
           </div>
 
           <div class="mb-3">
-            <label for="recommendedByPhone" class="fw-semibold fs-6 mb-2">Teléfono del Recomendador</label>
-            <input type="text" class="form-control" id="recommendedByPhone" name="recommendedByPhone"
-              [(ngModel)]="merchantModel.recommendedByPhone" #recommendedByPhone="ngModel">
-          </div>
-
-          <div class="mb-3">
-            <label for="description" class="fw-semibold fs-6 mb-2">Descripción</label>
-            <textarea class="form-control" id="description" name="description" [(ngModel)]="merchantModel.description"
-              #description="ngModel" rows="3" placeholder="Descripción del comerciante"></textarea>
+            <label for="emergencyContactPhone" class="fw-semibold fs-6 mb-2">Teléfono de Emergencia</label>
+            <input type="text" class="form-control" id="emergencyContactPhone" name="emergencyContactPhone"
+              [(ngModel)]="fishermanModel.person!.emergencyContactPhone" #emergencyContactPhone="ngModel">
           </div>
         </div>
       </div>

@@ -47,6 +47,7 @@ app.use('/api/local-sale', require('./routes/local-sale.routes'));
 app.use('/api/report', require('./routes/report.routes'));
 app.use('/api/asset', require('./routes/asset.routes'));
 app.use('/api/merchant', require('./routes/merchant.routes'));
+app.use('/api/fisherman', require('./routes/fisherman.routes'));
 
 // Serve static files from the Angular build output directory
 app.use(express.static(path.join(__dirname, 'public/chamanguitech')));

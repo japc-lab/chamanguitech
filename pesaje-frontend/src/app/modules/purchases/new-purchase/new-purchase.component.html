@@ -57,6 +57,20 @@
               [(ngModel)]="createPurchaseModel.controlNumber" disabled />
           </div>
 
+          <!-- Weight Sheet Number -->
+          <div class="col-md-6">
+            <label for="weightSheetNumber" class="required fw-semibold fs-6 mb-2"># Hoja de peso</label>
+            <input type="text" id="weightSheetNumber" name="weightSheetNumber"
+              [(ngModel)]="createPurchaseModel.weightSheetNumber" #weightSheetNumber="ngModel"
+              (keypress)="validateNumber($event)" (blur)="formatWeightSheetNumberOnBlur($event)"
+              (focus)="onWeightSheetNumberFocus($event)" class="form-control form-control-sm" maxlength="8"
+              placeholder="00000000" required />
+            <div *ngIf="purchaseForm.submitted && weightSheetNumber.invalid"
+              class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+              <div>El número de hoja de peso es obligatorio.</div>
+            </div>
+          </div>
+
           <!-- Has Invoice Selector & Invoice Number (Second Row) -->
           <div class="col-md-6">
             <label for="hasInvoice" class="required fw-semibold fs-6 mb-2">¿Factura recibida?</label>
@@ -64,8 +78,9 @@
               [(ngModel)]="createPurchaseModel.hasInvoice" (ngModelChange)="onHasInvoiceChange($event)"
               #hasInvoice="ngModel" required>
               <option [ngValue]="null" disabled selected>Seleccione una opción</option>
-              <option [ngValue]="true">Si</option>
-              <option [ngValue]="false">No</option>
+              <option [ngValue]="'yes'">Si</option>
+              <option [ngValue]="'no'">No</option>
+              <option [ngValue]="'not-applicable'">No aplica</option>
             </select>
             <div *ngIf="purchaseForm.submitted && hasInvoice.invalid"
               class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
@@ -74,9 +89,9 @@
           </div>
 
           <!-- Invoice Number -->
-          <div class="col-md-6" *ngIf="createPurchaseModel.hasInvoice === true">
+          <div class="col-md-6" *ngIf="createPurchaseModel.hasInvoice === 'yes'">
             <label for="invoiceNumber" class="required fw-semibold fs-6 mb-2">Número de factura</label>
-            <input type="text" id="invoiceNumber" name="invoiceNumber" [(ngModel)]="createPurchaseModel.invoice"
+            <input type="text" id="invoiceNumber" name="invoiceNumber" [(ngModel)]="createPurchaseModel.invoiceNumber"
               #invoiceNumber="ngModel" class="form-control form-control-sm" required />
             <div *ngIf="purchaseForm.submitted && invoiceNumber.invalid"
               class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
@@ -84,6 +99,16 @@
             </div>
           </div>
 
+          <!-- Invoice Name -->
+          <div class="col-md-6" *ngIf="createPurchaseModel.hasInvoice === 'yes'">
+            <label for="invoiceName" class="required fw-semibold fs-6 mb-2">Nombre de la factura</label>
+            <input type="text" id="invoiceName" name="invoiceName" [(ngModel)]="createPurchaseModel.invoiceName"
+              #invoiceName="ngModel" class="form-control form-control-sm" required />
+            <div *ngIf="purchaseForm.submitted && invoiceName.invalid"
+              class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+              El nombre de la factura es obligatorio.
+            </div>
+          </div>
         </div>
         <!-- end::Row -->
       </div>
@@ -142,7 +167,7 @@
 
         <div class="row g-5 g-xl-8 mt-1">
           <!-- Buyer -->
-          <div *ngIf="!isOnlyBuyer" class="col-md-4">
+          <div *ngIf="!isOnlyBuyer" class="col-md-6">
             <label for="buyer" class="required fw-semibold fs-6 mb-2">Comprador</label>
             <select id="buyer" name="buyer" class="form-select form-select-sm" [(ngModel)]="createPurchaseModel.buyer"
               #buyer="ngModel" required (change)="onBuyerChange($event)">
@@ -158,7 +183,7 @@
           </div>
 
           <!-- Broker -->
-          <div class="col-md-4">
+          <div class="col-md-6">
             <label for="broker" class="required fw-semibold fs-6 mb-2">Bróker</label>
             <select id="broker" name="broker" class="form-select form-select-sm"
               [(ngModel)]="createPurchaseModel.broker" #broker="ngModel" required>
@@ -173,8 +198,24 @@
             </div>
           </div>
 
+          <!-- Fisherman -->
+          <div class="col-md-6">
+            <label for="fisherman" class="required fw-semibold fs-6 mb-2">Recibidor de Pesca</label>
+            <select id="fisherman" name="fisherman" class="form-select form-select-sm"
+              [(ngModel)]="createPurchaseModel.fisherman" #fisherman="ngModel" required>
+              <option value="" disabled selected>Seleccione una opción</option>
+              <option *ngFor="let fisherman of fishermenList" [value]="fisherman.id">
+                {{ fisherman.person.names }} {{ fisherman.person.lastNames }}
+              </option>
+            </select>
+            <div *ngIf="purchaseForm.submitted && fisherman.invalid"
+              class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+              <div>Debe seleccionar un recibidor de pesca.</div>
+            </div>
+          </div>
+
           <!-- Client Dropdown & "Nuevo Cliente" Button -->
-          <div class="col-md-4 d-flex align-items-center">
+          <div class="col-md-6 d-flex align-items-center">
             <div class="flex-grow-1">
               <label for="client" class="required fw-semibold fs-6 mb-2">Cliente</label>
               <div class="d-flex align-items-center">
