@@ -310,7 +310,7 @@
             <label for="averageGrams" class="required fw-semibold fs-6 mb-2">Gramo promedio (g)</label>
             <input type="text" id="averageGrams" name="averageGrams" [(ngModel)]="createPurchaseModel.averageGrams"
               #averageGrams="ngModel" class="form-control form-control-sm" required (keypress)="validateNumber($event)"
-              (input)="onInputChange()" (blur)="formatDecimal('averageGrams')" />
+              (input)="onInputDetailsChange()" (blur)="formatDecimal('averageGrams')" />
             <div *ngIf="purchaseForm.submitted && averageGrams.invalid"
               class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
               Debe ingresar el gramo promedio.
@@ -331,7 +331,7 @@
               <span class="input-group-text">$</span>
               <input type="text" id="price" name="price" [(ngModel)]="createPurchaseModel.price" #price="ngModel"
                 class="form-control form-control-sm text-end" required (keypress)="validateNumber($event)"
-                (input)="onInputChange()" (blur)="formatDecimal('price')" />
+                (input)="onInputDetailsChange()" (blur)="formatDecimal('price')" />
             </div>
             <div *ngIf="purchaseForm.submitted && price.invalid"
               class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
@@ -344,7 +344,7 @@
             <label for="pounds" class="required fw-semibold fs-6 mb-2">Libras compradas (lb)</label>
             <input type="text" id="pounds" name="pounds" [(ngModel)]="createPurchaseModel.pounds" #pounds="ngModel"
               class="form-control form-control-sm" required (keypress)="validateNumber($event)"
-              (input)="onInputChange()" (blur)="formatDecimal('pounds')" />
+              (input)="onInputDetailsChange()" (blur)="formatDecimal('pounds')" />
             <div *ngIf="purchaseForm.submitted && pounds.invalid"
               class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
               Debe ingresar las libras compradas.
@@ -356,7 +356,7 @@
             <label for="averageGrams2" class="fw-semibold fs-6 mb-2">Gramo promedio 2 (g)</label>
             <input type="text" id="averageGrams2" name="averageGrams2" [(ngModel)]="createPurchaseModel.averageGrams2"
               #averageGrams2="ngModel" class="form-control form-control-sm" (keypress)="validateNumber($event)"
-              (input)="onInputChange()" (blur)="formatDecimal('averageGrams')" />
+              (input)="onInputDetailsChange()" (blur)="formatDecimal('averageGrams')" />
           </div>
 
           <!-- Shrimp Size 2 in company -->
@@ -373,7 +373,7 @@
               <span class="input-group-text">$</span>
               <input type="text" id="price2" name="price2" [(ngModel)]="createPurchaseModel.price2" #price2="ngModel"
                 class="form-control form-control-sm text-end" (keypress)="validateNumber($event)"
-                (input)="onInputChange()" (blur)="formatDecimal('price2')" />
+                (input)="onInputDetailsChange()" (blur)="formatDecimal('price2')" />
             </div>
           </div>
 
@@ -381,7 +381,7 @@
           <div class="col-md-6">
             <label for="pounds2" class="fw-semibold fs-6 mb-2">Libras compradas 2 (lb)</label>
             <input type="text" id="pounds2" name="pounds2" [(ngModel)]="createPurchaseModel.pounds2" #pounds2="ngModel"
-              class="form-control form-control-sm" (keypress)="validateNumber($event)" (input)="onInputChange()"
+              class="form-control form-control-sm" (keypress)="validateNumber($event)" (input)="onInputDetailsChange()"
               (blur)="formatDecimal('pounds2')" />
           </div>
 

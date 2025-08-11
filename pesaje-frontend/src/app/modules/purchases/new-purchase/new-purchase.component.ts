@@ -388,7 +388,7 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
     }
 
     // Ensure calculated fields are updated before submission
-    this.onInputChange();
+    this.onInputDetailsChange();
 
     this.alertService.confirm().then((result) => {
       if (result.isConfirmed) {
@@ -448,7 +448,7 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
     }
   }
 
-  onInputChange(): void {
+  onInputDetailsChange(): void {
     const avgGrams = +this.purchaseForm.controls.averageGrams?.value || 0;
     const avgGrams2 = +this.purchaseForm.controls.averageGrams2?.value || 0;
     const pounds = +this.purchaseForm.controls.pounds?.value || 0;
@@ -508,8 +508,8 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
     let value = input.value.replace(/\D/g, ''); // Remove non-digits
 
     if (value === '' || value === '0' || /^0+$/.test(value)) {
-      // If empty, just zeros, or all zeros, keep the model empty
-      this.createPurchaseModel.weightSheetNumber = '';
+      // If empty, just zeros, or all zeros, keep the model undefined
+      this.createPurchaseModel.weightSheetNumber = undefined;
       input.value = '';
     } else {
       // Pad with leading zeros to make it 8 digits
@@ -529,7 +529,7 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
 
     // If the field contains only zeros, clear it for easy typing
     if (value === '00000000' || value === '') {
-      this.createPurchaseModel.weightSheetNumber = '';
+      this.createPurchaseModel.weightSheetNumber = undefined;
       input.value = '';
     }
   }
