@@ -18,6 +18,7 @@ import {
 export interface ICreatePurchaseModel {
   buyer: string;
   company: string;
+  localSellCompany: string;
   period?: string;
   broker: string;
   fisherman: string;
@@ -69,6 +70,7 @@ export interface IBasePurchaseModel {
 export interface IDetailedPurchaseModel extends IBasePurchaseModel {
   buyer: IReadUserModel;
   company: ICompany;
+  localSellCompany: ICompany;
   period: IReadPeriodModel;
   broker: IReadBrokerModel;
   fisherman: IReadFishermanModel;
@@ -79,6 +81,7 @@ export interface IDetailedPurchaseModel extends IBasePurchaseModel {
 export interface IListPurchaseModel extends IBasePurchaseModel {
   buyer: string;
   company: string;
+  localSellCompany: string;
   period: string;
   broker: string;
   fisherman: string;
@@ -90,6 +93,7 @@ export interface IListPurchaseModel extends IBasePurchaseModel {
 export interface IReducedDetailedPurchaseModel extends IBasePurchaseModel {
   buyer: IReducedUserModel;
   company: ICompany;
+  localSellCompany: ICompany;
   period: IReducedPeriodModel;
   broker: IReducedUserModel;
   client: IReducedUserModel;
@@ -100,6 +104,7 @@ export interface IReducedDetailedPurchaseModel extends IBasePurchaseModel {
 }
 
 export interface IUpdatePurchaseModel {
+  localSellCompany: string;
   averageGrams: number;
   price: number;
   pounds: number;

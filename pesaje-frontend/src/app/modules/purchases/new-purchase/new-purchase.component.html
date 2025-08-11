@@ -148,6 +148,22 @@
             </div>
           </div>
 
+          <!-- Local Sell Company -->
+          <div class="col-md-6" *ngIf="isLocal">
+            <label for="localSellCompany" class="required fw-semibold fs-6 mb-2">Compañía de venta local</label>
+            <select id="localSellCompany" name="localSellCompany" class="form-select form-select-sm"
+              [(ngModel)]="createPurchaseModel.localSellCompany" #localSellCompany="ngModel" required>
+              <option value="" disabled selected>Seleccione una opción</option>
+              <option *ngFor="let company of companiesList" [value]="company.id">
+                {{ company.name }}
+              </option>
+            </select>
+            <div *ngIf="purchaseForm.submitted && localSellCompany.invalid"
+              class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+              <div>Debe seleccionar una compañía de venta local.</div>
+            </div>
+          </div>
+
           <!-- Period -->
           <div *ngIf="!isLocal" class="col-md-6">
             <label for="period" class="required fw-semibold fs-6 mb-2">Período</label>

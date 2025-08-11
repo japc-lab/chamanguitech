@@ -49,6 +49,7 @@ router.post(
         validateJWT,
         check('buyer', 'Buyer ID is required').isMongoId(),
         check('company', 'Company ID is required').isMongoId(),
+        check('localSellCompany', 'Local Sell Company ID is required').isMongoId(),
         check('broker', 'Broker ID is required').isMongoId(),
         check('client', 'Client ID is required').isMongoId(),
         check('shrimpFarm', 'Shrimp Farm ID is required').isMongoId(),
@@ -79,6 +80,7 @@ router.put(
     [
         validateJWT,
         param('id').isMongoId().withMessage('Invalid purchase ID'),
+        check('localSellCompany', 'Local Sell Company ID is required').isMongoId(),
         check('averageGrams').optional().isFloat({ min: 0 }),
         check('price').optional().isFloat({ min: 0 }),
         check('pounds').optional().isFloat({ min: 0 }),

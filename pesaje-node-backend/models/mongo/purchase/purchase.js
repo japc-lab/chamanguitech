@@ -13,6 +13,11 @@ const PurchaseSchema = Schema({
     ref: 'Company',
     required: true
   },
+  localSellCompany: {
+    type: Schema.Types.ObjectId,
+    ref: 'Company',
+    required: true
+  },
   broker: {
     type: Schema.Types.ObjectId,
     ref: 'Broker',
