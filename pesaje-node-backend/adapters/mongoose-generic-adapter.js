@@ -40,7 +40,12 @@ class MongooseGenericAdapter extends DatabaseAdapter {
     }
 
     async update(id, data) {
-        const updatedDocument = await this.model.findByIdAndUpdate(id, data, { new: true });
+        // Use $set to ensure partial updates and avoid accidental document replacement
+        const updatedDocument = await this.model.findByIdAndUpdate(
+            id,
+            { $set: data },
+            { new: true, runValidators: true }
+        );
         return updatedDocument ? this.transformDocument(updatedDocument) : null;
     }
 

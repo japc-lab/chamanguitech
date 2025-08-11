@@ -135,7 +135,7 @@ const create = async (data) => {
     }
 
     // Set initial status
-    data.status = PurchaseStatusEnum.DRAFT;
+    data.status = PurchaseStatusEnum.CREATED;
 
     // Create the purchase record
     return await dbAdapter.purchaseAdapter.create(data);

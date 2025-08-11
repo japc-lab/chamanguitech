@@ -105,6 +105,8 @@ export const locale = {
       DELETE_CONFIRM_TITLE: '¿Estás seguro de que deseas eliminar?',
       DELETE_CONFIRM_TEXT: 'Esta acción no se puede deshacer.',
       DELETE_SUCCESS: '¡El elemento fue eliminado exitosamente!',
+      CONFIRM_TITLE: '¿Estás seguro?',
+      CONFIRM_PURCHASE_TEXT: 'La información está completa. El estado se actualizará a Confirmado.',
       PURCHASE_NOT_FOUND: 'No se encontró la compra.',
       LOGISTICS_LIMIT_REACHED:
         'Ya se ha(n) creado {{count}} registro(s) logístico(s) permitido(s) para esta compra: {{record}}.',

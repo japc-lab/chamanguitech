@@ -10,6 +10,7 @@ const {
     updatePurchase,
     deletePurchase
 } = require('../controllers/purchase.controller');
+const PurchaseStatusEnum = require('../enums/purchase-status.enum');
 
 const router = express.Router();
 
@@ -80,7 +81,7 @@ router.put(
     [
         validateJWT,
         param('id').isMongoId().withMessage('Invalid purchase ID'),
-        check('localSellCompany', 'Local Sell Company ID is required').isMongoId(),
+        check('localSellCompany').optional().isMongoId().withMessage('Local Sell Company ID must be a valid MongoDB ObjectId'),
         check('averageGrams').optional().isFloat({ min: 0 }),
         check('price').optional().isFloat({ min: 0 }),
         check('pounds').optional().isFloat({ min: 0 }),
@@ -88,12 +89,16 @@ router.put(
         check('subtotal').optional().isFloat({ min: 0 }),
         check('grandTotal').optional().isFloat({ min: 0 }),
         check('totalAgreedToPay').optional().isFloat({ min: 0 }),
-        check('weightSheetNumber', 'weightSheetNumber is required').isString(),
-        check('hasInvoice', 'hasInvoice is required and must be one of: yes, no, not-applicable')
+        check('weightSheetNumber').optional().isString().withMessage('Weight sheet number must be a string'),
+        check('hasInvoice')
             .optional()
             .isIn(['yes', 'no', 'not-applicable']),
-        check('invoiceNumber', 'invoiceNumber is required').if(check('hasInvoice').equals('yes')).isString(),
-        check('invoiceName', 'invoiceName is required').if(check('hasInvoice').equals('yes')).isString(),
+        check('invoiceNumber').if(check('hasInvoice').equals('yes')).isString().withMessage('Invoice number must be a string'),
+        check('invoiceName').if(check('hasInvoice').equals('yes')).isString().withMessage('Invoice name must be a string'),
+        check('status')
+            .optional()
+            .isIn(Object.values(PurchaseStatusEnum))
+            .withMessage('Status must be one of: ' + Object.values(PurchaseStatusEnum).join(', ')),
         validateFields
     ],
     updatePurchase

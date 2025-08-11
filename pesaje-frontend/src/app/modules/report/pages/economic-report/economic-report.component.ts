@@ -106,9 +106,11 @@ export class EconomicReportComponent implements OnInit, OnDestroy {
 
           // Map purchase status
           const statusMap = {
-            [PurchaseStatusEnum.DRAFT]: 'Sin pagos',
+            [PurchaseStatusEnum.DRAFT]: 'Borrador',
+            [PurchaseStatusEnum.CREATED]: 'Sin pagos',
             [PurchaseStatusEnum.IN_PROGRESS]: 'En progreso',
-            [PurchaseStatusEnum.COMPLETED]: 'Completado',
+            [PurchaseStatusEnum.COMPLETED]: 'Pago Completo',
+            [PurchaseStatusEnum.CONFIRMED]: 'Información Completa',
             [PurchaseStatusEnum.CLOSED]: 'Cerrado',
           };
           this.purchaseStatus =

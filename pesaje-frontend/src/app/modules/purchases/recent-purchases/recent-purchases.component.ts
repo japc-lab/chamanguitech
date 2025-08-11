@@ -89,24 +89,32 @@ export class RecentPurchasesComponent implements OnInit {
             if (type === 'sort') {
               switch (data) {
                 case PurchaseStatusEnum.DRAFT:
-                  return 1;
+                  return 1; // Borrador
+                case PurchaseStatusEnum.CREATED:
+                  return 2; // Sin pagos
                 case PurchaseStatusEnum.IN_PROGRESS:
-                  return 2;
+                  return 3; // En progreso
                 case PurchaseStatusEnum.COMPLETED:
-                  return 3;
+                  return 4; // Pago Completo
+                case PurchaseStatusEnum.CONFIRMED:
+                  return 5; // Información Completa
                 case PurchaseStatusEnum.CLOSED:
-                  return 4;
+                  return 6; // Cerrado
                 default:
-                  return 5;
+                  return 99;
               }
             } else {
               switch (data) {
                 case PurchaseStatusEnum.DRAFT:
-                  return `<span class="badge bg-secondary">Sin pagos</span>`;
+                  return `<span class="badge bg-secondary">Borrador</span>`;
+                case PurchaseStatusEnum.CREATED:
+                  return `<span class="badge bg-info text-light">Sin pagos</span>`;
                 case PurchaseStatusEnum.IN_PROGRESS:
                   return `<span class="badge bg-warning text-dark">En progreso</span>`;
                 case PurchaseStatusEnum.COMPLETED:
-                  return `<span class="badge bg-success">Completado</span>`;
+                  return `<span class="badge bg-success">Pago Completo</span>`;
+                case PurchaseStatusEnum.CONFIRMED:
+                  return `<span class="badge bg-primary text-light">Información Completa</span>`;
                 case PurchaseStatusEnum.CLOSED:
                   return `<span class="badge bg-danger">Cerrado</span>`;
                 default:
@@ -257,6 +265,37 @@ export class RecentPurchasesComponent implements OnInit {
         $('td:eq(0)', row).addClass('d-flex align-items-center');
       },
     };
+  }
+
+  shouldShowConfirmAction = (row: IReducedDetailedPurchaseModel): boolean => {
+    return (
+      row?.status !== PurchaseStatusEnum.CONFIRMED &&
+      row?.status !== PurchaseStatusEnum.CLOSED
+    );
+  };
+
+  confirmPurchase(id: string) {
+    this.alertService
+      .confirmTranslated({
+        titleKey: 'MESSAGES.CONFIRM_TITLE',
+        messageKey: 'MESSAGES.CONFIRM_PURCHASE_TEXT',
+        confirmKey: 'BUTTONS.CONFIRM',
+        cancelKey: 'BUTTONS.CANCEL',
+        icon: 'warning',
+      })
+      .then((result) => {
+        if (!result.isConfirmed) return;
+        this.isLoading = true;
+        const sub = this.purchaseService
+          .updatePurchase(id, { status: PurchaseStatusEnum.CONFIRMED })
+          .subscribe({
+            next: () => this.loadRecentPurchases(),
+            error: () =>
+              this.alertService.showTranslatedAlert({ alertType: 'error' }),
+            complete: () => (this.isLoading = false),
+          });
+        this.unsubscribe.push(sub);
+      });
   }
 
   loadRecentPurchases() {
