@@ -20,6 +20,13 @@ const CompanySalePaymentMethodSchema = Schema({
     type: Date,
     required: true,
   },
+  accountName: {
+    type: String,
+    required: true,
+  },
+  observation: {
+    type: String,
+  },
   deletedAt: {
     type: Date,
     default: null

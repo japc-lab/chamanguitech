@@ -5,6 +5,8 @@ export interface ICompanySalePaymentModel {
   paymentMethod: IPaymentMethodModel;
   amount: number;
   paymentDate: string;
+  accountName: string;
+  observation?: string;
   deletedAt?: Date;
   id: string;
 }
@@ -15,6 +17,8 @@ export interface ICreateUpdateCompanySalePaymentModel {
   paymentMethod: string;
   amount: number;
   paymentDate: string;
+  accountName: string;
+  observation?: string;
 }
 
 export interface IReadCompanySalePaymentModel {

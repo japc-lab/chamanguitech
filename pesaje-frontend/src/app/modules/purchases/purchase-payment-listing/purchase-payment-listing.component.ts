@@ -68,6 +68,13 @@ export class PurchasePaymentListingComponent implements OnInit, OnDestroy {
         },
       },
       {
+        title: 'Nombre de Cuenta Bancaria',
+        data: 'accountName',
+        render: function (data) {
+          return data ? data : '-';
+        },
+      },
+      {
         title: 'Monto',
         data: 'amount',
         render: function (data) {
@@ -182,6 +189,8 @@ export class PurchasePaymentListingComponent implements OnInit, OnDestroy {
       paymentDate: this.dateUtils.convertLocalDateToUTC(
         this.purchasePaymentModel.paymentDate
       ),
+      accountName: this.purchasePaymentModel.accountName,
+      observation: this.purchasePaymentModel.observation,
     };
 
     const updateFn = () => {
@@ -207,6 +216,8 @@ export class PurchasePaymentListingComponent implements OnInit, OnDestroy {
                 paymentMethod: this.paymentMethods.find(
                   (x) => x.id === updatedInfo.paymentMethod
                 )!,
+                accountName: updatedInfo.accountName,
+                observation: updatedInfo.observation,
               };
 
               this.purchasePayments[index] = fullUpdatedPayment;

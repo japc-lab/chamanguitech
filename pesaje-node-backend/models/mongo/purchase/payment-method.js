@@ -4,7 +4,7 @@ const PaymentMethodSchema = Schema({
   name: {
     type: String,
     required: true,
-  },
+  }
 },
   { timestamps: true },
 );

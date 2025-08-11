@@ -67,6 +67,13 @@ export class CompanySalePaymentListingComponent implements OnInit, OnDestroy {
         },
       },
       {
+        title: 'Nombre de Cuenta Bancaria',
+        data: 'accountName',
+        render: function (data) {
+          return data ? data : '-';
+        },
+      },
+      {
         title: 'Monto',
         data: 'amount',
         render: function (data) {
@@ -181,6 +188,8 @@ export class CompanySalePaymentListingComponent implements OnInit, OnDestroy {
       paymentDate: this.dateUtils.convertLocalDateToUTC(
         this.companySalePaymentModel.paymentDate
       ),
+      accountName: this.companySalePaymentModel.accountName,
+      observation: this.companySalePaymentModel.observation,
     };
 
     const updateFn = () => {
@@ -208,6 +217,8 @@ export class CompanySalePaymentListingComponent implements OnInit, OnDestroy {
                 paymentMethod: this.paymentMethods.find(
                   (x) => x.id === updatedInfo.paymentMethod
                 )!,
+                accountName: updatedInfo.accountName,
+                observation: updatedInfo.observation,
               };
 
               this.companySalePayments[index] = fullUpdatedPayment;

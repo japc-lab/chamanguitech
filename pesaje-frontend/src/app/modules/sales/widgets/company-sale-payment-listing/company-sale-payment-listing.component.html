@@ -74,6 +74,18 @@
                 </div>
               </div>
 
+              <!-- Cuenta -->
+              <div class="mb-3">
+                <label for="accountName" class="required fw-semibold fs-6 mb-2">Nombre de Cuenta Bancaria</label>
+                <input type="text" class="form-control" id="accountName" name="accountName"
+                  [(ngModel)]="companySalePaymentModel.accountName" required #accountName="ngModel">
+                <div
+                  *ngIf="(myForm.submitted || accountName.dirty || accountName.touched) && accountName.errors?.['required']"
+                  class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                  <div>El nombre de la cuenta bancaria es obligatorio.</div>
+                </div>
+              </div>
+
               <!-- Monto -->
               <div class="mb-3">
                 <label for="amount" class="required fw-semibold fs-6 mb-2">Monto</label>
@@ -99,6 +111,13 @@
                   class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
                   <div>La fecha de pago es obligatoria.</div>
                 </div>
+              </div>
+
+              <!-- Observación -->
+              <div class="mb-3">
+                <label for="observation" class="fw-semibold fs-6 mb-2">Observación</label>
+                <textarea class="form-control" id="observation" name="observation"
+                  [(ngModel)]="companySalePaymentModel.observation" #observation="ngModel"></textarea>
               </div>
 
             </div>
