@@ -507,12 +507,17 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
     const input = event.target as HTMLInputElement;
     let value = input.value.replace(/\D/g, ''); // Remove non-digits
 
-    // Pad with leading zeros to make it 8 digits
-    value = value.padStart(8, '0');
-
-    // Update the model and input value
-    this.createPurchaseModel.weightSheetNumber = value;
-    input.value = value;
+    if (value === '' || value === '0' || /^0+$/.test(value)) {
+      // If empty, just zeros, or all zeros, keep the model empty
+      this.createPurchaseModel.weightSheetNumber = '';
+      input.value = '';
+    } else {
+      // Pad with leading zeros to make it 8 digits
+      value = value.padStart(8, '0');
+      // Update the model and input value
+      this.createPurchaseModel.weightSheetNumber = value;
+      input.value = value;
+    }
   }
 
   /**
