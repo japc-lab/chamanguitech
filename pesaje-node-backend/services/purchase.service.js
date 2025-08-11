@@ -17,6 +17,7 @@ const getAllByParams = async ({ includeDeleted = false, clientId, userId, compan
         'client',
         'shrimpFarm',
         'company',
+        'localSellCompany',
         'period',
     ]);
 
@@ -46,9 +47,19 @@ const getAllByParams = async ({ includeDeleted = false, clientId, userId, compan
         return map;
     }, {});
 
+    // Group payments by purchase id (normalize to string to avoid ObjectId vs string mismatches)
+    const paymentsByPurchase = payments.reduce((acc, pm) => {
+        const key = String(pm.purchase);
+        if (!acc[key]) acc[key] = [];
+        acc[key].push(pm);
+        return acc;
+    }, {});
+
     // Build final response
     return purchases.map(p => ({
         ...p,
+        payments: paymentsByPurchase[String(p.id)] || [],
+        paymentsCount: (paymentsByPurchase[String(p.id)]?.length || 0),
         totalPaid: paymentMap[p.id] || 0,
         buyer: p.buyer ? {
             id: p.buyer.id,

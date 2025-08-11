@@ -37,6 +37,8 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @Input() permissionRoute: string = '/';
 
+  @Input() stickyActionColumn: boolean = false;
+
   @Input() isExternalModal: boolean = false;
 
   // Reload emitter inside datatable
@@ -136,6 +138,7 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
     const actionColumn = {
       sortable: false,
       title: 'Acciones',
+      className: this.stickyActionColumn ? 'sticky-right' : undefined,
       render: (data: any, type: any, full: any) => {
         const editButton = !this.isExternalModal
           ? `

@@ -14,6 +14,7 @@ import {
   PurchaseStatusEnum,
 } from '../interfaces/purchase.interface';
 import { Router } from '@angular/router';
+import { IPurchasePaymentModel } from '../../shared/interfaces/purchase-payment.interface';
 import { PeriodService } from '../../shared/services/period.service';
 import { IReadPeriodModel } from '../../shared/interfaces/period.interface';
 import { IReadClientModel } from '../../shared/interfaces/client.interface';
@@ -182,7 +183,10 @@ export class RecentPurchasesComponent implements OnInit {
         {
           title: 'Compañía',
           data: 'company.name',
-          render: function (data) {
+          render: function (data, type, full) {
+            if (full.localSellCompany) {
+              return data ? data + ' - ' + full.localSellCompany.name : '-';
+            }
             return data ? data : '-';
           },
         },
@@ -191,6 +195,37 @@ export class RecentPurchasesComponent implements OnInit {
           data: 'period.name',
           render: function (data) {
             return data ? data : '-';
+          },
+        },
+        // Add Nombre de Cuenta Bancaria
+        // Has to be from the payment with the highest amount payed.
+        // Leave empty if the highest amount payer doesn't have name and if no payments have been made.
+        {
+          title: 'Nombre de Cuenta Bancaria',
+          data: 'payments',
+          render: function (data, type, full) {
+            const payments: IPurchasePaymentModel[] = Array.isArray(
+              full?.payments
+            )
+              ? (full.payments as IPurchasePaymentModel[])
+              : [];
+            if (payments.length === 0) {
+              return type === 'sort' ? 0 : '-';
+            }
+
+            // Find the payment with the highest amount
+            const topPayment = payments.reduce(
+              (max: IPurchasePaymentModel, curr: IPurchasePaymentModel) =>
+                (curr?.amount ?? 0) > (max?.amount ?? 0) ? curr : max,
+              payments[0]
+            );
+
+            if (type === 'sort') {
+              return topPayment?.amount ?? 0;
+            }
+
+            const accountName = topPayment?.accountName?.trim();
+            return accountName ? accountName : '-';
           },
         },
         {
@@ -207,34 +242,13 @@ export class RecentPurchasesComponent implements OnInit {
             return data ? data : '-';
           },
         },
-        // {
-        //   title: 'Subtotal',
-        //   data: 'subtotal',
-        //   render: function (data) {
-        //     if (!data && data !== 0) return '-';
-
-        //     const formatted = new Intl.NumberFormat('es-ES', {
-        //       minimumFractionDigits: 2,
-        //       maximumFractionDigits: 2,
-        //     }).format(data);
-
-        //     return `$${formatted}`;
-        //   },
-        // },
-        // {
-        //   title: 'Subtotal 2',
-        //   data: 'subtotal2',
-        //   render: function (data) {
-        //     if (!data && data !== 0) return '-';
-
-        //     const formatted = new Intl.NumberFormat('es-ES', {
-        //       minimumFractionDigits: 2,
-        //       maximumFractionDigits: 2,
-        //     }).format(data);
-
-        //     return `$${formatted}`;
-        //   },
-        // },
+        {
+          title: 'Nombre en Factura',
+          data: 'invoiceName',
+          render: function (data) {
+            return data ? data : '-';
+          },
+        },
       ],
       language: {
         url: 'https://cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json',

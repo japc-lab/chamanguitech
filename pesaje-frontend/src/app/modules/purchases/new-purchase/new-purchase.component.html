@@ -101,7 +101,7 @@
 
           <!-- Invoice Name -->
           <div class="col-md-6" *ngIf="createPurchaseModel.hasInvoice === 'yes'">
-            <label for="invoiceName" class="required fw-semibold fs-6 mb-2">Nombre de la factura</label>
+            <label for="invoiceName" class="required fw-semibold fs-6 mb-2">Nombre en factura</label>
             <input type="text" id="invoiceName" name="invoiceName" [(ngModel)]="createPurchaseModel.invoiceName"
               #invoiceName="ngModel" class="form-control form-control-sm" required />
             <div *ngIf="purchaseForm.submitted && invoiceName.invalid"

@@ -24,7 +24,7 @@
 
 
     <div class="mt-5">
-      <app-crud [datatableConfig]="datatableConfig" [permissionRoute]="PERMISSION_ROUTE"
+      <app-crud [datatableConfig]="datatableConfig" [permissionRoute]="PERMISSION_ROUTE" [stickyActionColumn]="true"
         (editEvent)="edit($event.toString())" (deleteEvent)="delete($event.toString())" [reload]="reloadEvent">
       </app-crud>
     </div>

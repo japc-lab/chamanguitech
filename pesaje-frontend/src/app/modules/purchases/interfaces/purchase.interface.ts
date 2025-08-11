@@ -10,6 +10,7 @@ import {
   IReadPeriodModel,
   IReducedPeriodModel,
 } from '../../shared/interfaces/period.interface';
+import { IPurchasePaymentModel } from '../../shared/interfaces/purchase-payment.interface';
 import {
   IReadShrimpFarmModel,
   IReducedShrimpFarmModel,
@@ -76,6 +77,8 @@ export interface IDetailedPurchaseModel extends IBasePurchaseModel {
   fisherman: IReadFishermanModel;
   client: IReadClientModel;
   shrimpFarm: IReadShrimpFarmModel;
+  payments: IPurchasePaymentModel[];
+  paymentsCount: number;
 }
 
 export interface IListPurchaseModel extends IBasePurchaseModel {
