@@ -1,11 +1,11 @@
 <!-- Loading Spinner -->
-<div *ngIf="isLoading$ | async" class="text-center py-5">
+<div *ngIf="isLoading" class="text-center py-5">
   <div class="spinner-border text-primary" role="status">
     <span class="visually-hidden">Loading...</span>
   </div>
 </div>
 
-<div *ngIf="!(isLoading$ | async)">
+<div *ngIf="!isLoading">
   <!-- Purchase Form -->
   <form #purchaseForm="ngForm" (ngSubmit)="confirmSave($event,purchaseForm)" novalidate>
 
@@ -77,7 +77,7 @@
             <select id="hasInvoice" name="hasInvoice" class="form-select form-select-sm"
               [(ngModel)]="createPurchaseModel.hasInvoice" (ngModelChange)="onHasInvoiceChange($event)"
               #hasInvoice="ngModel" required>
-              <option [ngValue]="null" disabled selected>Seleccione una opción</option>
+              <option [ngValue]="undefined" disabled selected>Seleccione una opción</option>
               <option [ngValue]="'yes'">Si</option>
               <option [ngValue]="'no'">No</option>
               <option [ngValue]="'not-applicable'">No aplica</option>
@@ -135,9 +135,9 @@
           <div class="col-md-6">
             <label for="company" class="required fw-semibold fs-6 mb-2">Compañía</label>
             <select id="company" name="company" class="form-select form-select-sm"
-              [(ngModel)]="createPurchaseModel.company" #company="ngModel" required [disabled]="!!purchaseId"
+              [(ngModel)]="createPurchaseModel.company" #company="ngModel" required [disabled]="isEditMode"
               (change)="onCompanyChange($event)">
-              <option value="" disabled selected>Seleccione una opción</option>
+              <option [ngValue]="undefined" disabled selected>Seleccione una opción</option>
               <option *ngFor="let company of companiesList" [value]="company.id">
                 {{ company.name }}
               </option>
@@ -153,7 +153,7 @@
             <label for="localSellCompany" class="required fw-semibold fs-6 mb-2">Compañía de venta local</label>
             <select id="localSellCompany" name="localSellCompany" class="form-select form-select-sm"
               [(ngModel)]="createPurchaseModel.localSellCompany" #localSellCompany="ngModel" required>
-              <option value="" disabled selected>Seleccione una opción</option>
+              <option [ngValue]="undefined" disabled selected>Seleccione una opción</option>
               <option *ngFor="let company of companiesList" [value]="company.id">
                 {{ company.name }}
               </option>
@@ -168,8 +168,8 @@
           <div *ngIf="!isLocal" class="col-md-6">
             <label for="period" class="required fw-semibold fs-6 mb-2">Período</label>
             <select id="period" name="period" class="form-select form-select-sm"
-              [(ngModel)]="createPurchaseModel.period" #period="ngModel" required [disabled]="!!purchaseId">
-              <option value="" disabled selected>Seleccione una opción</option>
+              [(ngModel)]="createPurchaseModel.period" #period="ngModel" required [disabled]="isEditMode">
+              <option [ngValue]="undefined" disabled selected>Seleccione una opción</option>
               <option *ngFor="let period of existingPeriods" [value]="period.id">
                 {{ period.name }}
               </option>
@@ -187,7 +187,7 @@
             <label for="buyer" class="required fw-semibold fs-6 mb-2">Comprador</label>
             <select id="buyer" name="buyer" class="form-select form-select-sm" [(ngModel)]="createPurchaseModel.buyer"
               #buyer="ngModel" required (change)="onBuyerChange($event)">
-              <option [ngValue]="null" disabled selected>Seleccione una opción</option>
+              <option [ngValue]="undefined" disabled selected>Seleccione una opción</option>
               <option *ngFor="let buyer of buyersList" [value]="buyer.id">
                 {{ buyer.person.names }} {{ buyer.person.lastNames }}
               </option>
@@ -203,7 +203,7 @@
             <label for="broker" class="required fw-semibold fs-6 mb-2">Bróker</label>
             <select id="broker" name="broker" class="form-select form-select-sm"
               [(ngModel)]="createPurchaseModel.broker" #broker="ngModel" required>
-              <option value="" disabled selected>Seleccione una opción</option>
+              <option [ngValue]="undefined" disabled selected>Seleccione una opción</option>
               <option *ngFor="let broker of brokersList" [value]="broker.id">
                 {{ broker.person.names }} {{ broker.person.lastNames }}
               </option>
@@ -219,7 +219,7 @@
             <label for="fisherman" class="required fw-semibold fs-6 mb-2">Recibidor de Pesca</label>
             <select id="fisherman" name="fisherman" class="form-select form-select-sm"
               [(ngModel)]="createPurchaseModel.fisherman" #fisherman="ngModel" required>
-              <option value="" disabled selected>Seleccione una opción</option>
+              <option [ngValue]="undefined" disabled selected>Seleccione una opción</option>
               <option *ngFor="let fisherman of fishermenList" [value]="fisherman.id">
                 {{ fisherman.person.names }} {{ fisherman.person.lastNames }}
               </option>
@@ -238,7 +238,7 @@
                 <!-- Dropdown takes most of the width -->
                 <select id="client" name="client" class="form-select form-select-sm flex-grow-1"
                   [(ngModel)]="createPurchaseModel.client" #client="ngModel" required (change)="onClientChange($event)">
-                  <option value="" disabled selected>Seleccione una opción</option>
+                  <option [ngValue]="undefined" disabled selected>Seleccione una opción</option>
                   <option *ngFor="let client of clientsList" [value]="client.id">
                     {{ client.person.names }} {{ client.person.lastNames }}
                   </option>
@@ -266,7 +266,7 @@
             <select id="shrimpFarm" name="shrimpFarm" class="form-select form-select-sm"
               [(ngModel)]="createPurchaseModel.shrimpFarm" #shrimpFarm="ngModel" (change)="onShrimpFarmChange($event)"
               required>
-              <option value="" disabled selected>Seleccione una opción</option>
+              <option [ngValue]="undefined" disabled selected>Seleccione una opción</option>
               <option *ngFor="let shrimpFarm of shrimpFarmsList" [value]="shrimpFarm.id">
                 {{ shrimpFarm.identifier }}
               </option>
@@ -319,9 +319,9 @@
 
           <!-- Shrimp Size in company -->
           <div class="col-md-6">
-            <label for="shrimpFarmSize" class="fw-semibold fs-6 mb-2">Talla de camarón en compañía</label>
-            <input type="text" id="shrimpFarmSize" name="shrimpFarmSize" class="form-control form-control-sm"
-              [(ngModel)]="shrimpFarmSize" disabled />
+            <label for="shrimpSize" class="fw-semibold fs-6 mb-2">Talla de camarón en compañía</label>
+            <input type="text" id="shrimpSize" name="shrimpSize" class="form-control form-control-sm"
+              [(ngModel)]="shrimpSize" disabled />
           </div>
 
           <!-- Precio camaron ($) -->
@@ -361,9 +361,9 @@
 
           <!-- Shrimp Size 2 in company -->
           <div class="col-md-6">
-            <label for="shrimpFarmSize2" class="fw-semibold fs-6 mb-2">Talla de camarón 2 en compañía</label>
-            <input type="text" id="shrimpFarmSize2" name="shrimpFarmSize2" class="form-control form-control-sm"
-              [(ngModel)]="shrimpFarmSize2" disabled />
+            <label for="shrimpSize2" class="fw-semibold fs-6 mb-2">Talla de camarón 2 en compañía</label>
+            <input type="text" id="shrimpSize2" name="shrimpSize2" class="form-control form-control-sm"
+              [(ngModel)]="shrimpSize2" disabled />
           </div>
 
           <!-- Precio camaron ($) -->
@@ -442,13 +442,13 @@
 
       <div class="card-footer d-flex justify-content-end py-6 px-9">
         <!-- Submit Button -->
-        <button *ngIf="canSavePurchase()" type="submit" class="btn btn-primary" [disabled]="isLoading$ | async">
+        <button *ngIf="canSavePurchase()" type="submit" class="btn btn-primary" [disabled]="isLoading">
           Guardar
         </button>
 
         <!-- Payments List Button -->
         <button *ngIf="canAddPayments()" type="button" (click)="openPaymentsModal()" class="btn btn-secondary ms-3"
-          [disabled]="isLoading$ | async">
+          [disabled]="isLoading">
           Pagos
         </button>
       </div>

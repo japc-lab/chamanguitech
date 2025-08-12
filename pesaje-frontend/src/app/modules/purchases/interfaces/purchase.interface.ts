@@ -21,11 +21,11 @@ export interface ICreatePurchaseModel {
   company: string;
   localSellCompany: string;
   period?: string;
-  broker: string;
-  fisherman: string;
-  client: string;
+  broker?: string;
+  fisherman?: string;
+  client?: string;
   status?: PurchaseStatusEnum;
-  shrimpFarm: string;
+  shrimpFarm?: string;
   averageGrams: number;
   price: number;
   pounds: number;
