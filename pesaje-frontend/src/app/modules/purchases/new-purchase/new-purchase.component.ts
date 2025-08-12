@@ -455,10 +455,15 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   }
 
   canAddPayments(): boolean {
+    if (this.createPurchaseModel.status === PurchaseStatusEnum.DRAFT) {
+      return false;
+    }
+
     if (this.purchaseId) {
       if (this.isOnlyBuyer) {
         return (
           this.createPurchaseModel.status !== PurchaseStatusEnum.COMPLETED &&
+          this.createPurchaseModel.status !== PurchaseStatusEnum.CONFIRMED &&
           this.createPurchaseModel.status !== PurchaseStatusEnum.CLOSED
         );
       } else {
