@@ -10,6 +10,7 @@ import {
   IReadPeriodModel,
   IReducedPeriodModel,
 } from '../../shared/interfaces/period.interface';
+import { IPurchasePaymentModel } from '../../shared/interfaces/purchase-payment.interface';
 import {
   IReadShrimpFarmModel,
   IReducedShrimpFarmModel,
@@ -18,12 +19,13 @@ import {
 export interface ICreatePurchaseModel {
   buyer: string;
   company: string;
+  localSellCompany: string;
   period?: string;
-  broker: string;
-  fisherman: string;
-  client: string;
+  broker?: string;
+  fisherman?: string;
+  client?: string;
   status?: PurchaseStatusEnum;
-  shrimpFarm: string;
+  shrimpFarm?: string;
   averageGrams: number;
   price: number;
   pounds: number;
@@ -69,16 +71,20 @@ export interface IBasePurchaseModel {
 export interface IDetailedPurchaseModel extends IBasePurchaseModel {
   buyer: IReadUserModel;
   company: ICompany;
+  localSellCompany: ICompany;
   period: IReadPeriodModel;
   broker: IReadBrokerModel;
   fisherman: IReadFishermanModel;
   client: IReadClientModel;
   shrimpFarm: IReadShrimpFarmModel;
+  payments: IPurchasePaymentModel[];
+  paymentsCount: number;
 }
 
 export interface IListPurchaseModel extends IBasePurchaseModel {
   buyer: string;
   company: string;
+  localSellCompany: string;
   period: string;
   broker: string;
   fisherman: string;
@@ -90,6 +96,7 @@ export interface IListPurchaseModel extends IBasePurchaseModel {
 export interface IReducedDetailedPurchaseModel extends IBasePurchaseModel {
   buyer: IReducedUserModel;
   company: ICompany;
+  localSellCompany: ICompany;
   period: IReducedPeriodModel;
   broker: IReducedUserModel;
   client: IReducedUserModel;
@@ -100,26 +107,30 @@ export interface IReducedDetailedPurchaseModel extends IBasePurchaseModel {
 }
 
 export interface IUpdatePurchaseModel {
-  averageGrams: number;
-  price: number;
-  pounds: number;
+  localSellCompany?: string;
+  averageGrams?: number;
+  price?: number;
+  pounds?: number;
   averageGrams2?: number;
   price2?: number;
   pounds2?: number;
-  totalPounds: number;
-  subtotal: number;
+  totalPounds?: number;
+  subtotal?: number;
   subtotal2?: number;
-  grandTotal: number;
-  totalAgreedToPay: number;
-  hasInvoice: 'yes' | 'no' | 'not-applicable';
+  grandTotal?: number;
+  totalAgreedToPay?: number;
+  hasInvoice?: 'yes' | 'no' | 'not-applicable';
   invoiceNumber?: string;
   invoiceName?: string;
   weightSheetNumber?: string;
+  status?: PurchaseStatusEnum;
 }
 
 export enum PurchaseStatusEnum {
   DRAFT = 'DRAFT',
+  CREATED = 'CREATED',
   IN_PROGRESS = 'IN_PROGRESS',
   COMPLETED = 'COMPLETED',
+  CONFIRMED = 'CONFIRMED',
   CLOSED = 'CLOSED',
 }

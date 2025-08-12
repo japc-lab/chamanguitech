@@ -33,6 +33,8 @@ router.post(
         check('paymentMethod', 'Payment Method ID is required').isMongoId(),
         check('amount', 'Amount must be a positive number').isFloat({ min: 0 }),
         check('paymentDate', 'Payment date is required and must be a valid date').isISO8601(),
+        check('accountName', 'Account name is required').not().isEmpty(),
+        check('observation', 'Observation is required').optional().not().isEmpty(),
         validateFields
     ],
     createCompanySalePaymentMethod
@@ -53,6 +55,8 @@ router.put(
         check('paymentDate', 'Payment date must be a valid ISO 8601 date')
             .optional()
             .isISO8601(),
+        check('accountName', 'Account name is required').optional().not().isEmpty(),
+        check('observation', 'Observation is required').optional().not().isEmpty(),
         validateFields
     ],
     updateCompanySalePaymentMethod

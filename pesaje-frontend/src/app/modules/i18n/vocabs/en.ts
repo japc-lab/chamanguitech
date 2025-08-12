@@ -105,6 +105,9 @@ export const locale = {
       DELETE_CONFIRM_TITLE: 'Are you sure you want to delete?',
       DELETE_CONFIRM_TEXT: 'This action cannot be undone.',
       DELETE_SUCCESS: 'The item was deleted successfully!',
+      CONFIRM_TITLE: 'Are you sure?',
+      CONFIRM_PURCHASE_TEXT:
+        'The information is complete. The status will be updated to Confirmed.',
       PURCHASE_NOT_FOUND: 'Purchase not found.',
       LOGISTICS_LIMIT_REACHED:
         '{{count}} logistics record(s) have already been created for this purchase: {{record}}.',

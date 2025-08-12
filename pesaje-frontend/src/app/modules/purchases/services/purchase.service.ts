@@ -103,12 +103,12 @@ export class PurchaseService {
   ): Observable<IDetailedPurchaseModel> {
     this.isLoadingSubject.next(true);
     return this.http
-      .put<{ updatedPurchase: IDetailedPurchaseModel }>(
+      .put<{ data: IDetailedPurchaseModel }>(
         `${API_PURCHASE_URL}/${id}`,
         payload
       )
       .pipe(
-        map((response) => response.updatedPurchase),
+        map((response) => response.data),
         finalize(() => this.isLoadingSubject.next(false))
       );
   }

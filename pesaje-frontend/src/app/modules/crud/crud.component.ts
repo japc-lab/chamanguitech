@@ -37,7 +37,14 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @Input() permissionRoute: string = '/';
 
+  @Input() stickyActionColumn: boolean = false;
+
   @Input() isExternalModal: boolean = false;
+
+  // Provide the Keen Icon name (e.g. 'ki-verify'); it will be wrapped in an <i> tag automatically
+  @Input() extraActionIconName: string = 'ki-element-11';
+  // Optional predicate to decide when to show the extra action per row
+  @Input() shouldShowExtraAction?: (row: any) => boolean;
 
   // Reload emitter inside datatable
   @Input() reload: EventEmitter<boolean>;
@@ -47,6 +54,8 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
   @Output() deleteEvent = new EventEmitter<number>();
   @Output() editEvent = new EventEmitter<number>();
   @Output() createEvent = new EventEmitter<boolean>();
+  // Emits when custom extra action is clicked
+  @Output() extraActionEvent = new EventEmitter<number>();
 
   dtOptions: Config = {};
 
@@ -136,6 +145,7 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
     const actionColumn = {
       sortable: false,
       title: 'Acciones',
+      className: this.stickyActionColumn ? 'sticky-right' : undefined,
       render: (data: any, type: any, full: any) => {
         const editButton = !this.isExternalModal
           ? `
@@ -155,6 +165,11 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
             </i>
           </button>`;
 
+        const extraButton = `
+          <button class="btn btn-icon btn-active-light-primary w-30px h-30px me-3" data-action="extra" data-id="${full.id}">
+            <i class="ki-duotone ${this.extraActionIconName || 'ki-element-11'} fs-3"><span class="path1"></span><span class="path2"></span></i>
+          </button>`;
+
         const buttons = [];
 
         if (
@@ -169,6 +184,10 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
           this.permissionService.canDelete(this.permissionRoute)
         ) {
           buttons.push(deleteButton);
+        }
+
+        if (this.extraActionEvent.observed && (!this.shouldShowExtraAction || this.shouldShowExtraAction(full))) {
+          buttons.push(extraButton);
         }
 
         return buttons.join('');
@@ -220,6 +239,10 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.successSwal.fire();
               }
             });
+            break;
+
+          case 'extra':
+            this.extraActionEvent.emit(this.idInAction);
             break;
         }
       }

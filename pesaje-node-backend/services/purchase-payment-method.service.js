@@ -4,7 +4,7 @@ const PurchaseStatusEnum = require('../enums/purchase-status.enum');
 const normalize = (num) => Math.round((Number(num) + Number.EPSILON) * 100) / 100;
 
 const determineStatus = (totalPaid, totalAgreedToPay) => {
-    if (totalPaid === 0) return PurchaseStatusEnum.DRAFT;
+    if (totalPaid === 0) return PurchaseStatusEnum.CREATED;
     if (totalPaid >= totalAgreedToPay) return PurchaseStatusEnum.COMPLETED;
     return PurchaseStatusEnum.IN_PROGRESS;
 };

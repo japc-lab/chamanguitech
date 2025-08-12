@@ -17,6 +17,7 @@ const getAllByParams = async ({ includeDeleted = false, clientId, userId, compan
         'client',
         'shrimpFarm',
         'company',
+        'localSellCompany',
         'period',
     ]);
 
@@ -46,9 +47,19 @@ const getAllByParams = async ({ includeDeleted = false, clientId, userId, compan
         return map;
     }, {});
 
+    // Group payments by purchase id (normalize to string to avoid ObjectId vs string mismatches)
+    const paymentsByPurchase = payments.reduce((acc, pm) => {
+        const key = String(pm.purchase);
+        if (!acc[key]) acc[key] = [];
+        acc[key].push(pm);
+        return acc;
+    }, {});
+
     // Build final response
     return purchases.map(p => ({
         ...p,
+        payments: paymentsByPurchase[String(p.id)] || [],
+        paymentsCount: (paymentsByPurchase[String(p.id)]?.length || 0),
         totalPaid: paymentMap[p.id] || 0,
         buyer: p.buyer ? {
             id: p.buyer.id,
@@ -107,11 +118,18 @@ const create = async (data) => {
         shrimpFarm: 'shrimpFarmAdapter'
     };
 
-    // Always validate required references
+    const isDraft = data.status === PurchaseStatusEnum.DRAFT;
+
+    // Validate references; for drafts, only validate provided ones; for non-drafts, enforce presence and validity
     await Promise.all(Object.entries(references).map(async ([key, adapter]) => {
-        const entity = await dbAdapter[adapter].getById(data[key]);
-        if (!entity) {
-            throw new Error(`${key.charAt(0).toUpperCase() + key.slice(1)} does not exist`);
+        const id = data[key];
+        if (id) {
+            const entity = await dbAdapter[adapter].getById(id);
+            if (!entity) {
+                throw new Error(`${key.charAt(0).toUpperCase() + key.slice(1)} does not exist`);
+            }
+        } else if (!isDraft) {
+            throw new Error(`${key.charAt(0).toUpperCase() + key.slice(1)} is required`);
         }
     }));
 
@@ -123,8 +141,10 @@ const create = async (data) => {
         }
     }
 
-    // Set initial status
-    data.status = PurchaseStatusEnum.DRAFT;
+    // Set initial status to CREATED only when not provided; allow explicit DRAFT
+    if (!data.status) {
+        data.status = PurchaseStatusEnum.CREATED;
+    }
 
     // Create the purchase record
     return await dbAdapter.purchaseAdapter.create(data);

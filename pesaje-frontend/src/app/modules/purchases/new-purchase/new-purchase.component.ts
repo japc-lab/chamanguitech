@@ -9,7 +9,7 @@ import { Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { NgForm } from '@angular/forms';
-import { distinctUntilChanged, Observable, Subscription } from 'rxjs';
+import { distinctUntilChanged, forkJoin, iif, of, Subscription } from 'rxjs';
 import { PERMISSION_ROUTES } from 'src/app/constants/routes.constants';
 import { PurchaseService } from '../services/purchase.service';
 import { IRoleModel } from '../../auth/interfaces/role.interface';
@@ -24,7 +24,6 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { FormUtilsService } from 'src/app/utils/form-utils.service';
 import {
   ICreatePurchaseModel,
-  IListPurchaseModel,
   PurchaseStatusEnum,
 } from '../interfaces/purchase.interface';
 import { InputUtilsService } from 'src/app/utils/input-utils.service';
@@ -55,7 +54,9 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   // Inicializa modalRef como null explícitamente
   private modalRef: NgbModalRef | null = null;
 
-  isLoading$: Observable<boolean>;
+  // Local loading state for component initialization
+  isLoading = true;
+  isEditMode = false;
 
   buyersList: IReadUserModel[];
   brokersList: IReadBrokerModel[];
@@ -71,14 +72,20 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   hasRouteId = false;
 
   farmPlace: string = '';
-  shrimpFarmSize: string = '';
-  shrimpFarmSize2: string = '';
+  shrimpSize: string = '';
+  shrimpSize2: string = '';
   purchaseId?: string;
 
   createPurchaseModel: ICreatePurchaseModel = {} as ICreatePurchaseModel;
 
   /** Stores all active subscriptions */
   private unsubscribe: Subscription[] = [];
+
+  /** Stores the form changes subscription */
+  private formChangesSubscription?: Subscription;
+
+  /** Stores the timeout for delayed logging */
+  private logTimeout?: any;
 
   constructor(
     private purchaseService: PurchaseService,
@@ -99,9 +106,7 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
     private router: Router,
     private location: Location,
     private changeDetectorRef: ChangeDetectorRef
-  ) {
-    this.isLoading$ = this.purchaseService.isLoading$;
-  }
+  ) {}
 
   get purchaseDateFormatted(): string | null {
     return this.dateUtils.formatISOToDateInput(
@@ -116,72 +121,157 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
 
     if (this.isOnlyBuyer) {
       this.createPurchaseModel.buyer = this.authService.currentUserValue?.id!;
-      this.loadBrokers(this.createPurchaseModel.buyer);
-      this.loadClients(this.createPurchaseModel.buyer);
-    } else {
-      this.loadBuyers();
-      this.loadFishermen();
     }
 
-    const companiesSub = this.loadCompanies().subscribe({
-      next: (companies) => {
+    const dataLoadingSub = forkJoin({
+      companies: this.companyService
+        .getCompanies()
+        .pipe(distinctUntilChanged()),
+      buyers: iif(
+        () => !this.isOnlyBuyer,
+        this.userService.getAllUsers(false, 'Comprador'),
+        of([])
+      ),
+      fishermen: this.fishermanService.getAll(),
+      brokers: iif(
+        () => this.isOnlyBuyer,
+        this.brokerService.getBrokersByUser(this.createPurchaseModel.buyer),
+        of([])
+      ),
+      clients: iif(
+        () => this.isOnlyBuyer,
+        this.clientService.getClientsByUser(this.createPurchaseModel.buyer),
+        of([])
+      ),
+      purchase: iif(
+        () => !!this.purchaseId,
+        this.purchaseService.getPurchaseById(this.purchaseId!),
+        of(null)
+      ),
+    }).subscribe({
+      next: ({ companies, buyers, fishermen, brokers, clients, purchase }) => {
         this.companiesList = companies;
+        this.buyersList = buyers;
+        this.fishermenList = fishermen;
+        this.brokersList = brokers;
+        this.clientsList = clients;
 
-        if (this.purchaseId) {
-          const purchaseSub = this.purchaseService
-            .getPurchaseById(this.purchaseId)
-            .subscribe({
-              next: (purchase: IListPurchaseModel) => {
-                this.createPurchaseModel = { ...purchase };
+        if (purchase) {
+          this.createPurchaseModel = { ...purchase };
+          this.isEditMode = !!this.createPurchaseModel.controlNumber;
 
-                this.loadBrokers(this.createPurchaseModel.buyer);
-                this.loadClients(this.createPurchaseModel.buyer);
-                this.loadShrimpFarms(this.createPurchaseModel.client);
+          if (this.createPurchaseModel.buyer) {
+            this.loadBrokers(this.createPurchaseModel.buyer);
+            this.loadClients(this.createPurchaseModel.buyer);
+            this.createPurchaseModel.client &&
+              this.loadShrimpFarms(this.createPurchaseModel.client);
+          }
 
-                if (this.createPurchaseModel.company) {
-                  const selectedCompany = this.companiesList.find(
-                    (com) => com.id === this.createPurchaseModel.company
-                  );
-                  this.isLocal = selectedCompany?.name === 'Local';
-                  if (!this.isLocal) {
-                    this.loadPeriods(this.createPurchaseModel.company);
-                  }
-                } else {
-                  this.isLocal = false;
-                }
+          if (this.createPurchaseModel.company) {
+            const selectedCompany = this.companiesList.find(
+              (com) => com.id === this.createPurchaseModel.company
+            );
+            this.isLocal = selectedCompany?.name === 'Local';
+            if (!this.isLocal) {
+              this.loadPeriods(this.createPurchaseModel.company);
+            }
+          }
 
-                this.shrimpFarmSize = this.inputUtils.formatToDecimal(
-                  this.createPurchaseModel.averageGrams > 0
-                    ? 1000 / this.createPurchaseModel.averageGrams
-                    : 0
-                );
-                this.shrimpFarmSize2 = this.inputUtils.formatToDecimal(
-                  this.createPurchaseModel.averageGrams2 &&
-                    this.createPurchaseModel.averageGrams2! > 0
-                    ? 1000 / this.createPurchaseModel.averageGrams2!
-                    : 0
-                );
-
-                this.changeDetectorRef.detectChanges();
-              },
-              error: (error) => {
-                console.error('Error fetching purchases:', error);
-              },
-            });
-
-          this.unsubscribe.push(purchaseSub);
+          this.shrimpSize = this.inputUtils.formatToDecimal(
+            this.createPurchaseModel.averageGrams > 0
+              ? 1000 / this.createPurchaseModel.averageGrams
+              : 0
+          );
+          this.shrimpSize2 = this.inputUtils.formatToDecimal(
+            this.createPurchaseModel.averageGrams2 &&
+              this.createPurchaseModel.averageGrams2! > 0
+              ? 1000 / this.createPurchaseModel.averageGrams2!
+              : 0
+          );
         }
       },
       error: (error) => {
-        console.error('Error loading companies:', error);
+        console.error('Error loading data:', error);
+        this.isLoading = false;
+        this.changeDetectorRef.detectChanges();
+      },
+      complete: () => {
+        // Set loading to false when all initial data loading is complete
+        this.isLoading = false;
+        this.changeDetectorRef.detectChanges();
+
+        // Initialize form logging after the form is rendered
+        setTimeout(() => {
+          if (
+            !this.isEditMode ||
+            this.createPurchaseModel.status === PurchaseStatusEnum.DRAFT
+          ) {
+            this.initializeAutosave();
+          }
+        }, 0);
       },
     });
 
-    this.unsubscribe.push(companiesSub);
+    // Store the subscription for cleanup
+    this.unsubscribe.push(dataLoadingSub);
   }
 
-  loadCompanies(): Observable<ICompany[]> {
-    return this.companyService.getCompanies().pipe(distinctUntilChanged());
+  /**
+   * Initializes autosave to monitor field changes
+   */
+  private initializeAutosave(): void {
+    if (this.purchaseForm) {
+      // Subscribe to form value changes
+      this.formChangesSubscription = this.purchaseForm.valueChanges?.subscribe(
+        (formValue) => {
+          this.autosaveFormFieldChanges(formValue);
+        }
+      );
+    }
+  }
+
+  /**
+   * Auto save form changes with a 5-second delay to debounce rapid changes
+   * @param formValue - The entire form value object
+   */
+  private autosaveFormFieldChanges(formValue: any): void {
+    // Clear existing timeout if it exists
+    if (this.logTimeout) {
+      clearTimeout(this.logTimeout);
+    }
+
+    // Set a new timeout for 5 seconds
+    this.logTimeout = setTimeout(() => {
+      // TODO: Auto save feature
+      if (this.purchaseId) {
+        // ✅ Update Purchase if ID exists
+        this.purchaseService
+          .updatePurchase(this.purchaseId, this.createPurchaseModel)
+          .subscribe({
+            next: (response) => {},
+            error: (error) => {
+              console.error('Error updating purchase:', error);
+            },
+          });
+      } else {
+        // ✅ Create New Purchase if ID does NOT exist
+        this.purchaseService
+          .createPurchase({
+            ...this.createPurchaseModel,
+            status: PurchaseStatusEnum.DRAFT,
+          })
+          .subscribe({
+            next: (response) => {
+              this.purchaseId = response.id; // ✅ Store the new ID for future updates
+              this.createPurchaseModel.status = response.status;
+              this.changeDetectorRef.detectChanges();
+            },
+            error: (error) => {
+              console.error('Error creating purchase:', error);
+            },
+          });
+      }
+    }, 5000);
   }
 
   loadPeriods(companyId: string): void {
@@ -190,6 +280,7 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (periods) => {
           this.existingPeriods = periods;
+          this.changeDetectorRef.detectChanges();
         },
         error: (err) => {
           console.error('Error al cargar periodos:', err);
@@ -197,20 +288,6 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
       });
 
     this.unsubscribe.push(periodSub);
-  }
-
-  loadBuyers(): void {
-    const userSub = this.userService.getAllUsers(false, 'Comprador').subscribe({
-      next: (users: IReadUserModel[]) => {
-        this.buyersList = users;
-        this.changeDetectorRef.detectChanges();
-      },
-      error: (error) => {
-        console.error('Error fetching users:', error);
-      },
-    });
-
-    this.unsubscribe.push(userSub);
   }
 
   loadBrokers(buyerId: string): void {
@@ -273,20 +350,6 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
     this.unsubscribe.push(shrimpFarmSub);
   }
 
-  loadFishermen(): void {
-    const fishermanSub = this.fishermanService.getAll(false).subscribe({
-      next: (fishermen: IReadFishermanModel[]) => {
-        this.fishermenList = fishermen;
-        this.changeDetectorRef.detectChanges();
-      },
-      error: (error) => {
-        console.error('Error fetching fishermen:', error);
-      },
-    });
-
-    this.unsubscribe.push(fishermanSub);
-  }
-
   onCompanyChange(event: Event) {
     this.createPurchaseModel.period = undefined;
 
@@ -304,9 +367,9 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   }
 
   onBuyerChange(event: Event): void {
-    this.createPurchaseModel.broker = '';
-    this.createPurchaseModel.client = '';
-    this.createPurchaseModel.shrimpFarm = '';
+    this.createPurchaseModel.broker = undefined;
+    this.createPurchaseModel.client = undefined;
+    this.createPurchaseModel.shrimpFarm = undefined;
 
     const buyerId = (event.target as HTMLSelectElement).value;
     if (buyerId) {
@@ -316,7 +379,7 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   }
 
   onClientChange(event: Event): void {
-    this.createPurchaseModel.shrimpFarm = '';
+    this.createPurchaseModel.shrimpFarm = undefined;
 
     const clientId = (event.target as HTMLSelectElement).value;
     if (clientId) {
@@ -347,38 +410,25 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   }
 
   submitForm(): void {
-    // if (this.isLocal) {
-    //   this.createPurchaseModel.period = null;
-    // }
-
     if (this.purchaseId) {
       // ✅ Update Purchase if ID exists
       this.purchaseService
-        .updatePurchase(this.purchaseId, this.createPurchaseModel)
+        .updatePurchase(this.purchaseId, {
+          ...this.createPurchaseModel,
+          status: PurchaseStatusEnum.CREATED,
+        })
         .subscribe({
           next: (response) => {
+            this.createPurchaseModel.controlNumber = response.controlNumber;
+            this.createPurchaseModel.status = response.status;
             this.alertService.showTranslatedAlert({ alertType: 'success' });
+            this.changeDetectorRef.detectChanges();
           },
           error: (error) => {
             console.error('Error updating purchase:', error);
             this.alertService.showTranslatedAlert({ alertType: 'error' });
           },
         });
-    } else {
-      // ✅ Create New Purchase if ID does NOT exist
-      this.purchaseService.createPurchase(this.createPurchaseModel).subscribe({
-        next: (response) => {
-          this.purchaseId = response.id; // ✅ Store the new ID for future updates
-          this.createPurchaseModel.controlNumber = response.controlNumber;
-          this.createPurchaseModel.status = response.status;
-          this.alertService.showTranslatedAlert({ alertType: 'success' });
-          // form.resetForm(); // Reset form after successful creation
-        },
-        error: (error) => {
-          console.error('Error creating purchase:', error);
-          this.alertService.showTranslatedAlert({ alertType: 'error' });
-        },
-      });
     }
   }
 
@@ -387,11 +437,16 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Ensure calculated fields are updated before submission
-    this.onInputChange();
-
     this.alertService.confirm().then((result) => {
       if (result.isConfirmed) {
+        // Unsubscribe from form changes BEFORE making API call to prevent autosave trigger
+        if (this.formChangesSubscription) {
+          this.formChangesSubscription.unsubscribe();
+        }
+
+        // Ensure calculated fields are updated before submission
+        this.onInputDetailsChange();
+
         this.submitForm();
       }
     });
@@ -412,10 +467,15 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   }
 
   canAddPayments(): boolean {
+    if (this.createPurchaseModel.status === PurchaseStatusEnum.DRAFT) {
+      return false;
+    }
+
     if (this.purchaseId) {
       if (this.isOnlyBuyer) {
         return (
           this.createPurchaseModel.status !== PurchaseStatusEnum.COMPLETED &&
+          this.createPurchaseModel.status !== PurchaseStatusEnum.CONFIRMED &&
           this.createPurchaseModel.status !== PurchaseStatusEnum.CLOSED
         );
       } else {
@@ -448,7 +508,7 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
     }
   }
 
-  onInputChange(): void {
+  onInputDetailsChange(): void {
     const avgGrams = +this.purchaseForm.controls.averageGrams?.value || 0;
     const avgGrams2 = +this.purchaseForm.controls.averageGrams2?.value || 0;
     const pounds = +this.purchaseForm.controls.pounds?.value || 0;
@@ -475,10 +535,10 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
     this.formatDecimal('grandTotal');
 
     // Format shrimp size calculations
-    this.shrimpFarmSize = this.inputUtils.formatToDecimal(
+    this.shrimpSize = this.inputUtils.formatToDecimal(
       avgGrams > 0 ? 1000 / avgGrams : 0
     );
-    this.shrimpFarmSize2 = this.inputUtils.formatToDecimal(
+    this.shrimpSize2 = this.inputUtils.formatToDecimal(
       avgGrams2 > 0 ? 1000 / avgGrams2 : 0
     );
   }
@@ -507,12 +567,17 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
     const input = event.target as HTMLInputElement;
     let value = input.value.replace(/\D/g, ''); // Remove non-digits
 
-    // Pad with leading zeros to make it 8 digits
-    value = value.padStart(8, '0');
-
-    // Update the model and input value
-    this.createPurchaseModel.weightSheetNumber = value;
-    input.value = value;
+    if (value === '' || value === '0' || /^0+$/.test(value)) {
+      // If empty, just zeros, or all zeros, keep the model undefined
+      this.createPurchaseModel.weightSheetNumber = undefined;
+      input.value = '';
+    } else {
+      // Pad with leading zeros to make it 8 digits
+      value = value.padStart(8, '0');
+      // Update the model and input value
+      this.createPurchaseModel.weightSheetNumber = value;
+      input.value = value;
+    }
   }
 
   /**
@@ -524,7 +589,7 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
 
     // If the field contains only zeros, clear it for easy typing
     if (value === '00000000' || value === '') {
-      this.createPurchaseModel.weightSheetNumber = '';
+      this.createPurchaseModel.weightSheetNumber = undefined;
       input.value = '';
     }
   }
@@ -568,6 +633,16 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   /** 🔴 Unsubscribe from all subscriptions to avoid memory leaks */
   ngOnDestroy(): void {
     this.unsubscribe.forEach((sub) => sub.unsubscribe());
+
+    // Unsubscribe from form changes subscription
+    if (this.formChangesSubscription) {
+      this.formChangesSubscription.unsubscribe();
+    }
+
+    // Clear any pending timeout
+    if (this.logTimeout) {
+      clearTimeout(this.logTimeout);
+    }
 
     // Cerrar el modal si está abierto
     if (this.modalRef) {

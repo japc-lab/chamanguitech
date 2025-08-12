@@ -32,6 +32,47 @@ export class AlertService {
     return Swal.fire({ ...defaultOptions, ...options });
   }
 
+  /**
+   * Show a translated confirmation dialog using i18n keys.
+   * Returns a Promise with the SweetAlertResult so callers can act on user choice.
+   */
+  confirmTranslated({
+    titleKey = 'MESSAGES.CONFIRM_TITLE',
+    messageKey = 'MESSAGES.CONFIRM_PURCHASE_TEXT',
+    confirmKey = 'BUTTONS.CONFIRM',
+    cancelKey = 'BUTTONS.CANCEL',
+    params = {},
+    icon = 'warning',
+  }: {
+    titleKey?: string;
+    messageKey?: string;
+    confirmKey?: string;
+    cancelKey?: string;
+    params?: { [key: string]: any };
+    icon?: 'success' | 'error' | 'info' | 'warning' | 'question';
+  }): Promise<SweetAlertResult> {
+    return new Promise((resolve) => {
+      this.translate
+        .get([titleKey, messageKey, confirmKey, cancelKey], params)
+        .subscribe((translations) => {
+          Swal.fire({
+            title: translations[titleKey] || '',
+            text: translations[messageKey] || '',
+            icon,
+            showCancelButton: true,
+            buttonsStyling: false,
+            focusCancel: true,
+            confirmButtonText: translations[confirmKey] || 'Ok',
+            cancelButtonText: translations[cancelKey] || 'Cancel',
+            customClass: {
+              confirmButton: 'btn btn-primary',
+              cancelButton: 'btn btn-active-light',
+            },
+          }).then(resolve);
+        });
+    });
+  }
+
   // /**
   //  * Show a notification alert (Success, Error, Info, etc.)
   //  * @param swalOptions Custom SweetAlert options

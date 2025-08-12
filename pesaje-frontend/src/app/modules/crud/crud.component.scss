@@ -1,0 +1,13 @@
+/* Sticky right-most action column */
+:host ::ng-deep .dataTable {
+  width: 100%;
+
+  th.sticky-right,
+  td.sticky-right {
+    position: sticky;
+    right: 0;
+    z-index: 3; /* keep above other cells */
+    background: #fff; /* ensure it overlays */
+  }
+}
+
