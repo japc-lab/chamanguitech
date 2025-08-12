@@ -295,7 +295,7 @@ const seedPermissions = async () => {
 
                     case 'Precios':
                         if (role.name === 'Admin' || role.name === 'Secretaria') {
-                            actions = [];
+                            actions = [Permission.VIEW];
                         } else if (role.name === 'Comprador') {
                             actions = [Permission.VIEW];
                         }
@@ -303,7 +303,7 @@ const seedPermissions = async () => {
 
                     case 'Precios por Compañía':
                         if (role.name === 'Admin' || role.name === 'Secretaria') {
-                            actions = [];
+                            actions = [Permission.VIEW, Permission.EDIT, Permission.ADD];
                         } else if (role.name === 'Comprador') {
                             actions = [Permission.VIEW, Permission.EDIT, Permission.ADD];
                         }
@@ -311,7 +311,7 @@ const seedPermissions = async () => {
 
                     case 'Mejores Precios':
                         if (role.name === 'Admin' || role.name === 'Secretaria') {
-                            actions = [];
+                            actions = [Permission.VIEW, Permission.EDIT, Permission.ADD];
                         } else if (role.name === 'Comprador') {
                             actions = [Permission.VIEW];
                         }
