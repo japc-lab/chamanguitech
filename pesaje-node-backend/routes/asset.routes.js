@@ -22,13 +22,13 @@ router.post(
         check('paidAmount', 'Paid amount is required and must be a positive number').isFloat({ min: 0 }),
         check('pendingAmount', 'Pending amount is required and must be a positive number').isFloat({ min: 0 }),
         check('responsible', 'Responsible is required').notEmpty().trim(),
-        
+
         // Optional fields
         check('location').optional().notEmpty().trim(),
-        check('currentSituation').optional().notEmpty().trim(),
+        check('currentSituation').optional().isIn(['good', 'bad', 'neutral']).trim().withMessage('Current situation must be either "good", "bad" or "neutral"'),
         check('disposalDate').optional().isISO8601().toDate(),
         check('daysOfUse').optional().isInt({ min: 0 }),
-        
+
         validateFields
     ],
     createAsset
@@ -48,10 +48,10 @@ router.put(
         check('pendingAmount').optional().isFloat({ min: 0 }).withMessage('Pending amount must be a positive number'),
         check('responsible').optional().notEmpty().trim().withMessage('Responsible cannot be empty'),
         check('location').optional().notEmpty().trim().withMessage('Location cannot be empty'),
-        check('currentSituation').optional().notEmpty().trim().withMessage('Current situation cannot be empty'),
+        check('currentSituation').optional().isIn(['good', 'bad', 'neutral']).trim().withMessage('Current situation must be either "good", "bad" or "neutral"'),
         check('disposalDate').optional().isISO8601().toDate().withMessage('Disposal date must be a valid date'),
         check('daysOfUse').optional().isInt({ min: 0 }).withMessage('Days of use must be a positive integer'),
-        
+
         validateFields
     ],
     updateAsset
