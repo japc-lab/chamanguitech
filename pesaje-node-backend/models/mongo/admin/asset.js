@@ -43,6 +43,7 @@ const AssetSchema = Schema({
   },
   currentSituation: {
     type: String,
+    enum: ['good', 'bad', 'neutral']
   },
   disposalDate: {
     type: Date,

@@ -237,7 +237,7 @@ export class RecentPurchasesComponent implements OnInit {
           },
         },
         {
-          title: 'Tiene Factura?',
+          title: '¿Factura recibida?',
           data: 'hasInvoice',
           render: function (data) {
             return data ? 'Si' : 'No';

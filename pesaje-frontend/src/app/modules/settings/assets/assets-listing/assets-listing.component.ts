@@ -5,11 +5,9 @@ import {
   EventEmitter,
   OnDestroy,
   OnInit,
-  ViewChild,
 } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { SweetAlertOptions } from 'sweetalert2';
 import { Config } from 'datatables.net';
 import { PERMISSION_ROUTES } from '../../../../constants/routes.constants';
 import { Router } from '@angular/router';
@@ -20,14 +18,13 @@ import {
   IUpdateAssetModel,
 } from '../../interfaces/asset.interface';
 import { AlertService } from 'src/app/utils/alert.service';
+import { DateUtilsService } from 'src/app/utils/date-utils.service';
 
 @Component({
   selector: 'app-assets-listing',
   templateUrl: './assets-listing.component.html',
 })
-export class AssetsListingComponent
-  implements OnInit, AfterViewInit, OnDestroy
-{
+export class AssetsListingComponent implements OnInit, OnDestroy {
   PERMISSION_ROUTE = PERMISSION_ROUTES.SETTINGS.ASSETS;
 
   isLoading = false;
@@ -47,7 +44,7 @@ export class AssetsListingComponent
     pendingAmount: 0,
     responsible: '',
     location: '',
-    currentSituation: '',
+    currentSituation: undefined,
     disposalDate: undefined,
     daysOfUse: 0,
   } as ICreateAssetModel;
@@ -65,6 +62,13 @@ export class AssetsListingComponent
     data: [], // ✅ Ensure default is an empty array
     columns: [
       {
+        title: 'Código',
+        data: 'id',
+        render: function (data) {
+          return data ? data : '-';
+        },
+      },
+      {
         title: 'Nombre',
         data: 'name',
         render: function (data) {
@@ -72,10 +76,10 @@ export class AssetsListingComponent
         },
       },
       {
-        title: 'Responsable',
-        data: 'responsible',
-        render: function (data) {
-          return data ? data : '-';
+        title: 'Fecha de Compra',
+        data: 'purchaseDate',
+        render: (data) => {
+          return this.dateUtilsService.formatISOToDateInput(data);
         },
       },
       {
@@ -97,13 +101,29 @@ export class AssetsListingComponent
         },
       },
       {
-        title: 'Estado',
-        data: 'deletedAt',
+        title: 'Monto Pendiente',
+        data: 'pendingAmount',
         render: function (data) {
-          if (data) {
-            return `<span class="badge bg-danger">Inactivo</span>`;
+          return data ? `$${data.toLocaleString()}` : '$0';
+        },
+      },
+      {
+        title: 'Responsable',
+        data: 'responsible',
+        render: function (data) {
+          return data ? data : '-';
+        },
+      },
+      {
+        title: 'Situación Actual',
+        data: 'currentSituation',
+        render: function (data) {
+          if (data === 'good') {
+            return `<span class="badge bg-success">Bueno</span>`;
+          } else if (data === 'bad') {
+            return `<span class="badge bg-danger">Malo</span>`;
           } else {
-            return `<span class="badge bg-success">Activo</span>`;
+            return `<span class="badge bg-warning">Regular</span>`;
           }
         },
       },
@@ -116,15 +136,13 @@ export class AssetsListingComponent
   constructor(
     private assetService: AssetService,
     private alertService: AlertService,
-    private router: Router,
+    private dateUtilsService: DateUtilsService,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     this.loadAssets();
   }
-
-  ngAfterViewInit(): void {}
 
   loadAssets(): void {
     const assetObservable = this.assetService.getAllAssets(true);
@@ -196,7 +214,7 @@ export class AssetsListingComponent
       pendingAmount: 0,
       responsible: '',
       location: '',
-      currentSituation: '',
+      currentSituation: undefined,
       disposalDate: undefined,
       daysOfUse: 0,
     };
@@ -278,6 +296,22 @@ export class AssetsListingComponent
           this.isLoading = false;
         },
       });
+    }
+  }
+
+  calculatePendingAmount(): void {
+    this.assetModel.pendingAmount =
+      (this.assetModel.cost || 0) - (this.assetModel.paidAmount || 0);
+  }
+
+  calculateDaysOfUse(): void {
+    if (this.assetModel.disposalDate) {
+      const disposalDate = new Date(this.assetModel.disposalDate);
+      const purchaseDate = new Date(this.assetModel.purchaseDate!);
+      this.assetModel.daysOfUse = Math.floor(
+        (disposalDate.getTime() - purchaseDate.getTime()) /
+          (1000 * 60 * 60 * 24)
+      );
     }
   }
 

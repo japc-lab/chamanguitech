@@ -9,7 +9,7 @@ export interface IUpdateAssetModel {
   pendingAmount?: number;
   responsible?: string;
   location?: string;
-  currentSituation?: string;
+  currentSituation?: 'good' | 'bad' | 'neutral';
   disposalDate?: Date;
   daysOfUse?: number;
   deletedAt?: Date | null;
@@ -25,7 +25,7 @@ export interface ICreateAssetModel {
   pendingAmount?: number;
   responsible?: string;
   location?: string;
-  currentSituation?: string;
+  currentSituation?: 'good' | 'bad' | 'neutral';
   disposalDate?: Date;
   daysOfUse?: number;
 }
@@ -41,7 +41,7 @@ export interface IReadAssetModel {
   pendingAmount: number;
   responsible: string;
   location?: string;
-  currentSituation?: string;
+  currentSituation?: 'good' | 'bad' | 'neutral';
   disposalDate?: Date;
   daysOfUse?: number;
   deletedAt?: Date;

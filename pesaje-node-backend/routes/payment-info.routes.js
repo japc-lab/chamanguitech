@@ -17,11 +17,11 @@ router.post(
             .bail() // Stop validation chain if the previous check fails
             .isMongoId().withMessage('Person ID must be a valid MongoDB ObjectId'), // Check format
         check('bankName', 'Bank name is required').not().isEmpty(),
-        check('accountName', 'Account name is required').not().isEmpty(),
-        check('accountNumber', 'Account number is required').not().isEmpty(),
+        check('accountName', 'Account name cannot be empty').not().isEmpty(),
+        check('accountNumber').optional(),
         check('identification', 'Identification is required').not().isEmpty(),
         check('mobilePhone', 'Mobile phone is required').not().isEmpty(),
-        check('email', 'Valid email is required').isEmail(),
+        check('email').optional().customSanitizer(value => value === '' ? undefined : value).isEmail().withMessage('Invalid email format'),
         validateFields,
         validateJWT
     ],
@@ -54,10 +54,10 @@ router.put(
         param('id').isMongoId().withMessage('Invalid PaymentInfo ID format'),
         check('bankName', 'Bank name cannot be empty').optional().not().isEmpty(),
         check('accountName', 'Account name cannot be empty').optional().not().isEmpty(),
-        check('accountNumber', 'Account number cannot be empty').optional().not().isEmpty(),
+        check('accountNumber').optional(),
         check('identification', 'Identification cannot be empty').optional().not().isEmpty(),
         check('mobilePhone', 'Mobile phone cannot be empty').optional().not().isEmpty(),
-        check('email', 'Valid email is required').optional().isEmail(),
+        check('email').optional().customSanitizer(value => value === '' ? undefined : value).isEmail().withMessage('Invalid email format'),
         validateFields,
         validateJWT,
     ],

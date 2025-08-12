@@ -16,18 +16,9 @@ const getById = async (id) => {
 const create = async (data, userId) => {
     const createdBy = userId;
 
-    if (!data.name || data.name.trim() === '') {
-        throw new Error('Asset name is required');
-    }
-
-    if (data.quantity === undefined || data.quantity === null || data.quantity < 0) {
-        throw new Error('Asset quantity is required and must be a non-negative number');
-    }
-
+    // Create asset with all properties from data, plus createdBy
     return await dbAdapter.assetAdapter.create({
-        name: data.name.trim(),
-        quantity: data.quantity,
-        createdBy: createdBy
+        ...data
     });
 };
 
@@ -37,26 +28,14 @@ const update = async (id, data) => {
         throw new Error('Asset not found');
     }
 
-    const updateData = {};
+    const updateData = { ...data };
 
-    if (data.name !== undefined) {
-        if (!data.name || data.name.trim() === '') {
-            throw new Error('Asset name cannot be empty');
-        }
-        updateData.name = data.name.trim();
-    }
-
-    if (data.quantity !== undefined) {
-        if (data.quantity === null || data.quantity < 0) {
-            throw new Error('Asset quantity must be a non-negative number');
-        }
-        updateData.quantity = data.quantity;
-    }
-
+    // Handle deletedAt separately if provided
     if (data.deletedAt !== undefined) {
         updateData.deletedAt = data.deletedAt;
     }
 
+    // Update with all provided data
     return await dbAdapter.assetAdapter.update(id, updateData);
 };
 

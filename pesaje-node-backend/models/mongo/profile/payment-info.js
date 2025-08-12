@@ -11,7 +11,6 @@ const PaymentInfoSchema = Schema({
     },
     accountNumber: {
         type: String,
-        required: true
     },
     identification: {
         type: String,
@@ -23,7 +22,6 @@ const PaymentInfoSchema = Schema({
     },
     email: {
         type: String,
-        required: true
     },
     person: {
         type: Schema.Types.ObjectId,
