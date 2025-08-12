@@ -6,37 +6,37 @@ const PurchaseSchema = Schema({
   buyer: {
     type: Schema.Types.ObjectId,
     ref: 'User',
-    required: true
+    required: function () { return this.status !== 'DRAFT'; }
   },
   company: {
     type: Schema.Types.ObjectId,
     ref: 'Company',
-    required: true
+    required: function () { return this.status !== 'DRAFT'; }
   },
   localSellCompany: {
     type: Schema.Types.ObjectId,
     ref: 'Company',
-    required: true
+    required: function () { return this.status !== 'DRAFT'; }
   },
   broker: {
     type: Schema.Types.ObjectId,
     ref: 'Broker',
-    required: true
+    required: function () { return this.status !== 'DRAFT'; }
   },
   fisherman: {
     type: Schema.Types.ObjectId,
     ref: 'Fisherman',
-    required: true
+    required: function () { return this.status !== 'DRAFT'; }
   },
   client: {
     type: Schema.Types.ObjectId,
     ref: 'Client',
-    required: true
+    required: function () { return this.status !== 'DRAFT'; }
   },
   shrimpFarm: {
     type: Schema.Types.ObjectId,
     ref: 'ShrimpFarm',
-    required: true
+    required: function () { return this.status !== 'DRAFT'; }
   },
   period: {
     type: Schema.Types.ObjectId,
@@ -44,25 +44,24 @@ const PurchaseSchema = Schema({
   },
   controlNumber: { // Auto-incremented
     type: String,
-    unique: true
   },
   purchaseDate: {
     type: Date,
-    required: true,
+    required: function () { return this.status !== 'DRAFT'; },
   },
   averageGrams: {
     type: Number,
-    required: true,
+    required: function () { return this.status !== 'DRAFT'; },
     min: 0
   },
   price: {
     type: Number,
-    required: true,
+    required: function () { return this.status !== 'DRAFT'; },
     min: 0
   },
   pounds: {
     type: Number,
-    required: true,
+    required: function () { return this.status !== 'DRAFT'; },
     min: 0
   },
   averageGrams2: {
@@ -79,12 +78,12 @@ const PurchaseSchema = Schema({
   },
   totalPounds: {
     type: Number,
-    required: true,
+    required: function () { return this.status !== 'DRAFT'; },
     min: 0
   },
   subtotal: {
     type: Number,
-    required: true,
+    required: function () { return this.status !== 'DRAFT'; },
     min: 0
   },
   subtotal2: {
@@ -93,17 +92,17 @@ const PurchaseSchema = Schema({
   },
   grandTotal: {
     type: Number,
-    required: true,
+    required: function () { return this.status !== 'DRAFT'; },
     min: 0
   },
   totalAgreedToPay: {
     type: Number,
-    required: true,
+    required: function () { return this.status !== 'DRAFT'; },
     min: 0
   },
   hasInvoice: {
     type: String,
-    required: true,
+    required: function () { return this.status !== 'DRAFT'; },
     enum: ['yes', 'no', 'not-applicable']
   },
   invoiceNumber: {
@@ -115,12 +114,13 @@ const PurchaseSchema = Schema({
   },
   weightSheetNumber: {
     type: String,
-    required: true,
+    required: function () { return this.status !== 'DRAFT'; },
   },
   status: {
     type: String,
     enum: PurchaseStatusEnum,
     required: true,
+    default: 'DRAFT'
   },
   deletedAt: {
     type: Date,
@@ -140,19 +140,37 @@ PurchaseSchema.index(
   }
 );
 
+// 🔹 Unique index for controlNumber only when it exists and is not null
+PurchaseSchema.index(
+  { controlNumber: 1 },
+  {
+    unique: true,
+    partialFilterExpression: { controlNumber: { $exists: true, $type: 'string' } }
+  }
+);
+
 // 🔹 Auto-increment `controlNumber`
 PurchaseSchema.pre('save', async function (next) {
   if (!this.controlNumber) {
     try {
-      const Counter = require('../control/counter'); // Lazy import
-      const Company = require('../admin/company'); // Lazy import of Company model
+      // Only generate control number when saving as CREATED
+      if (this.status !== 'CREATED') {
+        return next();
+      }
+
+      // Company is required to generate control number
+      if (!this.company) {
+        return next(new Error('Company not found when generating controlNumber'));
+      }
+
+      const Counter = require('../control/counter');
+      const Company = require('../admin/company');
 
       const company = await Company.findById(this.company);
       if (!company) {
         return next(new Error('Company not found when generating controlNumber'));
       }
 
-      // Determine counter key based on company name
       const counterKey = company.name === 'Local' ? 'Purchase_Local' : 'Purchase_Company';
       const prefix = company.name === 'Local' ? 'LC' : 'CO';
 
@@ -170,6 +188,43 @@ PurchaseSchema.pre('save', async function (next) {
     }
   }
   next();
+});
+
+// 🔹 Generate controlNumber on first update when company is present and controlNumber is missing
+PurchaseSchema.pre('findOneAndUpdate', async function (next) {
+  try {
+    const update = this.getUpdate() || {};
+    const $set = update.$set || update;
+    // If controlNumber already set in DB or in this update, skip
+    const currentDoc = await this.model.findOne(this.getQuery());
+    if (!currentDoc) return next();
+    const hasControl = currentDoc.controlNumber || $set.controlNumber;
+    const companyId = $set.company || currentDoc.company;
+    // Only generate control number on updates that explicitly set status to CREATED
+    if (hasControl || !companyId || $set.status !== 'CREATED') return next();
+
+    const Counter = require('../control/counter');
+    const Company = require('../admin/company');
+    const company = await Company.findById(companyId);
+    if (!company) return next(new Error('Company not found when generating controlNumber'));
+
+    const counterKey = company.name === 'Local' ? 'Purchase_Local' : 'Purchase_Company';
+    const prefix = company.name === 'Local' ? 'LC' : 'CO';
+    const counter = await Counter.findOneAndUpdate(
+      { model: counterKey },
+      { $inc: { seq: 1 } },
+      { new: true, upsert: true }
+    );
+    if (counter) {
+      // Ensure we mutate the update payload
+      if (!update.$set) update.$set = {};
+      update.$set.controlNumber = `${prefix}-${counter.seq}`;
+      this.setUpdate(update);
+    }
+    return next();
+  } catch (err) {
+    return next(err);
+  }
 });
 
 

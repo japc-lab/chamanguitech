@@ -4,20 +4,12 @@ import {
   OnDestroy,
   OnInit,
   ViewChild,
-  AfterViewInit,
 } from '@angular/core';
 import { Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { NgForm } from '@angular/forms';
-import {
-  distinctUntilChanged,
-  forkJoin,
-  iif,
-  Observable,
-  of,
-  Subscription,
-} from 'rxjs';
+import { distinctUntilChanged, forkJoin, iif, of, Subscription } from 'rxjs';
 import { PERMISSION_ROUTES } from 'src/app/constants/routes.constants';
 import { PurchaseService } from '../services/purchase.service';
 import { IRoleModel } from '../../auth/interfaces/role.interface';
@@ -168,9 +160,12 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
           this.createPurchaseModel = { ...purchase };
           this.isEditMode = !!this.createPurchaseModel.controlNumber;
 
-          this.loadBrokers(this.createPurchaseModel.buyer);
-          this.loadClients(this.createPurchaseModel.buyer);
-          this.loadShrimpFarms(this.createPurchaseModel.client!);
+          if (this.createPurchaseModel.buyer) {
+            this.loadBrokers(this.createPurchaseModel.buyer);
+            this.loadClients(this.createPurchaseModel.buyer);
+            this.createPurchaseModel.client &&
+              this.loadShrimpFarms(this.createPurchaseModel.client);
+          }
 
           if (this.createPurchaseModel.company) {
             const selectedCompany = this.companiesList.find(
@@ -211,7 +206,7 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
             !this.isEditMode ||
             this.createPurchaseModel.status === PurchaseStatusEnum.DRAFT
           ) {
-            this.initializeFormChangeLogging();
+            this.initializeAutosave();
           }
         }, 0);
       },
@@ -222,24 +217,24 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Initializes form change logging to monitor field changes
+   * Initializes autosave to monitor field changes
    */
-  private initializeFormChangeLogging(): void {
+  private initializeAutosave(): void {
     if (this.purchaseForm) {
       // Subscribe to form value changes
       this.formChangesSubscription = this.purchaseForm.valueChanges?.subscribe(
         (formValue) => {
-          this.logFormFieldChanges(formValue);
+          this.autosaveFormFieldChanges(formValue);
         }
       );
     }
   }
 
   /**
-   * Logs form changes with a 5-second delay to debounce rapid changes
+   * Auto save form changes with a 5-second delay to debounce rapid changes
    * @param formValue - The entire form value object
    */
-  private logFormFieldChanges(formValue: any): void {
+  private autosaveFormFieldChanges(formValue: any): void {
     // Clear existing timeout if it exists
     if (this.logTimeout) {
       clearTimeout(this.logTimeout);
@@ -247,12 +242,36 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
 
     // Set a new timeout for 5 seconds
     this.logTimeout = setTimeout(() => {
-      const timestamp = new Date().toISOString();
-      console.log(
-        `📝 [${timestamp}] Form values changed (after 5s delay):`,
-        formValue
-      );
-    }, 2000);
+      // TODO: Auto save feature
+      if (this.purchaseId) {
+        // ✅ Update Purchase if ID exists
+        this.purchaseService
+          .updatePurchase(this.purchaseId, this.createPurchaseModel)
+          .subscribe({
+            next: (response) => {},
+            error: (error) => {
+              console.error('Error updating purchase:', error);
+            },
+          });
+      } else {
+        // ✅ Create New Purchase if ID does NOT exist
+        this.purchaseService
+          .createPurchase({
+            ...this.createPurchaseModel,
+            status: PurchaseStatusEnum.DRAFT,
+          })
+          .subscribe({
+            next: (response) => {
+              this.purchaseId = response.id; // ✅ Store the new ID for future updates
+              this.createPurchaseModel.status = response.status;
+              this.changeDetectorRef.detectChanges();
+            },
+            error: (error) => {
+              console.error('Error creating purchase:', error);
+            },
+          });
+      }
+    }, 5000);
   }
 
   loadPeriods(companyId: string): void {
@@ -261,6 +280,7 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (periods) => {
           this.existingPeriods = periods;
+          this.changeDetectorRef.detectChanges();
         },
         error: (err) => {
           console.error('Error al cargar periodos:', err);
@@ -359,7 +379,7 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   }
 
   onClientChange(event: Event): void {
-    this.createPurchaseModel.shrimpFarm = '';
+    this.createPurchaseModel.shrimpFarm = undefined;
 
     const clientId = (event.target as HTMLSelectElement).value;
     if (clientId) {
@@ -390,38 +410,25 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   }
 
   submitForm(): void {
-    // if (this.isLocal) {
-    //   this.createPurchaseModel.period = null;
-    // }
-
     if (this.purchaseId) {
       // ✅ Update Purchase if ID exists
       this.purchaseService
-        .updatePurchase(this.purchaseId, this.createPurchaseModel)
+        .updatePurchase(this.purchaseId, {
+          ...this.createPurchaseModel,
+          status: PurchaseStatusEnum.CREATED,
+        })
         .subscribe({
           next: (response) => {
+            this.createPurchaseModel.controlNumber = response.controlNumber;
+            this.createPurchaseModel.status = response.status;
             this.alertService.showTranslatedAlert({ alertType: 'success' });
+            this.changeDetectorRef.detectChanges();
           },
           error: (error) => {
             console.error('Error updating purchase:', error);
             this.alertService.showTranslatedAlert({ alertType: 'error' });
           },
         });
-    } else {
-      // ✅ Create New Purchase if ID does NOT exist
-      this.purchaseService.createPurchase(this.createPurchaseModel).subscribe({
-        next: (response) => {
-          this.purchaseId = response.id; // ✅ Store the new ID for future updates
-          this.createPurchaseModel.controlNumber = response.controlNumber;
-          this.createPurchaseModel.status = response.status;
-          this.alertService.showTranslatedAlert({ alertType: 'success' });
-          // form.resetForm(); // Reset form after successful creation
-        },
-        error: (error) => {
-          console.error('Error creating purchase:', error);
-          this.alertService.showTranslatedAlert({ alertType: 'error' });
-        },
-      });
     }
   }
 
@@ -430,11 +437,16 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Ensure calculated fields are updated before submission
-    this.onInputDetailsChange();
-
     this.alertService.confirm().then((result) => {
       if (result.isConfirmed) {
+        // Unsubscribe from form changes BEFORE making API call to prevent autosave trigger
+        if (this.formChangesSubscription) {
+          this.formChangesSubscription.unsubscribe();
+        }
+
+        // Ensure calculated fields are updated before submission
+        this.onInputDetailsChange();
+
         this.submitForm();
       }
     });
