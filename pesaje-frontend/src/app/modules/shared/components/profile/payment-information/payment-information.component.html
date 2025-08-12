@@ -83,9 +83,9 @@
           </div>
 
           <div class="fv-row mb-7">
-            <label class="required fw-semibold fs-6 mb-2">Número de Cuenta</label>
+            <label class="fw-semibold fs-6 mb-2" [ngClass]="{'required': required}">Número de Cuenta</label>
             <input type="text" class="form-control form-control-solid" name="accountNumber"
-              [(ngModel)]="paymentInfo.accountNumber" #accountNumber="ngModel" required pattern="\d+" />
+              [(ngModel)]="paymentInfo.accountNumber" #accountNumber="ngModel" [required]="required" pattern="\d+" />
             <div *ngIf="myForm.submitted && myForm.invalid"
               class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
               <div *ngIf="accountNumber.errors?.['required']">El número de cuenta es obligatorio.</div>
@@ -116,9 +116,9 @@
           </div>
 
           <div class="fv-row mb-7">
-            <label class="required fw-semibold fs-6 mb-2">Correo Electrónico</label>
-                          <input type="email" class="form-control form-control-solid" name="email" [(ngModel)]="paymentInfo.email"
-               #email="ngModel" required />
+            <label class="fw-semibold fs-6 mb-2" [ngClass]="{'required': required}">Correo Electrónico</label>
+            <input type="email" class="form-control form-control-solid" name="email" [(ngModel)]="paymentInfo.email"
+              #email="ngModel" [required]="required" />
             <div *ngIf="myForm.submitted && myForm.invalid"
               class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
               <div *ngIf="email.errors?.['required']">El correo electrónico es obligatorio.</div>

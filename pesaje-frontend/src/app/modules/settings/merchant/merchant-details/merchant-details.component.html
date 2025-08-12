@@ -182,7 +182,7 @@
                       <!-- Nombre del recomendador -->
                       <div class="col-lg-6 fv-row">
                         <input type="text" class="form-control form-control-lg form-control-solid mb-3"
-                          placeholder="Nombre recomendador" name="recommendedBy"
+                          placeholder="Nombre de quien recomienda" name="recommendedBy"
                           [(ngModel)]="merchantData.recommendedBy" #recommendedBy="ngModel" minlength="3">
                         <div
                           *ngIf="(merchantForm.submitted || recommendedBy.dirty || recommendedBy.touched) && recommendedBy.errors?.['minlength']"
@@ -250,7 +250,7 @@
 
       <!-- begin::Payment Info -->
       <div class="tab-pane" [ngClass]="{ active: activeTab === 'Payment Info' }" *ngIf="activeTab === 'Payment Info'">
-        <app-payment-information [permissionRoute]="PERMISSION_ROUTE" [personId]="personId" />
+        <app-payment-information [permissionRoute]="PERMISSION_ROUTE" [personId]="personId" [required]="false" />
       </div>
       <!-- end::Payment Info -->
 

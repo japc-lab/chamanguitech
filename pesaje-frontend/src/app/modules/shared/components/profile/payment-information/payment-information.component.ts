@@ -36,6 +36,7 @@ export class PaymentInformationComponent
 
   @Input() permissionRoute: string;
   @Input() personId?: string;
+  @Input() required: boolean = true;
   @ViewChild('noticeSwal') noticeSwal!: SwalComponent;
   swalOptions: SweetAlertOptions = {};
 

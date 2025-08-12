@@ -30,17 +30,8 @@ router.post(
         check('person.mobilePhone', 'Mobile phone is required').not().isEmpty(),
         check('person.email')
             .optional({ nullable: true })
-            .custom(value => {
-                if (value === '' || value === null || value === undefined) {
-                    return true; // Allow empty, null, or undefined values
-                }
-                // If a value is provided, it must be a valid email
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailRegex.test(value)) {
-                    throw new Error('Invalid email format');
-                }
-                return true;
-            })
+            .customSanitizer(value => value === '' ? undefined : value)
+            .isEmail()
             .withMessage('Invalid email format'),
         check('person.emergencyContactName').optional(),
         check('person.emergencyContactPhone').optional(),
@@ -99,17 +90,8 @@ router.put(
         check('person.mobilePhone', 'Mobile phone cannot be empty').not().isEmpty(),
         check('person.email')
             .optional({ nullable: true })
-            .custom(value => {
-                if (value === '' || value === null || value === undefined) {
-                    return true; // Allow empty, null, or undefined values
-                }
-                // If a value is provided, it must be a valid email
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailRegex.test(value)) {
-                    throw new Error('Invalid email format');
-                }
-                return true;
-            })
+            .customSanitizer(value => value === '' ? undefined : value)
+            .isEmail()
             .withMessage('Invalid email format'),
         check('person.emergencyContactName').optional(),
         check('person.emergencyContactPhone').optional(),
