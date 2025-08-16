@@ -1,10 +1,16 @@
 const { Schema, model } = require('mongoose');
+const { LogisticsFinanceCategoryEnum, LogisticsResourceCategoryEnum } = require('../../../enums/logistics.enums');
 
 const LogisticsItemSchema = Schema({
-  logisticsCategory: {
-    type: Schema.Types.ObjectId,
-    ref: 'LogisticsCategory',
-    required: true
+  financeCategory: {
+    type: String,
+    enum: LogisticsFinanceCategoryEnum,
+    required: true,
+  },
+  resourceCategory: {
+    type: String,
+    enum: LogisticsResourceCategoryEnum,
+    required: true,
   },
   unit: {
     type: Number,

@@ -13,7 +13,7 @@ const {
 const router = Router();
 
 const { query } = require('express-validator');
-const LogisticsTypeEnum = require('../enums/logistics-type.enum');
+const { LogisticsTypeEnum } = require('../enums/logistics.enums');
 
 router.get(
     '/by-params',
@@ -53,7 +53,8 @@ router.post('/', [
         .isIn(Object.values(LogisticsTypeEnum))
         .withMessage(`type must be one of: ${Object.values(LogisticsTypeEnum).join(', ')}`),
     body('items').isArray({ min: 1 }).withMessage('Items must be an array with at least one element'),
-    body('items.*.logisticsCategory', 'Each item must have a valid logisticsCategory ID').isMongoId(),
+    body('items.*.financeCategory', 'Each item must have a valid financeCategory'),
+    body('items.*.resourceCategory', 'Each item must have a valid resourceCategory'),
     body('items.*.unit', 'Each item unit must be a positive number').isFloat({ min: 0 }),
     body('items.*.cost', 'Each item cost must be a positive number').isFloat({ min: 0 }),
     body('items.*.total', 'Each item total must be a positive number').isFloat({ min: 0 }),
@@ -69,7 +70,8 @@ router.put(
         check('grandTotal', 'grandTotal must be a number >= 0').optional().isFloat({ min: 0 }),
         check('logisticsSheetNumber', 'logisticsSheetNumber is required').optional().notEmpty(),
         body('items').optional().isArray({ min: 1 }),
-        body('items.*.logisticsCategory', 'Each item must have a valid logisticsType ID').isMongoId(),
+        body('items.*.financeCategory', 'Each item must have a valid financeCategory'),
+        body('items.*.resourceCategory', 'Each item must have a valid resourceCategory'),
         body('items.*.unit', 'Each item must have a numeric unit >= 0').isFloat({ min: 0 }),
         body('items.*.cost', 'Each item must have a numeric cost >= 0').isFloat({ min: 0 }),
         body('items.*.total', 'Each item must have a numeric total >= 0').isFloat({ min: 0 }),

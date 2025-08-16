@@ -1,7 +1,6 @@
 const { Schema, model } = require('mongoose');
 
-const LogisticsTypeEnum = require('../../../enums/logistics-type.enum');
-const LogisticsStatusEnum = require('../../../enums/logistics-status.enum');
+const { LogisticsTypeEnum, LogisticsStatusEnum } = require('../../../enums/logistics.enums');
 
 
 const LogisticsSchema = Schema({

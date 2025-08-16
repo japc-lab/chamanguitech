@@ -1,6 +1,6 @@
 const dbAdapter = require('../adapters');
 const CompanySaleStatusEnum = require('../enums/company-sale-status.enum');
-const LogisticsStatusEnum = require('../enums/logistics-status.enum');
+const { LogisticsStatusEnum } = require('../enums/logistics.enums');
 const PurchaseStatusEnum = require('../enums/purchase-status.enum');
 
 const getEconomicReportByParams = async ({ includeDeleted = false, clientId, userId, periodId, controlNumber }) => {

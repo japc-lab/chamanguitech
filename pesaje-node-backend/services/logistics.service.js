@@ -1,5 +1,5 @@
 const dbAdapter = require('../adapters');
-const LogisticsTypeEnum = require('../enums/logistics-type.enum');
+const { LogisticsTypeEnum } = require('../enums/logistics.enums');
 
 const create = async (data) => {
     const transaction = await dbAdapter.logisticsAdapter.startTransaction();
@@ -12,9 +12,6 @@ const create = async (data) => {
         // Validate and create each LogisticsItem
         const createdItems = [];
         for (const item of data.items) {
-            const logisticsCategory = await dbAdapter.logisticsCategoryAdapter.getById(item.logisticsCategory);
-            if (!logisticsCategory) throw new Error(`Invalid logisticsCategory: ${item.logisticsCategory}`);
-
             const createdItem = await dbAdapter.logisticsItemAdapter.create(item, { session: transaction.session });
             createdItems.push(createdItem.id);
         }
@@ -66,6 +63,7 @@ const getAllByParams = async ({ userId, controlNumber, includeDeleted = false })
     const purchaseMap = purchases.reduce((acc, p) => {
         acc[p.id] = {
             controlNumber: p.controlNumber,
+            weightSheetNumber: p.weightSheetNumber,
             companyName: p.company?.name || '',
             totalPounds: p.totalPounds || 0,
             buyer: p.buyer ? {
@@ -88,7 +86,7 @@ const getAllByParams = async ({ userId, controlNumber, includeDeleted = false })
     }
 
     const logistics = await dbAdapter.logisticsAdapter.getAllWithRelations(logisticsQuery, [
-        { path: 'items', populate: { path: 'logisticsCategory' } }
+        { path: 'items' }
     ]);
 
     return logistics.map(log => {
@@ -111,6 +109,7 @@ const getAllByParams = async ({ userId, controlNumber, includeDeleted = false })
             status: log.status || null,
             type: log.type,
             grandTotal: log.grandTotal,
+            logisticsSheetNumber: log.logisticsSheetNumber,
             purchase: log.purchase, // still returning the ID
             totalPounds,
             items: log.items.map(i => i.id),
@@ -128,7 +127,6 @@ const getById = async (id) => {
     const logistics = await dbAdapter.logisticsAdapter.getByIdWithRelations(id, [
         {
             path: 'items',
-            populate: { path: 'logisticsCategory' }
         },
         {
             path: 'purchase',
@@ -156,6 +154,7 @@ const getById = async (id) => {
             id: purchase.id,
             controlNumber: purchase.controlNumber,
             purchaseDate: purchase.purchaseDate,
+            weightSheetNumber: purchase.weightSheetNumber,
             buyer: formatPerson(purchase.buyer),
             broker: formatPerson(purchase.broker),
             client: formatPerson(purchase.client),
@@ -177,13 +176,8 @@ const getById = async (id) => {
             total: item.total,
             description: item.description,
             deletedAt: item.deletedAt,
-            logisticsCategory: item.logisticsCategory
-                ? {
-                    id: item.logisticsCategory._id,
-                    name: item.logisticsCategory.name,
-                    category: item.logisticsCategory.category
-                }
-                : null
+            financeCategory: item.financeCategory,
+            resourceCategory: item.resourceCategory,
         }))
     };
 };
@@ -205,9 +199,6 @@ const update = async (id, data) => {
         // 🔁 Create new LogisticsItems
         const newItemIds = [];
         for (const item of data.items) {
-            const logisticsCategory = await dbAdapter.logisticsCategoryAdapter.getById(item.logisticsCategory);
-            if (!logisticsCategory) throw new Error(`Invalid logisticsCategory: ${item.logisticsCategory}`);
-
             const newItem = await dbAdapter.logisticsItemAdapter.create(item, { session: transaction.session });
             newItemIds.push(newItem.id);
         }

@@ -1,4 +1,4 @@
-const { User, Role, Broker, Merchant, Fisherman, PaymentInfo, Person, RolePermission, Option, Client, ShrimpFarm, Period, SizePrice, Company, Size, Purchase, PaymentMethod, PurchasePaymentMethod, Logistics, LogisticsCategory, LogisticsItem, Sale, CompanySale, CompanySaleItem, CompanySalePaymentMethod, LocalSale, LocalSaleDetail, LocalSaleDetailItem, TotalReport, Asset } = require('../models');
+const { User, Role, Broker, Merchant, Fisherman, PaymentInfo, Person, RolePermission, Option, Client, ShrimpFarm, Period, SizePrice, Company, Size, Purchase, PaymentMethod, PurchasePaymentMethod, Logistics, LogisticsItem, Sale, CompanySale, CompanySaleItem, CompanySalePaymentMethod, LocalSale, LocalSaleDetail, LocalSaleDetailItem, TotalReport, Asset } = require('../models');
 const MongooseGenericAdapter = require('./mongoose-generic-adapter');
 
 // If you have another adapter (e.g., PostgreSQL):
@@ -29,7 +29,6 @@ if (dbType === 'mongo') {
     paymentMethodAdapter = new MongooseGenericAdapter(PaymentMethod);
     purchasePaymentMethodAdapter = new MongooseGenericAdapter(PurchasePaymentMethod);
     logisticsAdapter = new MongooseGenericAdapter(Logistics);
-    logisticsCategoryAdapter = new MongooseGenericAdapter(LogisticsCategory);
     logisticsItemAdapter = new MongooseGenericAdapter(LogisticsItem);
     saleAdapter = new MongooseGenericAdapter(Sale);
     companySaleAdapter = new MongooseGenericAdapter(CompanySale);
@@ -48,4 +47,4 @@ if (dbType === 'mongo') {
 //     throw new Error(`Unsupported DB_TYPE: ${dbType}`);
 // }
 
-module.exports = { userAdapter, personAdapter, brokerAdapter, merchantAdapter, fishermanAdapter, paymentInfoAdapter, roleAdapter, companyAdapter, sizeAdapter, rolePermissionAdapter, optionAdapter, clientAdapter, shrimpFarmAdapter, periodAdapter, sizePriceAdapter, purchaseAdapter, paymentMethodAdapter, purchasePaymentMethodAdapter, logisticsAdapter, logisticsCategoryAdapter, logisticsItemAdapter, saleAdapter, companySaleAdapter, companySaleItemAdapter, companySalePaymentMethodAdapter, localSaleAdapter, localSaleDetailAdapter, localSaleDetailItemAdapter, totalReportAdapter, assetAdapter };
+module.exports = { userAdapter, personAdapter, brokerAdapter, merchantAdapter, fishermanAdapter, paymentInfoAdapter, roleAdapter, companyAdapter, sizeAdapter, rolePermissionAdapter, optionAdapter, clientAdapter, shrimpFarmAdapter, periodAdapter, sizePriceAdapter, purchaseAdapter, paymentMethodAdapter, purchasePaymentMethodAdapter, logisticsAdapter, logisticsItemAdapter, saleAdapter, companySaleAdapter, companySaleItemAdapter, companySalePaymentMethodAdapter, localSaleAdapter, localSaleDetailAdapter, localSaleDetailItemAdapter, totalReportAdapter, assetAdapter };
