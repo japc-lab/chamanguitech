@@ -25,6 +25,7 @@ const create = async (data) => {
             type: data.type,
             logisticsDate: data.logisticsDate,
             grandTotal: data.grandTotal,
+            logisticsSheetNumber: data.logisticsSheetNumber,
             items: createdItems
         }, { session: transaction.session });
         await transaction.commit();
@@ -216,6 +217,7 @@ const update = async (id, data) => {
             {
                 logisticsDate: data.logisticsDate,
                 grandTotal: data.grandTotal,
+                logisticsSheetNumber: data.logisticsSheetNumber,
                 items: newItemIds
             },
             { session: transaction.session }

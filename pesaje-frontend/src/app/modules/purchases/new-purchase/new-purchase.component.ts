@@ -561,37 +561,25 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * 👉 Formats weight sheet number to 8 digits with leading zeros when input loses focus
+   * 👉 Formats sheet number to 8 digits with leading zeros when input loses focus
    */
   formatWeightSheetNumberOnBlur(event: Event) {
-    const input = event.target as HTMLInputElement;
-    let value = input.value.replace(/\D/g, ''); // Remove non-digits
-
-    if (value === '' || value === '0' || /^0+$/.test(value)) {
-      // If empty, just zeros, or all zeros, keep the model undefined
-      this.createPurchaseModel.weightSheetNumber = undefined;
-      input.value = '';
-    } else {
-      // Pad with leading zeros to make it 8 digits
-      value = value.padStart(8, '0');
-      // Update the model and input value
-      this.createPurchaseModel.weightSheetNumber = value;
-      input.value = value;
-    }
+    this.inputUtils.formatSheetNumberOnBlur(
+      event,
+      'weightSheetNumber',
+      this.createPurchaseModel
+    );
   }
 
   /**
    * 👉 Handles focus event to clear field if it's all zeros
    */
   onWeightSheetNumberFocus(event: Event) {
-    const input = event.target as HTMLInputElement;
-    const value = input.value;
-
-    // If the field contains only zeros, clear it for easy typing
-    if (value === '00000000' || value === '') {
-      this.createPurchaseModel.weightSheetNumber = undefined;
-      input.value = '';
-    }
+    this.inputUtils.onSheetNumberFocus(
+      event,
+      'weightSheetNumber',
+      this.createPurchaseModel
+    );
   }
 
   async openPaymentsModal(): Promise<any> {

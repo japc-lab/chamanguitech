@@ -29,6 +29,7 @@ import {
 import { IReducedUserModel } from '../../../settings/interfaces/user.interface';
 import { IReducedShrimpFarmModel } from '../../../shared/interfaces/shrimp-farm.interface';
 import { ActivatedRoute, Router } from '@angular/router';
+import { InputUtilsService } from 'src/app/utils/input-utils.service';
 
 @Component({
   selector: 'app-new-logistics',
@@ -71,8 +72,9 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private location: Location,
     private router: Router,
-    private cdr: ChangeDetectorRef
-  ) { }
+    private cdr: ChangeDetectorRef,
+    private inputUtils: InputUtilsService
+  ) {}
 
   get logisticsDateFormatted(): string | null {
     return this.dateUtils.formatISOToDateInput(
@@ -118,6 +120,7 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
               logisticsDate: logistics.logisticsDate,
               status: logistics.status,
               grandTotal: logistics.grandTotal,
+              logisticsSheetNumber: logistics.logisticsSheetNumber,
               items: [],
             };
             this.controlNumber = logistics.purchase.controlNumber!;
@@ -225,13 +228,13 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
     this.logisticsModel.purchase = this.purchaseModel.id;
     this.logisticsModel.items = this.logisticsItems.map(
       (x) =>
-      ({
-        logisticsCategory: x.logisticsCategory.id,
-        unit: x.unit,
-        cost: x.cost,
-        total: x.total,
-        description: x.description,
-      } as ICreateUpdateLogisticsItemModel)
+        ({
+          logisticsCategory: x.logisticsCategory.id,
+          unit: x.unit,
+          cost: x.cost,
+          total: x.total,
+          description: x.description,
+        } as ICreateUpdateLogisticsItemModel)
     );
     this.logisticsModel.grandTotal = this.grandTotalDisplayed;
 
@@ -308,12 +311,19 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
                 const isLocal =
                   purchase.company.name?.toLowerCase() === 'local';
                 const maxAllowed = isLocal ? 2 : 1;
-                const hasDifferentTypes = isLocal ? new Set(logistics.map(l => l.type)).size > 1 : true;
+                const hasDifferentTypes = isLocal
+                  ? new Set(logistics.map((l) => l.type)).size > 1
+                  : true;
                 if (logistics.length >= maxAllowed && hasDifferentTypes) {
                   this.alertService.showTranslatedAlert({
                     alertType: 'warning',
                     messageKey: 'MESSAGES.LOGISTICS_LIMIT_REACHED',
-                    params: { count: isLocal ? 2 : 1, record: Array.from(new Set(logistics.map(l => l.description))).join(', ') },
+                    params: {
+                      count: isLocal ? 2 : 1,
+                      record: Array.from(
+                        new Set(logistics.map((l) => l.description))
+                      ).join(', '),
+                    },
                   });
 
                   this.initializeModels();
@@ -411,6 +421,35 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
 
     this.logisticsModel.logisticsDate =
       this.dateUtils.convertLocalDateToUTC(event);
+  }
+
+  /**
+   * 👉 Validates numeric input (prevents invalid characters)
+   */
+  validateNumber(event: KeyboardEvent) {
+    this.inputUtils.validateNumber(event); // ✅ Use utility function
+  }
+
+  /**
+   * 👉 Formats sheet number to 8 digits with leading zeros when input loses focus
+   */
+  formatLogisticsSheetNumberOnBlur(event: Event) {
+    this.inputUtils.formatSheetNumberOnBlur(
+      event,
+      'logisticsSheetNumber',
+      this.logisticsModel
+    );
+  }
+
+  /**
+   * 👉 Handles focus event to clear field if it's all zeros
+   */
+  onLogisticsSheetNumberFocus(event: Event) {
+    this.inputUtils.onSheetNumberFocus(
+      event,
+      'logisticsSheetNumber',
+      this.logisticsModel
+    );
   }
 
   ngOnDestroy(): void {

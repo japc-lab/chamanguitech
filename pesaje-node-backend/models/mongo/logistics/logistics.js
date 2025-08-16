@@ -24,6 +24,10 @@ const LogisticsSchema = Schema({
     required: true,
     min: 0
   },
+  logisticsSheetNumber: {
+    type: String,
+    required: true
+  },
   items: [{
     type: Schema.Types.ObjectId,
     ref: 'LogisticsItem',

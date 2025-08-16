@@ -14,6 +14,7 @@ export interface ICreateUpdateLogisticsModel {
   grandTotal: number;
   status: LogisticsStatusEnum | null;
   items: ICreateUpdateLogisticsItemModel[];
+  logisticsSheetNumber: string;
 }
 
 export interface IDetailedReadLogisticsModel {
@@ -27,6 +28,7 @@ export interface IDetailedReadLogisticsModel {
   status: LogisticsStatusEnum | null;
   deletedAt: string | null;
   id: string;
+  logisticsSheetNumber: string;
 }
 
 export interface IReadLogisticsModel {
@@ -42,6 +44,7 @@ export interface IReadLogisticsModel {
   status: LogisticsStatusEnum | null;
   deletedAt: string | null;
   id: string;
+  logisticsSheetNumber: string;
 }
 
 export enum LogisticsTypeEnum {
