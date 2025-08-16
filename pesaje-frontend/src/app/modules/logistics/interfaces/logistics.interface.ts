@@ -1,6 +1,5 @@
 import { IReducedDetailedPurchaseModel } from '../../purchases/interfaces/purchase.interface';
 import { IReducedUserModel } from '../../settings/interfaces/user.interface';
-import { ILogisticsCategoryModel } from '../../shared/interfaces/logistic-type.interface';
 import {
   ICreateUpdateLogisticsItemModel,
   ILogisticsItemModel,
@@ -57,4 +56,16 @@ export enum LogisticsStatusEnum {
   IN_PROGRESS = 'IN_PROGRESS',
   COMPLETED = 'COMPLETED',
   CLOSED = 'CLOSED',
+}
+
+export enum LogisticsFinanceCategoryEnum {
+  INVOICE = 'INVOICE',
+  PETTY_CASH = 'PETTY_CASH',
+  OTHER = 'OTHER',
+}
+
+export enum LogisticsResourceCategoryEnum {
+  PERSONNEL = 'PERSONNEL',
+  RESOURCES = 'RESOURCES',
+  MATERIALS = 'MATERIALS',
 }

@@ -166,26 +166,16 @@
   <!-- end::Third Section: Logistics Info -->
 
 
-  <!-- Fourth Section: Personnel Logistics Details -->
+  <!-- Fourth Section: Logistics Items -->
   <div class="card card-xl-stretch mb-xl-8 mt-2">
-
-    <app-logistics-items-listing *ngIf="personnelLogisticsCategoryList.length>0" title="Personal"
-      [logisticsCategories]="personnelLogisticsCategoryList" [logisticsItems]="personnelLogisticsItems"
-      [hasDescription]="true" (logisticsItemsChange)="handlePersonnelLogisticsItems($event)" />
+    <app-logistics-items-listing
+      title="Detalles de Logística"
+      [logisticsItems]="logisticsItems"
+      (logisticsItemsChange)="handleLogisticsItems($event)" />
   </div>
-  <!-- end::Fourth Section: Personnel Logistics Details -->
+  <!-- end::Fourth Section: Logistics Items -->
 
-  <!-- Fifth Section: Inputs Logistics Details -->
-  <div class="card card-xl-stretch mb-xl-8 mt-2">
-
-    <app-logistics-items-listing *ngIf="inputLogisticsCategoryList.length>0" title="Productos e Insumos"
-      [logisticsCategories]="inputLogisticsCategoryList" [logisticsItems]="inputLogisticsItems" [hasDescription]="true"
-      (logisticsItemsChange)="handleInputLogisticsItems($event)" />
-
-  </div>
-  <!-- end::Fifth Section: Inputs Logistics Details -->
-
-  <!-- Sixth Section: Grand Total -->
+  <!-- Fifth Section: Grand Total -->
   <div class="card card-xl-stretch mb-xl-8 mt-2">
 
     <div class="card-body py-3 text-end fw-bold fs-4">

@@ -7,13 +7,8 @@ import { AuthService } from '../../../auth';
 import { IReducedDetailedPurchaseModel } from '../../../purchases/interfaces/purchase.interface';
 import { PurchaseService } from '../../../purchases/services/purchase.service';
 import { PERMISSION_ROUTES } from '../../../../constants/routes.constants';
-import {
-  ILogisticsCategoryModel,
-  LogisticsCategoryEnum,
-} from '../../../shared/interfaces/logistic-type.interface';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AlertService } from '../../../../utils/alert.service';
-import { LogisticsCategoryService } from '../../../shared/services/logistics-category.service';
 import {
   ICreateUpdateLogisticsModel,
   IDetailedReadLogisticsModel,
@@ -51,11 +46,6 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
   logisticsTypeLabels: { [key in LogisticsTypeEnum]?: string } = {};
 
   logisticsItems: ILogisticsItemModel[] = [];
-  personnelLogisticsItems: ILogisticsItemModel[] = [];
-  inputLogisticsItems: ILogisticsItemModel[] = [];
-
-  personnelLogisticsCategoryList: ILogisticsCategoryModel[] = [];
-  inputLogisticsCategoryList: ILogisticsCategoryModel[] = [];
 
   logisticsId: string | undefined;
 
@@ -66,7 +56,6 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
     private alertService: AlertService,
     private authService: AuthService,
     private dateUtils: DateUtilsService,
-    private logisticsCategoryService: LogisticsCategoryService,
     private purchaseService: PurchaseService,
     private logisticsService: LogisticsService,
     private route: ActivatedRoute,
@@ -87,17 +76,10 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
   }
 
   get grandTotalDisplayed(): number {
-    const personnelTotal = this.personnelLogisticsItems?.reduce(
+    return this.logisticsItems?.reduce(
       (sum, item) => sum + Number(item.total || 0),
       0
-    );
-
-    const inputTotal = this.inputLogisticsItems?.reduce(
-      (sum, item) => sum + Number(item.total || 0),
-      0
-    );
-
-    return personnelTotal + inputTotal;
+    ) || 0;
   }
 
   ngOnInit(): void {
@@ -106,7 +88,6 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
     this.isOnlyBuyer = this.authService.isOnlyBuyer;
 
     this.initializeModels();
-    this.loadLogisticsCategories();
 
     if (this.logisticsId) {
       const logisticsSub = this.logisticsService
@@ -126,16 +107,7 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
             this.controlNumber = logistics.purchase.controlNumber!;
             this.purchaseModel = logistics.purchase;
 
-            this.personnelLogisticsItems = logistics.items.filter(
-              (item) =>
-                item.logisticsCategory.category ===
-                LogisticsCategoryEnum.PERSONNEL
-            );
-
-            this.inputLogisticsItems = logistics.items.filter(
-              (item) =>
-                item.logisticsCategory.category === LogisticsCategoryEnum.INPUTS
-            );
+            this.logisticsItems = logistics.items;
 
             if (this.purchaseModel.controlNumber?.includes('CO')) {
               this.logisticsTypeLabels = {
@@ -163,7 +135,14 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
   }
 
   initializeModels() {
-    this.logisticsModel = {} as ICreateUpdateLogisticsModel;
+    this.logisticsModel = {
+      type: LogisticsTypeEnum.SHIPMENT,
+      logisticsDate: '',
+      grandTotal: 0,
+      status: LogisticsStatusEnum.DRAFT,
+      items: [],
+      logisticsSheetNumber: ''
+    } as ICreateUpdateLogisticsModel;
 
     this.purchaseModel = {} as IReducedDetailedPurchaseModel;
     this.purchaseModel.buyer = {} as IReducedUserModel;
@@ -172,42 +151,26 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
     this.purchaseModel.shrimpFarm = {} as IReducedShrimpFarmModel;
   }
 
-  loadLogisticsCategories(): void {
-    this.logisticsCategoryService.getAllLogisticsCategories().subscribe({
-      next: (categories) => {
-        this.personnelLogisticsCategoryList = categories
-          .filter(
-            (logistic) => logistic.category === LogisticsCategoryEnum.PERSONNEL
-          )
-          .sort((a, b) => a.name.localeCompare(b.name));
 
-        this.inputLogisticsCategoryList = categories
-          .filter(
-            (logistic) => logistic.category === LogisticsCategoryEnum.INPUTS
-          )
-          .sort((a, b) => a.name.localeCompare(b.name));
-
-        this.cdr.detectChanges();
-      },
-      error: (error) => {
-        console.error('Error fetching logistics categories:', error);
-      },
-    });
-  }
 
   confirmSave(event: Event, form: NgForm) {
     if (form && form.invalid) {
       return;
     }
 
-    // Check if both lists are empty
-    if (
-      (!this.personnelLogisticsItems ||
-        this.personnelLogisticsItems.length === 0) &&
-      (!this.inputLogisticsItems || this.inputLogisticsItems.length === 0)
-    ) {
+    // Check if there are complete items to save
+    const completeItems = this.logisticsItems.filter(item =>
+      Number(item.unit) > 0 &&
+      Number(item.cost) > 0 &&
+      Number(item.total) > 0 &&
+      item.financeCategory &&
+      item.resourceCategory
+    );
+
+    if (completeItems.length === 0) {
       this.alertService.showTranslatedAlert({
         alertType: 'info',
+        messageKey: 'MESSAGES.NO_COMPLETE_ITEMS',
       });
       return;
     }
@@ -220,22 +183,32 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
   }
 
   submitLogisticsForm() {
-    this.logisticsItems = [
-      ...this.personnelLogisticsItems,
-      ...this.inputLogisticsItems,
-    ];
-
     this.logisticsModel.purchase = this.purchaseModel.id;
-    this.logisticsModel.items = this.logisticsItems.map(
-      (x) =>
-        ({
-          logisticsCategory: x.logisticsCategory.id,
+
+    // Filter out incomplete items and map them
+    this.logisticsModel.items = this.logisticsItems
+      .filter(item => {
+        const isComplete = Number(item.unit) > 0 &&
+          Number(item.cost) > 0 &&
+          Number(item.total) > 0 &&
+          item.financeCategory &&
+          item.resourceCategory;
+
+        return isComplete;
+      })
+      .map((x) => {
+        const mappedItem = {
+          financeCategory: x.financeCategory,
+          resourceCategory: x.resourceCategory,
           unit: x.unit,
           cost: x.cost,
           total: x.total,
-          description: x.description,
-        } as ICreateUpdateLogisticsItemModel)
-    );
+          description: x.description || '',
+        } as ICreateUpdateLogisticsItemModel;
+
+        return mappedItem;
+      });
+
     this.logisticsModel.grandTotal = this.grandTotalDisplayed;
 
     if (this.logisticsId) {
@@ -408,12 +381,8 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
     this.location.back();
   }
 
-  handlePersonnelLogisticsItems(items: ILogisticsItemModel[]) {
-    this.personnelLogisticsItems = items;
-  }
-
-  handleInputLogisticsItems(items: ILogisticsItemModel[]) {
-    this.inputLogisticsItems = items;
+  handleLogisticsItems(items: ILogisticsItemModel[]) {
+    this.logisticsItems = items;
   }
 
   onDateChange(event: any): void {

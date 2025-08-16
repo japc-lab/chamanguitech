@@ -1,7 +1,11 @@
-import { ILogisticsCategoryModel } from '../../shared/interfaces/logistic-type.interface';
+import {
+  LogisticsFinanceCategoryEnum,
+  LogisticsResourceCategoryEnum,
+} from './logistics.interface';
 
 export interface ILogisticsItemModel {
-  logisticsCategory: ILogisticsCategoryModel;
+  financeCategory: LogisticsFinanceCategoryEnum;
+  resourceCategory: LogisticsResourceCategoryEnum;
   unit: number;
   cost: number;
   total: number;
@@ -9,7 +13,8 @@ export interface ILogisticsItemModel {
 }
 
 export interface ICreateUpdateLogisticsItemModel {
-  logisticsCategory: string;
+  financeCategory: LogisticsFinanceCategoryEnum;
+  resourceCategory: LogisticsResourceCategoryEnum;
   unit: number;
   cost: number;
   total: number;
