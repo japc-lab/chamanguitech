@@ -61,7 +61,7 @@ export enum LogisticsStatusEnum {
 export enum LogisticsFinanceCategoryEnum {
   INVOICE = 'INVOICE',
   PETTY_CASH = 'PETTY_CASH',
-  OTHER = 'OTHER',
+  ADDITIONAL = 'ADDITIONAL',
 }
 
 export enum LogisticsResourceCategoryEnum {

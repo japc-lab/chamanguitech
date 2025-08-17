@@ -43,8 +43,8 @@
           <tr *ngFor="let row of getItemsByFinanceCategory(financeCategory); let i = index; let globalIndex = index">
             <!-- Finance Category -->
             <td class="text-start">
-              <select class="form-select form-select-sm" [value]="row.financeCategory"
-                (change)="onFinanceCategoryChange(getGlobalIndex(financeCategory, i), $event)">
+              <select class="form-select form-select-sm" [(ngModel)]="row.financeCategory"
+                (ngModelChange)="onFinanceCategoryChange(getGlobalIndex(financeCategory, i), $event)">
                 <option *ngFor="let category of financeCategories" [value]="category">
                   {{ getFinanceCategoryLabel(category) }}
                 </option>
@@ -53,8 +53,8 @@
 
             <!-- Resource Category -->
             <td class="text-start">
-              <select class="form-select form-select-sm" [value]="row.resourceCategory"
-                (change)="onResourceCategoryChange(getGlobalIndex(financeCategory, i), $event)">
+              <select class="form-select form-select-sm" [(ngModel)]="row.resourceCategory"
+                (ngModelChange)="onResourceCategoryChange(getGlobalIndex(financeCategory, i), $event)">
                 <option *ngFor="let category of resourceCategories" [value]="category">
                   {{ getResourceCategoryLabel(category) }}
                 </option>

@@ -13,7 +13,7 @@ const LogisticsStatusEnum = Object.freeze({
 const LogisticsFinanceCategoryEnum = Object.freeze({
     INVOICE: "INVOICE",
     PETTY_CASH: "PETTY_CASH",
-    OTHER: "OTHER"
+    ADDITIONAL: "ADDITIONAL"
 });
 
 const LogisticsResourceCategoryEnum = Object.freeze({

@@ -1,8 +1,8 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, OnChanges, SimpleChanges } from '@angular/core';
 import { ILogisticsItemModel } from '../../interfaces/logistics-item.interface';
 import {
   LogisticsFinanceCategoryEnum,
-  LogisticsResourceCategoryEnum
+  LogisticsResourceCategoryEnum,
 } from '../../interfaces/logistics.interface';
 import { InputUtilsService } from 'src/app/utils/input-utils.service';
 import { FormUtilsService } from 'src/app/utils/form-utils.service';
@@ -14,7 +14,7 @@ import { PERMISSION_ROUTES } from '../../../../constants/routes.constants';
   templateUrl: './logistics-items-listing.component.html',
   styleUrl: './logistics-items-listing.component.scss',
 })
-export class LogisticsItemsListingComponent implements OnInit {
+export class LogisticsItemsListingComponent implements OnInit, OnChanges {
   PERMISSION_ROUTE = PERMISSION_ROUTES.LOGISTICS.LOGISTICS_FORM;
 
   private _logisticsItems: ILogisticsItemModel[] = [];
@@ -37,7 +37,8 @@ export class LogisticsItemsListingComponent implements OnInit {
   private emitChangesSubject = new Subject<void>();
   private emitChangesSubscription: Subscription;
 
-  get formArray(): any[] { // This getter is no longer needed but kept for compatibility
+  get formArray(): any[] {
+    // This getter is no longer needed but kept for compatibility
     return this.tableRows;
   }
 
@@ -58,15 +59,23 @@ export class LogisticsItemsListingComponent implements OnInit {
       });
   }
 
-  ngOnChanges(): void {
-    if (this.logisticsItems) {
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['logisticsItems']) {
       this.initializeTableRows();
     }
   }
 
   private initializeTableRows(): void {
+    // Ensure all items have the required properties
     this.tableRows = this.logisticsItems.length > 0
-      ? [...this.logisticsItems]
+      ? this.logisticsItems.map(item => ({
+          financeCategory: item.financeCategory || LogisticsFinanceCategoryEnum.INVOICE,
+          resourceCategory: item.resourceCategory || LogisticsResourceCategoryEnum.PERSONNEL,
+          unit: item.unit || 0,
+          cost: item.cost || 0,
+          total: item.total || 0,
+          description: item.description || '',
+        }))
       : [];
     this.calculateTotal();
   }
@@ -78,7 +87,7 @@ export class LogisticsItemsListingComponent implements OnInit {
       unit: 0,
       cost: 0,
       total: 0,
-      description: ''
+      description: '',
     };
     this.tableRows.push(newRow);
     this.emitChanges();
@@ -104,18 +113,12 @@ export class LogisticsItemsListingComponent implements OnInit {
   }
 
   // Event handlers for template
-  onFinanceCategoryChange(index: number, event: Event): void {
-    const target = event.target as HTMLSelectElement;
-    if (target) {
-      this.updateRow(index, 'financeCategory', target.value);
-    }
+  onFinanceCategoryChange(index: number, value: string): void {
+    this.updateRow(index, 'financeCategory', value);
   }
 
-  onResourceCategoryChange(index: number, event: Event): void {
-    const target = event.target as HTMLSelectElement;
-    if (target) {
-      this.updateRow(index, 'resourceCategory', target.value);
-    }
+  onResourceCategoryChange(index: number, value: string): void {
+    this.updateRow(index, 'resourceCategory', value);
   }
 
   onDescriptionChange(index: number, value: string): void {
@@ -146,32 +149,29 @@ export class LogisticsItemsListingComponent implements OnInit {
     this.total = this.tableRows.reduce((sum, row) => sum + (row.total || 0), 0);
   }
 
-    getValidLogisticsItems(): ILogisticsItemModel[] {
+  getValidLogisticsItems(): ILogisticsItemModel[] {
     // Return all items that have categories selected, even if values are 0
     // This allows the parent component to see all rows and handle validation as needed
-    const validItems = this.tableRows.filter(
-      (item) => {
-        const hasCategories = item.financeCategory && item.resourceCategory;
-        return hasCategories;
-      }
-    );
+    const validItems = this.tableRows.filter((item) => {
+      const hasCategories = item.financeCategory && item.resourceCategory;
+      return hasCategories;
+    });
 
     return validItems;
   }
 
   getCompleteLogisticsItems(): ILogisticsItemModel[] {
     // Return only items that are complete and ready for submission
-    const completeItems = this.tableRows.filter(
-      (item) => {
-        const isComplete = Number(item.unit) > 0 &&
-          Number(item.cost) > 0 &&
-          Number(item.total) > 0 &&
-          item.financeCategory &&
-          item.resourceCategory;
+    const completeItems = this.tableRows.filter((item) => {
+      const isComplete =
+        Number(item.unit) > 0 &&
+        Number(item.cost) > 0 &&
+        Number(item.total) > 0 &&
+        item.financeCategory &&
+        item.resourceCategory;
 
-        return isComplete;
-      }
-    );
+      return isComplete;
+    });
 
     return completeItems;
   }
@@ -198,7 +198,7 @@ export class LogisticsItemsListingComponent implements OnInit {
     const labels = {
       [LogisticsFinanceCategoryEnum.INVOICE]: 'Factura',
       [LogisticsFinanceCategoryEnum.PETTY_CASH]: 'Caja Menor',
-      [LogisticsFinanceCategoryEnum.OTHER]: 'Otro'
+      [LogisticsFinanceCategoryEnum.ADDITIONAL]: 'Adicional',
     };
     return labels[category] || category;
   }
@@ -207,32 +207,47 @@ export class LogisticsItemsListingComponent implements OnInit {
     const labels = {
       [LogisticsResourceCategoryEnum.PERSONNEL]: 'Personal',
       [LogisticsResourceCategoryEnum.RESOURCES]: 'Recursos',
-      [LogisticsResourceCategoryEnum.MATERIALS]: 'Materiales'
+      [LogisticsResourceCategoryEnum.MATERIALS]: 'Materiales',
     };
     return labels[category] || category;
   }
 
   // Methods for grouping by finance category
   getFinanceCategoriesWithItems(): LogisticsFinanceCategoryEnum[] {
-    const categories = new Set(this.tableRows.map(item => item.financeCategory));
+    const categories = new Set(
+      this.tableRows.map((item) => item.financeCategory)
+    );
     return Array.from(categories).sort();
   }
 
-  getItemsByFinanceCategory(financeCategory: LogisticsFinanceCategoryEnum): ILogisticsItemModel[] {
-    return this.tableRows.filter(item => item.financeCategory === financeCategory);
+  getItemsByFinanceCategory(
+    financeCategory: LogisticsFinanceCategoryEnum
+  ): ILogisticsItemModel[] {
+    return this.tableRows.filter(
+      (item) => item.financeCategory === financeCategory
+    );
   }
 
-  getFinanceCategorySubtotal(financeCategory: LogisticsFinanceCategoryEnum): number {
-    return this.getItemsByFinanceCategory(financeCategory)
-      .reduce((sum, item) => sum + (item.total || 0), 0);
+  getFinanceCategorySubtotal(
+    financeCategory: LogisticsFinanceCategoryEnum
+  ): number {
+    return this.getItemsByFinanceCategory(financeCategory).reduce(
+      (sum, item) => sum + (item.total || 0),
+      0
+    );
   }
 
-  getGlobalIndex(financeCategory: LogisticsFinanceCategoryEnum, localIndex: number): number {
-    return this.tableRows.findIndex(item => {
+  getGlobalIndex(
+    financeCategory: LogisticsFinanceCategoryEnum,
+    localIndex: number
+  ): number {
+    return this.tableRows.findIndex((item) => {
       const categoryItems = this.getItemsByFinanceCategory(financeCategory);
       return item === categoryItems[localIndex];
     });
   }
+
+
 
   ngOnDestroy(): void {
     if (this.emitChangesSubscription) {
