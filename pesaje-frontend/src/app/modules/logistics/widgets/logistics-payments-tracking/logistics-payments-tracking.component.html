@@ -1,0 +1,151 @@
+<!-- begin::Header -->
+<div class="card-header border-0 pt-8">
+  <h4 class="card-title align-items-start flex-column">
+    <span class="card-label fw-bolder fs-3 mb-1">{{ title }}</span>
+  </h4>
+</div>
+<!-- end::Header -->
+
+<!-- begin::Body -->
+<div class="card-body py-3">
+  <!-- begin::Table container -->
+  <div class="table-responsive">
+    <!-- begin::Table -->
+    <table class="table table-row-bordered table-row-gray-100 align-middle gs-0 gy-3">
+      <!-- begin::Table head -->
+      <thead>
+        <tr class="fw-bold text-muted bg-light-primary">
+          <th class="ps-4 min-w-200px rounded-start">Descripción</th>
+          <th class="min-w-120px text-end">Monto</th>
+          <th class="min-w-120px text-center">Pagos</th>
+          <th class="min-w-120px text-center">Fecha de pago</th>
+          <th class="min-w-150px text-center">Método de pago</th>
+          <th class="min-w-120px text-center">Factura o recibo</th>
+          <th class="min-w-150px text-center">Número de factura o recibo</th>
+          <th class="min-w-150px text-center">Nombre de factura o recibo</th>
+          <th class="min-w-150px text-center">Persona encargada del dinero</th>
+          <th class="min-w-120px text-center">Información completa</th>
+          <th class="min-w-200px text-center rounded-end">Observaciones</th>
+        </tr>
+      </thead>
+      <!-- end::Table head -->
+
+      <!-- begin::Table body -->
+      <tbody>
+        <!-- Payment rows -->
+        <tr *ngFor="let payment of getVisiblePayments(); let i = index" [class.table-light]="payment.isComplete"
+          [class.border-success]="payment.isComplete">
+
+          <!-- Description -->
+          <td class="ps-4">
+            <div class="d-flex align-items-center">
+              <div class="d-flex justify-content-start flex-column">
+                <span class="text-dark fw-bold text-h6 mb-1">{{ payment.description }}</span>
+              </div>
+            </div>
+          </td>
+
+          <!-- Amount -->
+          <td class="text-end">
+            <div class="input-group input-group-sm">
+              <span class="input-group-text">$</span>
+              <input type="number" class="form-control text-end no-spinner" [value]="payment.amount" readonly
+                placeholder="0.00" />
+            </div>
+          </td>
+
+          <!-- Payment Status -->
+          <td class="text-center">
+            <select class="form-select form-select-sm" [(ngModel)]="payment.paymentStatus"
+              (ngModelChange)="onPaymentStatusChange(i, $event)">
+              <option *ngFor="let status of paymentStatuses" [value]="status.value">
+                {{ status.label }}
+              </option>
+            </select>
+          </td>
+
+          <!-- Payment Date -->
+          <td class="text-center">
+            <input type="date" class="form-control form-control-sm" [value]="payment.paymentDate"
+              (change)="onPaymentDateChange(i, $event)" [disabled]="payment.paymentStatus !== 'PAID'" />
+          </td>
+
+          <!-- Payment Method -->
+          <td class="text-center">
+            <select class="form-select form-select-sm" [value]="payment.paymentMethod?.id"
+              (change)="onPaymentMethodChange(i, $event)" [disabled]="payment.paymentStatus !== 'PAID'">
+              <option value="">Seleccionar</option>
+              <option *ngFor="let method of paymentMethods" [value]="method.id">
+                {{ method.name }}
+              </option>
+            </select>
+          </td>
+
+          <!-- Has Invoice -->
+          <td class="text-center">
+            <select class="form-select form-select-sm" [(ngModel)]="payment.hasInvoice"
+              (ngModelChange)="onHasInvoiceChange(i, $event)">
+              <option *ngFor="let option of invoiceOptions" [value]="option.value">
+                {{ option.label }}
+              </option>
+            </select>
+          </td>
+
+          <!-- Invoice Number -->
+          <td class="text-center">
+            <input type="text" class="form-control form-control-sm" [(ngModel)]="payment.invoiceNumber"
+              (ngModelChange)="onInvoiceNumberChange(i, $event)" placeholder="Número"
+              [disabled]="payment.hasInvoice !== 'true'" />
+          </td>
+
+          <!-- Invoice Name -->
+          <td class="text-center">
+            <input type="text" class="form-control form-control-sm" [(ngModel)]="payment.invoiceName"
+              (ngModelChange)="onInvoiceNameChange(i, $event)" placeholder="Nombre" [disabled]="payment.hasInvoice !== 'true'" />
+          </td>
+
+          <!-- Person in Charge -->
+          <td class="text-center">
+            <input type="text" class="form-control form-control-sm" [(ngModel)]="payment.personInCharge"
+              (ngModelChange)="onPersonInChargeChange(i, $event)" placeholder="Nombre"
+              [disabled]="payment.paymentStatus !== 'PAID'" />
+          </td>
+
+          <!-- Complete Information -->
+          <td class="text-center">
+            <span *ngIf="payment.isComplete" class="badge badge-light-success">
+              <i class="fas fa-check-circle me-1"></i>Completo
+            </span>
+            <span *ngIf="!payment.isComplete" class="badge badge-light-warning">
+              <i class="fas fa-exclamation-circle me-1"></i>Incompleto
+            </span>
+          </td>
+
+          <!-- Observations -->
+          <td class="text-center">
+            <input type="text" class="form-control form-control-sm" [(ngModel)]="payment.observations"
+              (ngModelChange)="onObservationsChange(i, $event)" placeholder="Comentarios" />
+          </td>
+        </tr>
+
+        <!-- Total General Logistics Row -->
+        <tr class="table-light border-top border-primary" *ngIf="getVisiblePayments().length > 0">
+          <td class="ps-4 fw-bold fs-5">TOTAL GENERAL LOGÍSTICA</td>
+          <td class="text-end fw-bold fs-5">$ {{ getTotalAmount() | number: '1.2-2' }}</td>
+          <td class="text-center">
+            <span class="badge" [class.badge-light-success]="getOverallPaymentStatus() === 'PAID'"
+              [class.badge-light-warning]="getOverallPaymentStatus() === 'PENDING'"
+              [class.badge-light-secondary]="getOverallPaymentStatus() === 'NO_PAYMENT'">
+              {{ getOverallPaymentStatusLabel() }}
+            </span>
+          </td>
+          <td colspan="8"></td>
+        </tr>
+      </tbody>
+      <!-- end::Table body -->
+    </table>
+    <!-- end::Table -->
+  </div>
+  <!-- end::Table container -->
+</div>
+<!-- end::Body -->

@@ -168,14 +168,19 @@
 
   <!-- Fourth Section: Logistics Items -->
   <div class="card card-xl-stretch mb-xl-8 mt-2">
-    <app-logistics-items-listing
-      title="Detalles de Logística"
-      [logisticsItems]="logisticsItems"
+    <app-logistics-items-listing title="Detalles de Logística" [logisticsItems]="logisticsItems"
       (logisticsItemsChange)="handleLogisticsItems($event)" />
   </div>
   <!-- end::Fourth Section: Logistics Items -->
 
-  <!-- Fifth Section: Grand Total -->
+  <!-- Fifth Section: Logistics Payments Tracking -->
+  <div class="card card-xl-stretch mb-xl-8 mt-2">
+    <app-logistics-payments-tracking title="Pagos de Logística" [payments]="logisticsPayments"
+      [logisticsItems]="logisticsItems" (paymentsChange)="handleLogisticsPayments($event)" />
+  </div>
+  <!-- end::Fifth Section: Logistics Payments Tracking -->
+
+  <!-- Sixth Section: Grand Total -->
   <div class="card card-xl-stretch mb-xl-8 mt-2">
 
     <div class="card-body py-3 text-end fw-bold fs-4">
@@ -190,7 +195,7 @@
       </button>
     </div>
   </div>
-  <!-- end::Fifth Section: Inputs Logistics Details -->
+  <!-- end::Sixth Section: Grand Total -->
 
 </form>
 <!-- end::Logistics Form -->

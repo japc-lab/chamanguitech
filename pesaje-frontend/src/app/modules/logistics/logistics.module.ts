@@ -8,12 +8,14 @@ import { SharedModule } from '../shared/shared.module';
 import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { RecentLogisticsComponent } from './pages/recent-logistics/recent-logistics.component';
 import { LogisticsItemsListingComponent } from './widgets/logistics-items-listing/logistics-items-listing.component';
+import { LogisticsPaymentsTrackingComponent } from './widgets/logistics-payments-tracking/logistics-payments-tracking.component';
 
 @NgModule({
   declarations: [
     NewLogisticsComponent,
     RecentLogisticsComponent,
     LogisticsItemsListingComponent,
+    LogisticsPaymentsTrackingComponent,
   ],
   imports: [
     CommonModule,

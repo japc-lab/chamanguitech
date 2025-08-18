@@ -25,6 +25,7 @@ import { IReducedUserModel } from '../../../settings/interfaces/user.interface';
 import { IReducedShrimpFarmModel } from '../../../shared/interfaces/shrimp-farm.interface';
 import { ActivatedRoute, Router } from '@angular/router';
 import { InputUtilsService } from 'src/app/utils/input-utils.service';
+import { ILogisticsPaymentModel } from '../../widgets/logistics-payments-tracking/logistics-payments-tracking.component';
 
 @Component({
   selector: 'app-new-logistics',
@@ -46,6 +47,7 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
   logisticsTypeLabels: { [key in LogisticsTypeEnum]?: string } = {};
 
   logisticsItems: ILogisticsItemModel[] = [];
+  logisticsPayments: ILogisticsPaymentModel[] = [];
 
   logisticsId: string | undefined;
 
@@ -383,6 +385,10 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
 
   handleLogisticsItems(items: ILogisticsItemModel[]) {
     this.logisticsItems = items;
+  }
+
+  handleLogisticsPayments(payments: ILogisticsPaymentModel[]) {
+    this.logisticsPayments = payments;
   }
 
   onDateChange(event: any): void {

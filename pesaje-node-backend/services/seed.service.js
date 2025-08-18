@@ -585,6 +585,7 @@ const seedPaymentMethods = async () => {
             { _id: new mongoose.Types.ObjectId("60f9b7b2c8b3f10ffc2e5a02"), name: "Transferencia" },
             { _id: new mongoose.Types.ObjectId("60f9b7b2c8b3f10ffc2e5a03"), name: "Cheque" },
             { _id: new mongoose.Types.ObjectId("60f9b7b2c8b3f10ffc2e5a04"), name: "Débito" },
+            { _id: new mongoose.Types.ObjectId("60f9b7b2c8b3f10ffc2e5a05"), name: "Otro" },
         ];
 
         // Insert payment methods only if they do not exist
