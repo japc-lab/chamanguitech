@@ -1,28 +1,20 @@
-import { Component, EventEmitter, Input, OnInit, Output, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { ILogisticsItemModel } from '../../interfaces/logistics-item.interface';
 import {
   LogisticsFinanceCategoryEnum,
   LogisticsResourceCategoryEnum,
 } from '../../interfaces/logistics.interface';
 import { InputUtilsService } from 'src/app/utils/input-utils.service';
-import { FormUtilsService } from 'src/app/utils/form-utils.service';
-import { debounceTime, Subject, Subscription } from 'rxjs';
-import { PERMISSION_ROUTES } from '../../../../constants/routes.constants';
+import { NgModel } from '@angular/forms';
 
 @Component({
   selector: 'app-logistics-items-listing',
   templateUrl: './logistics-items-listing.component.html',
   styleUrl: './logistics-items-listing.component.scss',
 })
-export class LogisticsItemsListingComponent implements OnInit, OnChanges {
-  PERMISSION_ROUTE = PERMISSION_ROUTES.LOGISTICS.LOGISTICS_FORM;
-
-  private _logisticsItems: ILogisticsItemModel[] = [];
-  private formChangesSub: Subscription;
-
-  @Input() title: string = '';
+export class LogisticsItemsListingComponent implements OnInit {
+  @Input() title: string = 'Detalles de Logística';
   @Input() logisticsItems: ILogisticsItemModel[] = [];
-
   @Output() logisticsItemsChange = new EventEmitter<ILogisticsItemModel[]>();
 
   // Finance and Resource category options
@@ -33,50 +25,26 @@ export class LogisticsItemsListingComponent implements OnInit, OnChanges {
   tableRows: ILogisticsItemModel[] = [];
   total = 0;
 
-  // Debounced emit changes
-  private emitChangesSubject = new Subject<void>();
-  private emitChangesSubscription: Subscription;
-
-  get formArray(): any[] {
-    // This getter is no longer needed but kept for compatibility
-    return this.tableRows;
-  }
-
-  constructor(
-    private inputUtils: InputUtilsService,
-    private formUtils: FormUtilsService
-  ) {}
+  constructor(private inputUtils: InputUtilsService) {}
 
   ngOnInit(): void {
     this.initializeTableRows();
-
-    // Set up debounced emit changes
-    this.emitChangesSubscription = this.emitChangesSubject
-      .pipe(debounceTime(300))
-      .subscribe(() => {
-        const validItems = this.getValidLogisticsItems();
-        this.logisticsItemsChange.emit(validItems);
-      });
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['logisticsItems']) {
-      this.initializeTableRows();
-    }
   }
 
   private initializeTableRows(): void {
-    // Ensure all items have the required properties
-    this.tableRows = this.logisticsItems.length > 0
-      ? this.logisticsItems.map(item => ({
-          financeCategory: item.financeCategory || LogisticsFinanceCategoryEnum.INVOICE,
-          resourceCategory: item.resourceCategory || LogisticsResourceCategoryEnum.PERSONNEL,
-          unit: item.unit || 0,
-          cost: item.cost || 0,
-          total: item.total || 0,
-          description: item.description || '',
-        }))
-      : [];
+    this.tableRows =
+      this.logisticsItems.length > 0
+        ? this.logisticsItems.map((item) => ({
+            financeCategory:
+              item.financeCategory || LogisticsFinanceCategoryEnum.INVOICE,
+            resourceCategory:
+              item.resourceCategory || LogisticsResourceCategoryEnum.PERSONNEL,
+            unit: item.unit || 0,
+            cost: item.cost || 0,
+            total: item.total || 0,
+            description: item.description || '',
+          }))
+        : [];
     this.calculateTotal();
   }
 
@@ -93,55 +61,47 @@ export class LogisticsItemsListingComponent implements OnInit, OnChanges {
     this.emitChanges();
   }
 
-  removeRow(index: number): void {
-    this.tableRows.splice(index, 1);
-    this.calculateTotal();
-    this.emitChanges();
-  }
-
-  updateRow(index: number, field: keyof ILogisticsItemModel, value: any): void {
-    // Update the specific field
-    (this.tableRows[index] as any)[field] = value;
-
-    // Recalculate total for this row
-    if (field === 'unit' || field === 'cost') {
-      this.calculateRowTotal(index);
+  removeRow(row: ILogisticsItemModel): void {
+    const index = this.tableRows.indexOf(row);
+    if (index > -1) {
+      this.tableRows.splice(index, 1);
+      this.calculateTotal();
+      this.emitChanges();
     }
-
-    this.calculateTotal();
-    this.emitChanges();
   }
 
   // Event handlers for template
-  onFinanceCategoryChange(index: number, value: string): void {
-    this.updateRow(index, 'financeCategory', value);
+  onFinanceCategoryChange(row: ILogisticsItemModel, value: string): void {
+    row.financeCategory = value as LogisticsFinanceCategoryEnum;
+    this.calculateTotal();
+    this.emitChanges();
   }
 
-  onResourceCategoryChange(index: number, value: string): void {
-    this.updateRow(index, 'resourceCategory', value);
+  onResourceCategoryChange(row: ILogisticsItemModel, value: string): void {
+    row.resourceCategory = value as LogisticsResourceCategoryEnum;
+    this.emitChanges();
   }
 
-  onDescriptionChange(index: number, value: string): void {
-    this.updateRow(index, 'description', value);
+  onDescriptionChange(row: ILogisticsItemModel, value: string): void {
+    row.description = value;
+    this.emitChanges();
   }
 
-  onUnitChange(index: number, value: any): void {
-    this.updateRow(index, 'unit', value);
+  onUnitChange(row: ILogisticsItemModel, value: any): void {
+    row.unit = Number(value);
+    this.calculateRowTotal(row);
+    this.calculateTotal();
+    this.emitChanges();
   }
 
-  onCostChange(index: number, value: string): void {
-    this.updateRow(index, 'cost', value);
+  onCostChange(row: ILogisticsItemModel, value: any): void {
+    row.cost = value;
+    this.calculateRowTotal(row);
+    this.calculateTotal();
+    this.emitChanges();
   }
 
-  onCostBlurChange(index: number, event: Event): void {
-    const target = event.target as HTMLInputElement;
-    if (target) {
-      this.onCostBlur(target.value, index);
-    }
-  }
-
-  calculateRowTotal(index: number): void {
-    const row = this.tableRows[index];
+  calculateRowTotal(row: ILogisticsItemModel): void {
     row.total = (row.unit || 0) * (row.cost || 0);
   }
 
@@ -150,18 +110,14 @@ export class LogisticsItemsListingComponent implements OnInit, OnChanges {
   }
 
   getValidLogisticsItems(): ILogisticsItemModel[] {
-    // Return all items that have categories selected, even if values are 0
-    // This allows the parent component to see all rows and handle validation as needed
     const validItems = this.tableRows.filter((item) => {
       const hasCategories = item.financeCategory && item.resourceCategory;
       return hasCategories;
     });
-
     return validItems;
   }
 
   getCompleteLogisticsItems(): ILogisticsItemModel[] {
-    // Return only items that are complete and ready for submission
     const completeItems = this.tableRows.filter((item) => {
       const isComplete =
         Number(item.unit) > 0 &&
@@ -169,10 +125,8 @@ export class LogisticsItemsListingComponent implements OnInit, OnChanges {
         Number(item.total) > 0 &&
         item.financeCategory &&
         item.resourceCategory;
-
       return isComplete;
     });
-
     return completeItems;
   }
 
@@ -184,13 +138,16 @@ export class LogisticsItemsListingComponent implements OnInit, OnChanges {
     this.inputUtils.validateWholeNumber(event);
   }
 
-  onCostBlur(value: string, index: number): void {
-    const numericValue = this.inputUtils.formatToDecimal(value);
-    this.updateRow(index, 'cost', parseFloat(numericValue));
+  formatDecimal(control: NgModel) {
+    if (!control || control.value == null) return;
+
+    const value = parseFloat(control.value).toFixed(2);
+    control.control.setValue(Number(value), { emitEvent: false });
   }
 
-  private emitChanges(): void {
-    this.emitChangesSubject.next();
+  emitChanges(): void {
+    const validItems = this.getValidLogisticsItems();
+    this.logisticsItemsChange.emit(validItems);
   }
 
   // Helper methods for template
@@ -235,23 +192,5 @@ export class LogisticsItemsListingComponent implements OnInit, OnChanges {
       (sum, item) => sum + (item.total || 0),
       0
     );
-  }
-
-  getGlobalIndex(
-    financeCategory: LogisticsFinanceCategoryEnum,
-    localIndex: number
-  ): number {
-    return this.tableRows.findIndex((item) => {
-      const categoryItems = this.getItemsByFinanceCategory(financeCategory);
-      return item === categoryItems[localIndex];
-    });
-  }
-
-
-
-  ngOnDestroy(): void {
-    if (this.emitChangesSubscription) {
-      this.emitChangesSubscription.unsubscribe();
-    }
   }
 }

@@ -1,7 +1,7 @@
 <!-- begin::Header -->
 <div class="card-header border-0 pt-5">
   <h3 class="card-title align-items-start flex-column">
-    <span class="card-label fw-bolder fs-3 mb-1">{{title}}</span>
+    <span class="card-label fw-bolder fs-3 mb-1">{{ title }}</span>
   </h3>
   <div class="card-toolbar">
     <button type="button" class="btn btn-primary btn-sm" (click)="addRow()">
@@ -29,105 +29,77 @@
         </tr>
       </thead>
       <tbody>
-        <!-- Group rows by finance category -->
-        <ng-container *ngFor="let financeCategory of getFinanceCategoriesWithItems(); let categoryIndex = index">
-          <!-- Finance Category Header -->
-          <tr class="table-light" *ngIf="getItemsByFinanceCategory(financeCategory).length > 0">
-            <td colspan="7" class="fw-bold text-primary">
-              <i class="fas fa-tag me-2"></i>
-              {{ getFinanceCategoryLabel(financeCategory) }}
-            </td>
-          </tr>
+        <!-- All rows in a simple loop -->
+        <tr *ngFor="let row of tableRows; let i = index">
+          <!-- Finance Category -->
+          <td class="text-start">
+            <select class="form-select form-select-sm" [(ngModel)]="row.financeCategory"
+              (ngModelChange)="onFinanceCategoryChange(row, $event)" [id]="'finance-category-' + i"
+              [name]="'finance-category-' + i">
+              <option *ngFor="let category of financeCategories" [value]="category">
+                {{ getFinanceCategoryLabel(category) }}
+              </option>
+            </select>
+          </td>
 
-          <!-- Items for this finance category -->
-          <tr *ngFor="let row of getItemsByFinanceCategory(financeCategory); let i = index; let globalIndex = index">
-            <!-- Finance Category -->
-            <td class="text-start">
-              <select class="form-select form-select-sm" [(ngModel)]="row.financeCategory"
-                (ngModelChange)="onFinanceCategoryChange(getGlobalIndex(financeCategory, i), $event)">
-                <option *ngFor="let category of financeCategories" [value]="category">
-                  {{ getFinanceCategoryLabel(category) }}
-                </option>
-              </select>
-            </td>
+          <!-- Resource Category -->
+          <td class="text-start">
+            <select class="form-select form-select-sm" [(ngModel)]="row.resourceCategory"
+              (ngModelChange)="onResourceCategoryChange(row, $event)" [id]="'resource-category-' + i"
+              [name]="'resource-category-' + i">
+              <option *ngFor="let category of resourceCategories" [value]="category">
+                {{ getResourceCategoryLabel(category) }}
+              </option>
+            </select>
+          </td>
 
-            <!-- Resource Category -->
-            <td class="text-start">
-              <select class="form-select form-select-sm" [(ngModel)]="row.resourceCategory"
-                (ngModelChange)="onResourceCategoryChange(getGlobalIndex(financeCategory, i), $event)">
-                <option *ngFor="let category of resourceCategories" [value]="category">
-                  {{ getResourceCategoryLabel(category) }}
-                </option>
-              </select>
-            </td>
+          <!-- Description -->
+          <td class="text-start">
+            <input type="text" class="form-control form-control-sm" [(ngModel)]="row.description"
+              (ngModelChange)="onDescriptionChange(row, $event)"
+              [id]="'description-' + i" [name]="'description-' + i" placeholder="Descripción" />
+          </td>
 
-            <!-- Description -->
-            <td class="text-start">
-              <input
-                type="text"
-                class="form-control form-control-sm"
-                [(ngModel)]="row.description"
-                (ngModelChange)="onDescriptionChange(getGlobalIndex(financeCategory, i), $event)"
-                placeholder="Descripción" />
-            </td>
+          <!-- Unit -->
+          <td class="text-end" style="width: 90px;">
+            <input type="number" class="form-control form-control-sm text-end no-spinner" [(ngModel)]="row.unit"
+              (ngModelChange)="onUnitChange(row, $event)" (keypress)="validateWholeNumber($event)"
+              [id]="'unit-' + i" [name]="'unit-' + i" placeholder="0" />
+          </td>
 
-            <!-- Unit -->
-            <td class="text-end" style="width: 90px;">
-              <input
-                type="number"
-                class="form-control form-control-sm text-end no-spinner"
-                [(ngModel)]="row.unit"
-                (ngModelChange)="onUnitChange(getGlobalIndex(financeCategory, i), $event)"
-                (keypress)="validateWholeNumber($event)"
-                placeholder="0" />
-            </td>
+          <!-- Cost -->
+          <td class="text-end" style="width: 150px;">
+            <div class="input-group input-group-sm">
+              <span class="input-group-text">$</span>
+              <input type="number" class="form-control text-end no-spinner" [(ngModel)]="row.cost"
+                (ngModelChange)="onCostChange(row, $event)" (keypress)="validateNumber($event)"
+                (blur)="formatDecimal(costCtrl)" [id]="'cost-' + i" [name]="'cost-' + i"
+                #costCtrl="ngModel" placeholder="0.00" />
+            </div>
+          </td>
 
-            <!-- Cost -->
-            <td class="text-end" style="width: 150px;">
-              <div class="input-group input-group-sm">
-                <span class="input-group-text">$</span>
-                <input
-                  type="text"
-                  class="form-control text-end no-spinner"
-                  [(ngModel)]="row.cost"
-                  (ngModelChange)="onCostChange(getGlobalIndex(financeCategory, i), $event)"
-                  (blur)="onCostBlurChange(getGlobalIndex(financeCategory, i), $event)"
-                  (keypress)="validateNumber($event)"
-                  placeholder="0.00" />
-              </div>
-            </td>
+          <!-- Total -->
+          <td class="text-end" style="width: 120px;">
+            <span class="fw-bold">$ {{ row.total | number: '1.2-2' }}</span>
+          </td>
 
-            <!-- Total -->
-            <td class="text-end" style="width: 120px;">
-              <span class="fw-bold">$ {{ row.total | number: '1.2-2' }}</span>
-            </td>
+          <!-- Actions -->
+          <td class="text-center" style="width: 80px;">
+            <button type="button" class="btn btn-sm btn-icon btn-light-danger" (click)="removeRow(row)"
+              title="Eliminar fila">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        </tr>
 
-            <!-- Actions -->
-            <td class="text-center" style="width: 80px;">
-              <button type="button" class="btn btn-sm btn-icon btn-light-danger"
-                (click)="removeRow(getGlobalIndex(financeCategory, i))" title="Eliminar fila">
-                <i class="fas fa-trash"></i>
-              </button>
-            </td>
-          </tr>
-
-          <!-- Finance Category Subtotal -->
-          <tr class="table-light border-top" *ngIf="getItemsByFinanceCategory(financeCategory).length > 0">
-            <td colspan="5" class="text-end fw-bold text-primary">
-              Subtotal {{ getFinanceCategoryLabel(financeCategory) }}
-            </td>
-            <td class="text-end fw-bold text-primary">$ {{ getFinanceCategorySubtotal(financeCategory) | number: '1.2-2'
-              }}</td>
-            <td></td>
-          </tr>
-
-          <!-- Spacer row between categories (except for the last category) -->
-          <tr
-            *ngIf="categoryIndex < getFinanceCategoriesWithItems().length - 1 && getItemsByFinanceCategory(financeCategory).length > 0">
-            <td colspan="7" class="py-3"></td>
-          </tr>
-
-        </ng-container>
+        <!-- Subtotals by finance category -->
+        <tr *ngFor="let category of getFinanceCategoriesWithItems()" class="table-light border-top">
+          <td colspan="5" class="text-end fw-bold text-primary">
+            Subtotal {{ getFinanceCategoryLabel(category) }}
+          </td>
+          <td class="text-end fw-bold text-primary">$ {{ getFinanceCategorySubtotal(category) | number: '1.2-2' }}</td>
+          <td></td>
+        </tr>
 
         <!-- Empty state -->
         <tr *ngIf="tableRows.length === 0">
@@ -136,13 +108,6 @@
             <p class="mb-0">No hay detalles agregados</p>
             <small>Haz clic en "Agregar Detalle" para comenzar</small>
           </td>
-        </tr>
-
-        <!-- Grand Total row -->
-        <tr class="border-top border-primary" *ngIf="tableRows.length > 0">
-          <td colspan="5" class="text-end fw-bold fs-5">Total General</td>
-          <td class="text-end fw-bold fs-5">$ {{ total | number: '1.2-2' }}</td>
-          <td></td>
         </tr>
 
       </tbody>
