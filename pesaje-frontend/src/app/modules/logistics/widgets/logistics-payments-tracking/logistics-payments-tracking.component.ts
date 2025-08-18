@@ -1,18 +1,8 @@
-import {
-  Component,
-  Input,
-  Output,
-  EventEmitter,
-  OnInit,
-  OnChanges,
-  SimpleChanges,
-  OnDestroy,
-} from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { ILogisticsItemModel } from '../../interfaces/logistics-item.interface';
 import { LogisticsFinanceCategoryEnum } from '../../interfaces/logistics.interface';
 import { IPaymentMethodModel } from '../../../shared/interfaces/payment-method.interface';
 import { PaymentMethodService } from '../../../shared/services/payment-method.service';
-import { debounceTime, Subject, Subscription } from 'rxjs';
 
 export interface ILogisticsPaymentModel {
   id?: string;
@@ -34,7 +24,7 @@ export interface ILogisticsPaymentModel {
   templateUrl: './logistics-payments-tracking.component.html',
   styleUrls: ['./logistics-payments-tracking.component.scss'],
 })
-export class LogisticsPaymentsTrackingComponent implements OnInit, OnChanges, OnDestroy {
+export class LogisticsPaymentsTrackingComponent implements OnInit, OnChanges {
   @Input() title: string = 'Seguimiento de Pagos de Logística';
   @Input() payments: ILogisticsPaymentModel[] = [];
   @Input() logisticsItems: ILogisticsItemModel[] = [];
@@ -48,10 +38,6 @@ export class LogisticsPaymentsTrackingComponent implements OnInit, OnChanges, On
 
   paymentMethods: IPaymentMethodModel[] = [];
 
-  // Debounced emit changes
-  private emitChangesSubject = new Subject<void>();
-  private emitChangesSubscription: Subscription;
-
   invoiceOptions = [
     { value: 'true', label: 'SÍ' },
     { value: 'false', label: 'NO' },
@@ -64,7 +50,7 @@ export class LogisticsPaymentsTrackingComponent implements OnInit, OnChanges, On
       description: 'Subtotal logística a pagar con factura',
       amount: 0,
       paymentStatus: 'NO_PAYMENT',
-      hasInvoice: 'true',
+      hasInvoice: 'false',
       isComplete: false,
     },
     {
@@ -78,7 +64,7 @@ export class LogisticsPaymentsTrackingComponent implements OnInit, OnChanges, On
       description: 'Subtotal logística adicional',
       amount: 0,
       paymentStatus: 'NO_PAYMENT',
-      hasInvoice: 'null',
+      hasInvoice: 'false',
       isComplete: false,
     },
   ];
@@ -91,29 +77,7 @@ export class LogisticsPaymentsTrackingComponent implements OnInit, OnChanges, On
       this.payments = [...this.defaultPayments];
     }
     this.updateCompleteness();
-
-    // Update amounts if logistics items are already available
-    if (this.logisticsItems && this.logisticsItems.length > 0) {
-      this.updatePaymentAmounts();
-    }
-
-    // Set up debounced emit changes
-    this.emitChangesSubscription = this.emitChangesSubject
-      .pipe(debounceTime(300))
-      .subscribe(() => {
-        this.paymentsChange.emit(this.payments);
-      });
-  }
-
-  loadPaymentMethods(): void {
-    this.paymentMethodService.getAllPaymentsMethods().subscribe({
-      next: (methods) => {
-        this.paymentMethods = methods;
-      },
-      error: (error) => {
-        console.error('Error loading payment methods:', error);
-      },
-    });
+    this.updatePaymentAmounts();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -122,151 +86,154 @@ export class LogisticsPaymentsTrackingComponent implements OnInit, OnChanges, On
     }
   }
 
-  updatePayment(
-    index: number,
-    field: keyof ILogisticsPaymentModel,
-    value: any
-  ): void {
-    // Update the specific field directly to prevent full object recreation
-    (this.payments[index] as any)[field] = value;
+  loadPaymentMethods(): void {
+    this.paymentMethodService.getAllPaymentsMethods().subscribe({
+      next: (methods: IPaymentMethodModel[]) => {
+        this.paymentMethods = methods;
+      },
+      error: (error: any) => {
+        console.error('Error loading payment methods:', error);
+      },
+    });
+  }
+
+  updatePaymentAmounts(): void {
+    if (!this.logisticsItems || this.logisticsItems.length === 0) return;
+
+    const categorySubtotals = this.calculateCategorySubtotals();
+
+    this.payments.forEach((payment) => {
+      if (payment.description.includes('factura')) {
+        payment.amount = categorySubtotals[LogisticsFinanceCategoryEnum.INVOICE] || 0;
+      } else if (payment.description.includes('caja chica')) {
+        payment.amount = categorySubtotals[LogisticsFinanceCategoryEnum.PETTY_CASH] || 0;
+      } else if (payment.description.includes('adicional')) {
+        payment.amount = categorySubtotals[LogisticsFinanceCategoryEnum.ADDITIONAL] || 0;
+      }
+    });
+  }
+
+  calculateCategorySubtotals(): { [key: string]: number } {
+    const subtotals: { [key: string]: number } = {};
+
+    this.logisticsItems.forEach((item) => {
+      if (item.financeCategory && item.total) {
+        if (!subtotals[item.financeCategory]) {
+          subtotals[item.financeCategory] = 0;
+        }
+        subtotals[item.financeCategory] += item.total;
+      }
+    });
+
+    return subtotals;
+  }
+
+  // Event handlers
+  onPaymentStatusChange(index: number, value: string): void {
+    this.payments[index].paymentStatus = value as 'NO_PAYMENT' | 'PENDING' | 'PAID';
     this.updateCompleteness();
     this.emitChanges();
   }
 
-  onPaymentStatusChange(index: number, value: string): void {
-    this.updatePayment(index, 'paymentStatus', value);
+  onPaymentDateChange(index: number, event: any): void {
+    this.payments[index].paymentDate = event.target.value;
+    this.updateCompleteness();
+    this.emitChanges();
   }
 
-  onPaymentDateChange(index: number, event: Event): void {
-    const target = event.target as HTMLInputElement;
-    this.updatePayment(index, 'paymentDate', target.value);
-  }
-
-  onPaymentMethodChange(index: number, event: Event): void {
-    const target = event.target as HTMLSelectElement;
-    const selectedMethod = this.paymentMethods.find(
-      (m) => m.id === target.value
-    );
-    this.updatePayment(index, 'paymentMethod', selectedMethod);
+  onPaymentMethodChange(index: number, event: any): void {
+    const methodId = event.target.value;
+    const method = this.paymentMethods.find(m => m.id === methodId);
+    this.payments[index].paymentMethod = method;
+    this.updateCompleteness();
+    this.emitChanges();
   }
 
   onHasInvoiceChange(index: number, value: string): void {
-    this.updatePayment(index, 'hasInvoice', value);
+    this.payments[index].hasInvoice = value as 'true' | 'false' | 'null';
+    this.updateCompleteness();
+    this.emitChanges();
   }
 
   onInvoiceNumberChange(index: number, value: string): void {
-    this.updatePayment(index, 'invoiceNumber', value);
+    this.payments[index].invoiceNumber = value;
+    this.updateCompleteness();
+    this.emitChanges();
   }
 
   onInvoiceNameChange(index: number, value: string): void {
-    this.updatePayment(index, 'invoiceName', value);
+    this.payments[index].invoiceName = value;
+    this.updateCompleteness();
+    this.emitChanges();
   }
 
   onPersonInChargeChange(index: number, value: string): void {
-    this.updatePayment(index, 'personInCharge', value);
+    this.payments[index].personInCharge = value;
+    this.updateCompleteness();
+    this.emitChanges();
   }
 
   onObservationsChange(index: number, value: string): void {
-    this.updatePayment(index, 'observations', value);
+    this.payments[index].observations = value;
+    this.emitChanges();
   }
 
   updateCompleteness(): void {
     this.payments.forEach((payment) => {
-      const isComplete = this.checkPaymentCompleteness(payment);
-      payment.isComplete = isComplete;
+      payment.isComplete = this.checkPaymentCompleteness(payment);
     });
   }
 
   checkPaymentCompleteness(payment: ILogisticsPaymentModel): boolean {
-    // Basic required fields
-    if (!payment.description || payment.amount <= 0) {
+    // Only show "Completo" when status is PAID and all required fields are filled
+    if (payment.paymentStatus !== 'PAID') {
       return false;
     }
 
-    // If payment status is PAID, require additional fields
-    if (payment.paymentStatus === 'PAID') {
-      if (
-        !payment.paymentDate ||
-        !payment.paymentMethod?.id ||
-        !payment.personInCharge
-      ) {
-        return false;
-      }
+    // Check required fields for paid status
+    const hasRequiredFields = payment.paymentDate && payment.paymentMethod?.id && payment.personInCharge;
 
-      // If has invoice is true, require invoice details
-      if (payment.hasInvoice === 'true') {
-        if (!payment.invoiceNumber || !payment.invoiceName) {
-          return false;
-        }
-      }
+    if (!hasRequiredFields) return false;
+
+    // Check invoice fields if invoice is required
+    if (payment.hasInvoice === 'true') {
+      return !!(payment.invoiceNumber && payment.invoiceName);
     }
 
     return true;
   }
 
   getPaymentStatusLabel(status: string): string {
-    const found = this.paymentStatuses.find((s) => s.value === status);
-    return found ? found.label : status;
+    const statusObj = this.paymentStatuses.find(s => s.value === status);
+    return statusObj ? statusObj.label : status;
   }
 
-  getPaymentMethodLabel(method: IPaymentMethodModel | undefined): string {
-    return method ? method.name : '';
+  getPaymentMethodLabel(methodId: string): string {
+    const method = this.paymentMethods.find(m => m.id === methodId);
+    return method ? method.name : 'Seleccionar';
   }
 
-  getInvoiceLabel(hasInvoice: boolean | null): string {
-    if (hasInvoice === true) return 'SÍ';
-    if (hasInvoice === false) return 'NO';
-    return 'N/A';
+  getInvoiceLabel(value: string): string {
+    const option = this.invoiceOptions.find(o => o.value === value);
+    return option ? option.label : value;
   }
 
   getTotalAmount(): number {
-    return this.getVisiblePayments().reduce(
-      (sum, payment) => sum + (payment.amount || 0),
-      0
-    );
+    return this.payments.reduce((sum, payment) => sum + (payment.amount || 0), 0);
   }
 
-  getOverallPaymentStatus(): string {
-    const visiblePayments = this.getVisiblePayments();
-    const paidPayments = visiblePayments.filter(
-      (p) => p.paymentStatus === 'PAID'
-    );
-    const totalPayments = visiblePayments.filter((p) => p.amount > 0);
+  getOverallPaymentStatus(): 'NO_PAYMENT' | 'PENDING' | 'PAID' {
+    const paidCount = this.payments.filter(p => p.paymentStatus === 'PAID').length;
+    const pendingCount = this.payments.filter(p => p.paymentStatus === 'PENDING').length;
+    const noPaymentCount = this.payments.filter(p => p.paymentStatus === 'NO_PAYMENT').length;
 
-    if (totalPayments.length === 0) return 'NO_PAYMENT';
-    if (paidPayments.length === totalPayments.length) return 'PAID';
-    return 'PENDING';
+    if (paidCount === this.payments.length) return 'PAID';
+    if (pendingCount > 0 || paidCount > 0) return 'PENDING';
+    return 'NO_PAYMENT';
   }
 
   getOverallPaymentStatusLabel(): string {
-    const status = this.getOverallPaymentStatus();
-    return this.getPaymentStatusLabel(status);
-  }
-
-  updatePaymentAmounts(): void {
-    if (!this.logisticsItems || this.logisticsItems.length === 0) {
-      return;
-    }
-
-    // Calculate subtotals for each finance category
-    const categorySubtotals = this.calculateCategorySubtotals();
-
-    // Update payment amounts based on category
-    this.payments.forEach((payment) => {
-      if (payment.description.includes('factura')) {
-        payment.amount =
-          categorySubtotals[LogisticsFinanceCategoryEnum.INVOICE] || 0;
-      } else if (payment.description.includes('caja chica')) {
-        payment.amount =
-          categorySubtotals[LogisticsFinanceCategoryEnum.PETTY_CASH] || 0;
-      } else if (payment.description.includes('adicional')) {
-        payment.amount =
-          categorySubtotals[LogisticsFinanceCategoryEnum.ADDITIONAL] || 0;
-      }
-    });
-
-    this.updateCompleteness();
-    this.emitChanges();
+    return this.getPaymentStatusLabel(this.getOverallPaymentStatus());
   }
 
   getVisiblePayments(): ILogisticsPaymentModel[] {
@@ -274,51 +241,21 @@ export class LogisticsPaymentsTrackingComponent implements OnInit, OnChanges, On
       return [];
     }
 
-    // Get categories that have items
-    const categoriesWithItems = new Set(
-      this.logisticsItems
-        .filter(item => item.financeCategory && item.total && Number(item.total) > 0)
-        .map(item => item.financeCategory)
-    );
+    const categorySubtotals = this.calculateCategorySubtotals();
 
-    // Filter payments to show only those with categories that have items
     return this.payments.filter(payment => {
       if (payment.description.includes('factura')) {
-        return categoriesWithItems.has(LogisticsFinanceCategoryEnum.INVOICE);
+        return categorySubtotals[LogisticsFinanceCategoryEnum.INVOICE] > 0;
       } else if (payment.description.includes('caja chica')) {
-        return categoriesWithItems.has(LogisticsFinanceCategoryEnum.PETTY_CASH);
+        return categorySubtotals[LogisticsFinanceCategoryEnum.PETTY_CASH] > 0;
       } else if (payment.description.includes('adicional')) {
-        return categoriesWithItems.has(LogisticsFinanceCategoryEnum.ADDITIONAL);
+        return categorySubtotals[LogisticsFinanceCategoryEnum.ADDITIONAL] > 0;
       }
-      return false;
+      return true;
     });
   }
 
-  private calculateCategorySubtotals(): {
-    [key in LogisticsFinanceCategoryEnum]: number;
-  } {
-    const subtotals = {
-      [LogisticsFinanceCategoryEnum.INVOICE]: 0,
-      [LogisticsFinanceCategoryEnum.PETTY_CASH]: 0,
-      [LogisticsFinanceCategoryEnum.ADDITIONAL]: 0,
-    };
-
-    this.logisticsItems.forEach((item) => {
-      if (item.financeCategory && item.total) {
-        subtotals[item.financeCategory] += Number(item.total) || 0;
-      }
-    });
-
-    return subtotals;
-  }
-
-  private emitChanges(): void {
-    this.emitChangesSubject.next();
-  }
-
-  ngOnDestroy(): void {
-    if (this.emitChangesSubscription) {
-      this.emitChangesSubscription.unsubscribe();
-    }
+  emitChanges(): void {
+    this.paymentsChange.emit(this.payments);
   }
 }

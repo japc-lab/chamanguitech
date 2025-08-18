@@ -84,7 +84,7 @@
           <!-- Has Invoice -->
           <td class="text-center">
             <select class="form-select form-select-sm" [(ngModel)]="payment.hasInvoice"
-              (ngModelChange)="onHasInvoiceChange(i, $event)">
+              (ngModelChange)="onHasInvoiceChange(i, $event)" [disabled]="payment.paymentStatus !== 'PAID'">
               <option *ngFor="let option of invoiceOptions" [value]="option.value">
                 {{ option.label }}
               </option>

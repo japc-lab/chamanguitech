@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, OnChanges, SimpleChanges } from '@angular/core';
 import { ILogisticsItemModel } from '../../interfaces/logistics-item.interface';
 import {
   LogisticsFinanceCategoryEnum,
@@ -12,7 +12,7 @@ import { NgModel } from '@angular/forms';
   templateUrl: './logistics-items-listing.component.html',
   styleUrl: './logistics-items-listing.component.scss',
 })
-export class LogisticsItemsListingComponent implements OnInit {
+export class LogisticsItemsListingComponent implements OnInit, OnChanges {
   @Input() title: string = 'Detalles de Logística';
   @Input() logisticsItems: ILogisticsItemModel[] = [];
   @Output() logisticsItemsChange = new EventEmitter<ILogisticsItemModel[]>();
@@ -29,6 +29,16 @@ export class LogisticsItemsListingComponent implements OnInit {
 
   ngOnInit(): void {
     this.initializeTableRows();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['logisticsItems'] && this.logisticsItems) {
+      // Only reinitialize if we have items and our table is empty
+      // This prevents re-rendering when user is actively editing
+      if (this.logisticsItems.length > 0 && this.tableRows.length === 0) {
+        this.initializeTableRows();
+      }
+    }
   }
 
   private initializeTableRows(): void {
