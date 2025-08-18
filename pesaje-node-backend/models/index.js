@@ -45,6 +45,7 @@ const PurchasePaymentMethod = require(`${purchaseModelsPath}/purchase-payment-me
 // Import logistics models
 const Logistics = require(`${logisticsModelsPath}/logistics`);
 const LogisticsItem = require(`${logisticsModelsPath}/logistics-item`);
+const LogisticsPayment = require(`${logisticsModelsPath}/logistics-payment`);
 
 // Import sale models
 const Sale = require(`${saleModelsPath}/sale`);
@@ -86,6 +87,7 @@ module.exports = {
     PurchasePaymentMethod,
     Logistics,
     LogisticsItem,
+    LogisticsPayment,
     Sale,
     CompanySale,
     CompanySaleItem,

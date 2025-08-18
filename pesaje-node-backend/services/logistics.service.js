@@ -1,5 +1,44 @@
 const dbAdapter = require('../adapters');
-const { LogisticsTypeEnum } = require('../enums/logistics.enums');
+const { LogisticsTypeEnum, LogisticsStatusEnum } = require('../enums/logistics.enums');
+
+// Helper function to determine logistics status based on payment statuses
+const determineLogisticsStatus = (items) => {
+    if (!items || items.length === 0) {
+        return LogisticsStatusEnum.CREATED;
+    }
+
+    const paymentStatuses = items.map(item => item.payment?.paymentStatus).filter(Boolean);
+    
+    if (paymentStatuses.length === 0) {
+        return LogisticsStatusEnum.CREATED;
+    }
+
+    // Check if all payments are PAID
+    const allPaid = paymentStatuses.every(status => status === 'PAID');
+    if (allPaid) {
+        // Check if all payments are completed
+        const allCompleted = items.every(item => item.payment?.isCompleted === true);
+        if (allCompleted) {
+            return LogisticsStatusEnum.CONFIRMED;
+        }
+        return LogisticsStatusEnum.COMPLETED;
+    }
+
+    // Check if any payment is PENDING
+    const hasPending = paymentStatuses.some(status => status === 'PENDING');
+    if (hasPending) {
+        return LogisticsStatusEnum.IN_PROGRESS;
+    }
+
+    // Check if all payments are NO_PAYMENT
+    const allNoPayment = paymentStatuses.every(status => status === 'NO_PAYMENT');
+    if (allNoPayment) {
+        return LogisticsStatusEnum.CREATED;
+    }
+
+    // Default case
+    return LogisticsStatusEnum.IN_PROGRESS;
+};
 
 const create = async (data) => {
     const transaction = await dbAdapter.logisticsAdapter.startTransaction();
@@ -16,6 +55,9 @@ const create = async (data) => {
             createdItems.push(createdItem.id);
         }
 
+        // Determine logistics status based on payment statuses
+        const logisticsStatus = determineLogisticsStatus(data.items);
+
         // Create the Logistics document
         const logistics = await dbAdapter.logisticsAdapter.create({
             purchase: data.purchase,
@@ -23,6 +65,7 @@ const create = async (data) => {
             logisticsDate: data.logisticsDate,
             grandTotal: data.grandTotal,
             logisticsSheetNumber: data.logisticsSheetNumber,
+            status: logisticsStatus,
             items: createdItems
         }, { session: transaction.session });
         await transaction.commit();
@@ -86,7 +129,7 @@ const getAllByParams = async ({ userId, controlNumber, includeDeleted = false })
     }
 
     const logistics = await dbAdapter.logisticsAdapter.getAllWithRelations(logisticsQuery, [
-        { path: 'items' }
+        { path: 'items', populate: { path: 'payment' } }
     ]);
 
     return logistics.map(log => {
@@ -112,7 +155,7 @@ const getAllByParams = async ({ userId, controlNumber, includeDeleted = false })
             logisticsSheetNumber: log.logisticsSheetNumber,
             purchase: log.purchase, // still returning the ID
             totalPounds,
-            items: log.items.map(i => i.id),
+            items: log.items,
             controlNumber,
             description,
             buyer: purchaseInfo?.buyer || null,
@@ -127,6 +170,7 @@ const getById = async (id) => {
     const logistics = await dbAdapter.logisticsAdapter.getByIdWithRelations(id, [
         {
             path: 'items',
+            populate: { path: 'payment' }
         },
         {
             path: 'purchase',
@@ -169,16 +213,7 @@ const getById = async (id) => {
                 }
                 : null
         },
-        items: items.map(item => ({
-            id: item.id,
-            unit: item.unit,
-            cost: item.cost,
-            total: item.total,
-            description: item.description,
-            deletedAt: item.deletedAt,
-            financeCategory: item.financeCategory,
-            resourceCategory: item.resourceCategory,
-        }))
+        items: items
     };
 };
 
@@ -202,6 +237,10 @@ const update = async (id, data) => {
             const newItem = await dbAdapter.logisticsItemAdapter.create(item, { session: transaction.session });
             newItemIds.push(newItem.id);
         }
+
+        // Determine logistics status based on payment statuses
+        const logisticsStatus = determineLogisticsStatus(data.items);
+
         // ✏️ Update Logistics record
         const updatedLogistics = await dbAdapter.logisticsAdapter.update(
             id,
@@ -209,6 +248,7 @@ const update = async (id, data) => {
                 logisticsDate: data.logisticsDate,
                 grandTotal: data.grandTotal,
                 logisticsSheetNumber: data.logisticsSheetNumber,
+                status: logisticsStatus,
                 items: newItemIds
             },
             { session: transaction.session }

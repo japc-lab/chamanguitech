@@ -30,6 +30,11 @@ const LogisticsItemSchema = Schema({
   description: {
     type: String,
   },
+  payment: {
+    type: Schema.Types.ObjectId,
+    ref: 'LogisticsPayment',
+    required: true
+  },
   deletedAt: {
     type: Date,
     default: null
