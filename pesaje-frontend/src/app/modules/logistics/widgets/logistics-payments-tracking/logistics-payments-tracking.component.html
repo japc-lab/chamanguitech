@@ -32,104 +32,107 @@
 
       <!-- begin::Table body -->
       <tbody>
-        <!-- Payment rows -->
-        <tr *ngFor="let payment of getVisiblePayments(); let i = index" [class.table-light]="payment.isComplete"
-          [class.border-success]="payment.isComplete">
+        <!-- Logistics Payment rows -->
+        <ng-container *ngFor="let payment of logisticsPayments; let i = index">
+          <tr [class.table-light]="payment.isCompleted"
+            [class.border-success]="payment.isCompleted">
 
-          <!-- Description -->
-          <td class="ps-4">
-            <div class="d-flex align-items-center">
-              <div class="d-flex justify-content-start flex-column">
-                <span class="text-dark fw-bold text-h6 mb-1">{{ payment.description }}</span>
+            <!-- Description -->
+            <td class="ps-4">
+              <div class="d-flex align-items-center">
+                <div class="d-flex justify-content-start flex-column">
+                  <span class="text-dark fw-bold text-h6 mb-1">{{ getDescriptionForCategory(payment.financeCategory) }}</span>
+                </div>
               </div>
-            </div>
-          </td>
+            </td>
 
-          <!-- Amount -->
-          <td class="text-end">
-            <div class="input-group input-group-sm">
-              <span class="input-group-text">$</span>
-              <input type="number" class="form-control text-end no-spinner" [value]="payment.amount" readonly
-                placeholder="0.00" />
-            </div>
-          </td>
+            <!-- Amount -->
+            <td class="text-end">
+              <div class="input-group input-group-sm">
+                <span class="input-group-text">$</span>
+                <input type="number" class="form-control text-end no-spinner" [value]="payment.amount" readonly
+                  placeholder="0.00" />
+              </div>
+            </td>
 
-          <!-- Payment Status -->
-          <td class="text-center">
-            <select class="form-select form-select-sm" [(ngModel)]="payment.paymentStatus"
-              (ngModelChange)="onPaymentStatusChange(i, $event)">
-              <option *ngFor="let status of paymentStatuses" [value]="status.value">
-                {{ status.label }}
-              </option>
-            </select>
-          </td>
+            <!-- Payment Status -->
+            <td class="text-center">
+              <select class="form-select form-select-sm" [(ngModel)]="payment.paymentStatus"
+                (ngModelChange)="onPaymentStatusChange(payment, $event)">
+                <option *ngFor="let status of paymentStatuses" [value]="status.value">
+                  {{ status.label }}
+                </option>
+              </select>
+            </td>
 
-          <!-- Payment Date -->
-          <td class="text-center">
-            <input type="date" class="form-control form-control-sm" [value]="payment.paymentDate"
-              (change)="onPaymentDateChange(i, $event)" [disabled]="payment.paymentStatus !== 'PAID'" />
-          </td>
+            <!-- Payment Date -->
+            <td class="text-center">
+              <input type="date" class="form-control form-control-sm" [(ngModel)]="payment.paymentDate"
+                (ngModelChange)="onPaymentDateChange(payment, $event)" [disabled]="payment.paymentStatus !== 'PAID'" />
+            </td>
 
-          <!-- Payment Method -->
-          <td class="text-center">
-            <select class="form-select form-select-sm" [value]="payment.paymentMethod?.id"
-              (change)="onPaymentMethodChange(i, $event)" [disabled]="payment.paymentStatus !== 'PAID'">
-              <option value="">Seleccionar</option>
-              <option *ngFor="let method of paymentMethods" [value]="method.id">
-                {{ method.name }}
-              </option>
-            </select>
-          </td>
+            <!-- Payment Method -->
+            <td class="text-center">
+              <select class="form-select form-select-sm" [(ngModel)]="payment.paymentMethod"
+                (ngModelChange)="onPaymentMethodChange(payment, $event)" [disabled]="payment.paymentStatus !== 'PAID'">
+                <option value="">Seleccionar</option>
+                <option *ngFor="let method of paymentMethods" [ngValue]="method">
+                  {{ method.name }}
+                </option>
+              </select>
+            </td>
 
-          <!-- Has Invoice -->
-          <td class="text-center">
-            <select class="form-select form-select-sm" [(ngModel)]="payment.hasInvoice"
-              (ngModelChange)="onHasInvoiceChange(i, $event)" [disabled]="payment.paymentStatus !== 'PAID'">
-              <option *ngFor="let option of invoiceOptions" [value]="option.value">
-                {{ option.label }}
-              </option>
-            </select>
-          </td>
+            <!-- Has Invoice -->
+            <td class="text-center">
+              <select class="form-select form-select-sm" [(ngModel)]="payment.hasInvoice"
+                (ngModelChange)="onHasInvoiceChange(payment, $event)" [disabled]="payment.paymentStatus !== 'PAID'">
+                <option *ngFor="let option of invoiceOptions" [value]="option.value">
+                  {{ option.label }}
+                </option>
+              </select>
+            </td>
 
-          <!-- Invoice Number -->
-          <td class="text-center">
-            <input type="text" class="form-control form-control-sm" [(ngModel)]="payment.invoiceNumber"
-              (ngModelChange)="onInvoiceNumberChange(i, $event)" placeholder="Número"
-              [disabled]="payment.hasInvoice !== 'true'" />
-          </td>
+            <!-- Invoice Number -->
+            <td class="text-center">
+              <input type="text" class="form-control form-control-sm" [(ngModel)]="payment.invoiceNumber"
+                (ngModelChange)="onInvoiceNumberChange(payment, $event)" placeholder="Número"
+                [disabled]="payment.hasInvoice !== 'yes'" />
+            </td>
 
-          <!-- Invoice Name -->
-          <td class="text-center">
-            <input type="text" class="form-control form-control-sm" [(ngModel)]="payment.invoiceName"
-              (ngModelChange)="onInvoiceNameChange(i, $event)" placeholder="Nombre" [disabled]="payment.hasInvoice !== 'true'" />
-          </td>
+            <!-- Invoice Name -->
+            <td class="text-center">
+              <input type="text" class="form-control form-control-sm" [(ngModel)]="payment.invoiceName"
+                (ngModelChange)="onInvoiceNameChange(payment, $event)" placeholder="Nombre"
+                [disabled]="payment.hasInvoice !== 'yes'" />
+            </td>
 
-          <!-- Person in Charge -->
-          <td class="text-center">
-            <input type="text" class="form-control form-control-sm" [(ngModel)]="payment.personInCharge"
-              (ngModelChange)="onPersonInChargeChange(i, $event)" placeholder="Nombre"
-              [disabled]="payment.paymentStatus !== 'PAID'" />
-          </td>
+            <!-- Person in Charge -->
+            <td class="text-center">
+              <input type="text" class="form-control form-control-sm" [(ngModel)]="payment.personInCharge"
+                (ngModelChange)="onPersonInChargeChange(payment, $event)" placeholder="Nombre"
+                [disabled]="payment.paymentStatus !== 'PAID'" />
+            </td>
 
-          <!-- Complete Information -->
-          <td class="text-center">
-            <span *ngIf="payment.isComplete" class="badge badge-light-success">
-              <i class="fas fa-check-circle me-1"></i>Completo
-            </span>
-            <span *ngIf="!payment.isComplete" class="badge badge-light-warning">
-              <i class="fas fa-exclamation-circle me-1"></i>Incompleto
-            </span>
-          </td>
+            <!-- Complete Information -->
+            <td class="text-center">
+              <span *ngIf="payment.isCompleted" class="badge badge-light-success">
+                <i class="fas fa-check-circle me-1"></i>Completo
+              </span>
+              <span *ngIf="!payment.isCompleted" class="badge badge-light-warning">
+                <i class="fas fa-exclamation-circle me-1"></i>Incompleto
+              </span>
+            </td>
 
-          <!-- Observations -->
-          <td class="text-center">
-            <input type="text" class="form-control form-control-sm" [(ngModel)]="payment.observations"
-              (ngModelChange)="onObservationsChange(i, $event)" placeholder="Comentarios" />
-          </td>
-        </tr>
+            <!-- Observations -->
+            <td class="text-center">
+              <input type="text" class="form-control form-control-sm" [(ngModel)]="payment.observation"
+                (ngModelChange)="onObservationChange(payment, $event)" placeholder="Comentarios" />
+            </td>
+          </tr>
+        </ng-container>
 
         <!-- Total General Logistics Row -->
-        <tr class="table-light border-top border-primary" *ngIf="getVisiblePayments().length > 0">
+        <tr class="table-light border-top border-primary" *ngIf="logisticsPayments.length > 0">
           <td class="ps-4 fw-bold fs-5">TOTAL GENERAL LOGÍSTICA</td>
           <td class="text-end fw-bold fs-5">$ {{ getTotalAmount() | number: '1.2-2' }}</td>
           <td class="text-center">
@@ -141,8 +144,7 @@
           </td>
           <td colspan="8"></td>
         </tr>
-      </tbody>
-      <!-- end::Table body -->
+        <!-- end::Table body -->
     </table>
     <!-- end::Table -->
   </div>

@@ -2,12 +2,12 @@ const dbAdapter = require('../adapters');
 const { LogisticsTypeEnum, LogisticsStatusEnum } = require('../enums/logistics.enums');
 
 // Helper function to determine logistics status based on payment statuses
-const determineLogisticsStatus = (items) => {
-    if (!items || items.length === 0) {
+const determineLogisticsStatus = (payments) => {
+    if (!payments || payments.length === 0) {
         return LogisticsStatusEnum.CREATED;
     }
 
-    const paymentStatuses = items.map(item => item.payment?.paymentStatus).filter(Boolean);
+    const paymentStatuses = payments.map(payment => payment.paymentStatus).filter(Boolean);
     
     if (paymentStatuses.length === 0) {
         return LogisticsStatusEnum.CREATED;
@@ -17,7 +17,7 @@ const determineLogisticsStatus = (items) => {
     const allPaid = paymentStatuses.every(status => status === 'PAID');
     if (allPaid) {
         // Check if all payments are completed
-        const allCompleted = items.every(item => item.payment?.isCompleted === true);
+        const allCompleted = payments.every(payment => payment.isCompleted === true);
         if (allCompleted) {
             return LogisticsStatusEnum.CONFIRMED;
         }
@@ -55,8 +55,15 @@ const create = async (data) => {
             createdItems.push(createdItem.id);
         }
 
+        // Validate and create each LogisticsPayment
+        const createdPayments = [];
+        for (const payment of data.payments || []) {
+            const createdPayment = await dbAdapter.logisticsPaymentAdapter.create(payment, { session: transaction.session });
+            createdPayments.push(createdPayment.id);
+        }
+
         // Determine logistics status based on payment statuses
-        const logisticsStatus = determineLogisticsStatus(data.items);
+        const logisticsStatus = determineLogisticsStatus(data.payments || []);
 
         // Create the Logistics document
         const logistics = await dbAdapter.logisticsAdapter.create({
@@ -66,7 +73,8 @@ const create = async (data) => {
             grandTotal: data.grandTotal,
             logisticsSheetNumber: data.logisticsSheetNumber,
             status: logisticsStatus,
-            items: createdItems
+            items: createdItems,
+            payments: createdPayments
         }, { session: transaction.session });
         await transaction.commit();
         return logistics;
@@ -129,7 +137,8 @@ const getAllByParams = async ({ userId, controlNumber, includeDeleted = false })
     }
 
     const logistics = await dbAdapter.logisticsAdapter.getAllWithRelations(logisticsQuery, [
-        { path: 'items', populate: { path: 'payment' } }
+        { path: 'items' },
+        { path: 'payments', populate: { path: 'paymentMethod' } }
     ]);
 
     return logistics.map(log => {
@@ -146,6 +155,21 @@ const getAllByParams = async ({ userId, controlNumber, includeDeleted = false })
             description = 'Procesamiento Local';
         }
 
+        // Convert payments to apply toJSON transformations
+        const convertedPayments = log.payments.map(payment => {
+            const paymentObj = payment.toObject ? payment.toObject({ transform: true }) : payment;
+            
+            // Manually convert payment method if it exists
+            if (paymentObj.paymentMethod && paymentObj.paymentMethod._id) {
+                paymentObj.paymentMethod = {
+                    id: paymentObj.paymentMethod._id,
+                    name: paymentObj.paymentMethod.name
+                };
+            }
+            
+            return paymentObj;
+        });
+
         return {
             id: log.id,
             logisticsDate: log.logisticsDate,
@@ -156,6 +180,7 @@ const getAllByParams = async ({ userId, controlNumber, includeDeleted = false })
             purchase: log.purchase, // still returning the ID
             totalPounds,
             items: log.items,
+            payments: convertedPayments,
             controlNumber,
             description,
             buyer: purchaseInfo?.buyer || null,
@@ -169,8 +194,11 @@ const getAllByParams = async ({ userId, controlNumber, includeDeleted = false })
 const getById = async (id) => {
     const logistics = await dbAdapter.logisticsAdapter.getByIdWithRelations(id, [
         {
-            path: 'items',
-            populate: { path: 'payment' }
+            path: 'items'
+        },
+        {
+            path: 'payments',
+            populate: { path: 'paymentMethod' }
         },
         {
             path: 'purchase',
@@ -186,11 +214,26 @@ const getById = async (id) => {
 
     if (!logistics) throw new Error('Logistics not found');
 
-    const { purchase, items, ...rest } = logistics;
+    const { purchase, items, payments, ...rest } = logistics;
 
     const formatPerson = (user) => user?.person
         ? { id: user._id, fullName: `${user.person.names} ${user.person.lastNames}`.trim() }
         : { id: user?._id || null, fullName: null };
+
+    // Convert payments to apply toJSON transformations
+    const convertedPayments = payments.map(payment => {
+        const paymentObj = payment.toObject ? payment.toObject({ transform: true }) : payment;
+        
+        // Manually convert payment method if it exists
+        if (paymentObj.paymentMethod && paymentObj.paymentMethod._id) {
+            paymentObj.paymentMethod = {
+                id: paymentObj.paymentMethod._id,
+                name: paymentObj.paymentMethod.name
+            };
+        }
+        
+        return paymentObj;
+    });
 
     return {
         ...rest,
@@ -213,7 +256,8 @@ const getById = async (id) => {
                 }
                 : null
         },
-        items: items
+        items: items,
+        payments: convertedPayments
     };
 };
 
@@ -231,6 +275,11 @@ const update = async (id, data) => {
             await dbAdapter.logisticsItemAdapter.removePermanently(itemId);
         }
 
+        // 🔥 Real deletion of each LogisticsPayment using removePermanently
+        for (const paymentId of existingLogistics.payments || []) {
+            await dbAdapter.logisticsPaymentAdapter.removePermanently(paymentId);
+        }
+
         // 🔁 Create new LogisticsItems
         const newItemIds = [];
         for (const item of data.items) {
@@ -238,8 +287,15 @@ const update = async (id, data) => {
             newItemIds.push(newItem.id);
         }
 
+        // 🔁 Create new LogisticsPayments
+        const newPaymentIds = [];
+        for (const payment of data.payments || []) {
+            const newPayment = await dbAdapter.logisticsPaymentAdapter.create(payment, { session: transaction.session });
+            newPaymentIds.push(newPayment.id);
+        }
+
         // Determine logistics status based on payment statuses
-        const logisticsStatus = determineLogisticsStatus(data.items);
+        const logisticsStatus = determineLogisticsStatus(data.payments || []);
 
         // ✏️ Update Logistics record
         const updatedLogistics = await dbAdapter.logisticsAdapter.update(
@@ -249,7 +305,8 @@ const update = async (id, data) => {
                 grandTotal: data.grandTotal,
                 logisticsSheetNumber: data.logisticsSheetNumber,
                 status: logisticsStatus,
-                items: newItemIds
+                items: newItemIds,
+                payments: newPaymentIds
             },
             { session: transaction.session }
         );

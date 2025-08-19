@@ -25,7 +25,7 @@ import { IReducedUserModel } from '../../../settings/interfaces/user.interface';
 import { IReducedShrimpFarmModel } from '../../../shared/interfaces/shrimp-farm.interface';
 import { ActivatedRoute, Router } from '@angular/router';
 import { InputUtilsService } from 'src/app/utils/input-utils.service';
-import { ILogisticsPaymentModel } from '../../widgets/logistics-payments-tracking/logistics-payments-tracking.component';
+import { ILogisticsPaymentModel } from '../../interfaces/logistics-payment.interface';
 
 @Component({
   selector: 'app-new-logistics',
@@ -78,10 +78,12 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
   }
 
   get grandTotalDisplayed(): number {
-    return this.logisticsItems?.reduce(
-      (sum, item) => sum + Number(item.total || 0),
-      0
-    ) || 0;
+    return (
+      this.logisticsItems?.reduce(
+        (sum, item) => sum + Number(item.total || 0),
+        0
+      ) || 0
+    );
   }
 
   ngOnInit(): void {
@@ -105,11 +107,13 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
               grandTotal: logistics.grandTotal,
               logisticsSheetNumber: logistics.logisticsSheetNumber,
               items: [],
+              payments: [],
             };
             this.controlNumber = logistics.purchase.controlNumber!;
             this.purchaseModel = logistics.purchase;
 
             this.logisticsItems = logistics.items;
+            this.logisticsPayments = logistics.payments || [];
 
             if (this.purchaseModel.controlNumber?.includes('CO')) {
               this.logisticsTypeLabels = {
@@ -143,7 +147,8 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
       grandTotal: 0,
       status: LogisticsStatusEnum.DRAFT,
       items: [],
-      logisticsSheetNumber: ''
+      payments: [],
+      logisticsSheetNumber: '',
     } as ICreateUpdateLogisticsModel;
 
     this.purchaseModel = {} as IReducedDetailedPurchaseModel;
@@ -153,20 +158,19 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
     this.purchaseModel.shrimpFarm = {} as IReducedShrimpFarmModel;
   }
 
-
-
   confirmSave(event: Event, form: NgForm) {
     if (form && form.invalid) {
       return;
     }
 
     // Check if there are complete items to save
-    const completeItems = this.logisticsItems.filter(item =>
-      Number(item.unit) > 0 &&
-      Number(item.cost) > 0 &&
-      Number(item.total) > 0 &&
-      item.financeCategory &&
-      item.resourceCategory
+    const completeItems = this.logisticsItems.filter(
+      (item) =>
+        Number(item.unit) > 0 &&
+        Number(item.cost) > 0 &&
+        Number(item.total) > 0 &&
+        item.financeCategory &&
+        item.resourceCategory
     );
 
     if (completeItems.length === 0) {
@@ -189,8 +193,9 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
 
     // Filter out incomplete items and map them
     this.logisticsModel.items = this.logisticsItems
-      .filter(item => {
-        const isComplete = Number(item.unit) > 0 &&
+      .filter((item) => {
+        const isComplete =
+          Number(item.unit) > 0 &&
           Number(item.cost) > 0 &&
           Number(item.total) > 0 &&
           item.financeCategory &&
@@ -210,6 +215,24 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
 
         return mappedItem;
       });
+
+    // Add payments to the logistics model
+    this.logisticsModel.payments = this.logisticsPayments.map((payment) => ({
+      financeCategory: payment.financeCategory,
+      amount: payment.amount,
+      paymentStatus: payment.paymentStatus,
+      paymentDate: payment.paymentStatus === 'PAID' && payment.paymentDate ?
+        this.dateUtils.convertLocalDateToUTC(payment.paymentDate) : undefined,
+      paymentMethod: payment.paymentStatus === 'PAID' ?
+        (typeof payment.paymentMethod === 'string' ? payment.paymentMethod : payment.paymentMethod?.id || '') :
+        undefined,
+      hasInvoice: payment.hasInvoice,
+      invoiceNumber: payment.hasInvoice === 'yes' ? payment.invoiceNumber : undefined,
+      invoiceName: payment.hasInvoice === 'yes' ? payment.invoiceName : undefined,
+      personInCharge: payment.paymentStatus === 'PAID' ? payment.personInCharge : undefined,
+      observation: payment.observation,
+      isCompleted: payment.isCompleted
+    }));
 
     this.logisticsModel.grandTotal = this.grandTotalDisplayed;
 

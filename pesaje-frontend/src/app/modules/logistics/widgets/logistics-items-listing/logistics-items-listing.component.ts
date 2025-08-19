@@ -164,7 +164,7 @@ export class LogisticsItemsListingComponent implements OnInit, OnChanges {
   getFinanceCategoryLabel(category: LogisticsFinanceCategoryEnum): string {
     const labels = {
       [LogisticsFinanceCategoryEnum.INVOICE]: 'Factura',
-      [LogisticsFinanceCategoryEnum.PETTY_CASH]: 'Caja Menor',
+      [LogisticsFinanceCategoryEnum.PETTY_CASH]: 'Caja Chica',
       [LogisticsFinanceCategoryEnum.ADDITIONAL]: 'Adicional',
     };
     return labels[category] || category;

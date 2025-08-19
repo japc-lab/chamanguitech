@@ -175,8 +175,8 @@
 
   <!-- Fifth Section: Logistics Payments Tracking -->
   <div class="card card-xl-stretch mb-xl-8 mt-2">
-    <app-logistics-payments-tracking title="Pagos de Logística" [payments]="logisticsPayments"
-      [logisticsItems]="logisticsItems" (paymentsChange)="handleLogisticsPayments($event)" />
+    <app-logistics-payments-tracking [logisticsItems]="logisticsItems" [logisticsPayments]="logisticsPayments"
+      (logisticsPaymentsChange)="handleLogisticsPayments($event)" />
   </div>
   <!-- end::Fifth Section: Logistics Payments Tracking -->
 

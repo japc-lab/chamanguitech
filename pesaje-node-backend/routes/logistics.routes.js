@@ -58,6 +58,10 @@ router.post('/', [
     body('items.*.unit', 'Each item unit must be a positive number').isFloat({ min: 0 }),
     body('items.*.cost', 'Each item cost must be a positive number').isFloat({ min: 0 }),
     body('items.*.total', 'Each item total must be a positive number').isFloat({ min: 0 }),
+    body('payments').optional().isArray().withMessage('Payments must be an array'),
+    body('payments.*.amount', 'Each payment must have a valid amount').optional().isFloat({ min: 0 }),
+    body('payments.*.paymentStatus', 'Each payment must have a valid paymentStatus').optional().isIn(['NO_PAYMENT', 'PENDING', 'PAID']),
+    body('payments.*.hasInvoice', 'Each payment must have a valid hasInvoice').optional().isIn(['yes', 'no', 'not-applicable']),
     validateFields
 ], createLogistics);
 
@@ -75,6 +79,10 @@ router.put(
         body('items.*.unit', 'Each item must have a numeric unit >= 0').isFloat({ min: 0 }),
         body('items.*.cost', 'Each item must have a numeric cost >= 0').isFloat({ min: 0 }),
         body('items.*.total', 'Each item must have a numeric total >= 0').isFloat({ min: 0 }),
+        body('payments').optional().isArray().withMessage('Payments must be an array'),
+        body('payments.*.amount', 'Each payment must have a valid amount').optional().isFloat({ min: 0 }),
+        body('payments.*.paymentStatus', 'Each payment must have a valid paymentStatus').optional().isIn(['NO_PAYMENT', 'PENDING', 'PAID']),
+        body('payments.*.hasInvoice', 'Each payment must have a valid hasInvoice').optional().isIn(['yes', 'no', 'not-applicable']),
         validateFields,
     ],
     updateLogistics

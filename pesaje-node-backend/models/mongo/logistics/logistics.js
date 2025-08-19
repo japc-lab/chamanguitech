@@ -32,6 +32,11 @@ const LogisticsSchema = Schema({
     ref: 'LogisticsItem',
     required: true
   }],
+  payments: [{
+    type: Schema.Types.ObjectId,
+    ref: 'LogisticsPayment',
+    required: true
+  }],
   status: {
     type: String,
     enum: LogisticsStatusEnum,

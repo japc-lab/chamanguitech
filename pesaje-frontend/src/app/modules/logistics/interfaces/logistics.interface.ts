@@ -4,6 +4,10 @@ import {
   ICreateUpdateLogisticsItemModel,
   ILogisticsItemModel,
 } from './logistics-item.interface';
+import {
+  ICreateUpdateLogisticsPaymentModel,
+  ILogisticsPaymentModel,
+} from './logistics-payment.interface';
 
 export interface ICreateUpdateLogisticsModel {
   id?: string;
@@ -13,6 +17,7 @@ export interface ICreateUpdateLogisticsModel {
   grandTotal: number;
   status: LogisticsStatusEnum | null;
   items: ICreateUpdateLogisticsItemModel[];
+  payments: ICreateUpdateLogisticsPaymentModel[];
   logisticsSheetNumber: string;
 }
 
@@ -20,6 +25,7 @@ export interface IDetailedReadLogisticsModel {
   purchase: IReducedDetailedPurchaseModel;
   controlNumber: string;
   items: ILogisticsItemModel[];
+  payments: ILogisticsPaymentModel[];
   type: LogisticsTypeEnum;
   logisticsDate: string;
   grandTotal: number;
@@ -34,6 +40,7 @@ export interface IReadLogisticsModel {
   purchase: string;
   controlNumber: string;
   items: string[];
+  payments: string[];
   type: LogisticsTypeEnum;
   logisticsDate: string;
   grandTotal: number;
@@ -53,8 +60,10 @@ export enum LogisticsTypeEnum {
 
 export enum LogisticsStatusEnum {
   DRAFT = 'DRAFT',
+  CREATED = 'CREATED',
   IN_PROGRESS = 'IN_PROGRESS',
   COMPLETED = 'COMPLETED',
+  CONFIRMED = 'CONFIRMED',
   CLOSED = 'CLOSED',
 }
 
