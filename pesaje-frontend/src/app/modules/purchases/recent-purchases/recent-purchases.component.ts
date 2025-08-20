@@ -278,7 +278,7 @@ export class RecentPurchasesComponent implements OnInit {
     this.alertService
       .confirmTranslated({
         titleKey: 'MESSAGES.CONFIRM_TITLE',
-        messageKey: 'MESSAGES.CONFIRM_PURCHASE_TEXT',
+        messageKey: 'MESSAGES.CONFIRM_STATUS_TEXT',
         confirmKey: 'BUTTONS.CONFIRM',
         cancelKey: 'BUTTONS.CANCEL',
         icon: 'warning',

@@ -69,7 +69,7 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
 
   get logisticsDateFormatted(): string | null {
     return this.dateUtils.formatISOToDateInput(
-      this.logisticsModel.logisticsDate
+      this.logisticsModel.logisticsDate!
     );
   }
 
@@ -221,17 +221,25 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
       financeCategory: payment.financeCategory,
       amount: payment.amount,
       paymentStatus: payment.paymentStatus,
-      paymentDate: payment.paymentStatus === 'PAID' && payment.paymentDate ?
-        this.dateUtils.convertLocalDateToUTC(payment.paymentDate) : undefined,
-      paymentMethod: payment.paymentStatus === 'PAID' ?
-        (typeof payment.paymentMethod === 'string' ? payment.paymentMethod : payment.paymentMethod?.id || '') :
-        undefined,
+      paymentDate:
+        payment.paymentStatus === 'PAID' && payment.paymentDate
+          ? this.dateUtils.convertLocalDateToUTC(payment.paymentDate)
+          : undefined,
+      paymentMethod:
+        payment.paymentStatus === 'PAID'
+          ? typeof payment.paymentMethod === 'string'
+            ? payment.paymentMethod
+            : payment.paymentMethod?.id || ''
+          : undefined,
       hasInvoice: payment.hasInvoice,
-      invoiceNumber: payment.hasInvoice === 'yes' ? payment.invoiceNumber : undefined,
-      invoiceName: payment.hasInvoice === 'yes' ? payment.invoiceName : undefined,
-      personInCharge: payment.paymentStatus === 'PAID' ? payment.personInCharge : undefined,
+      invoiceNumber:
+        payment.hasInvoice === 'yes' ? payment.invoiceNumber : undefined,
+      invoiceName:
+        payment.hasInvoice === 'yes' ? payment.invoiceName : undefined,
+      personInCharge:
+        payment.paymentStatus === 'PAID' ? payment.personInCharge : undefined,
       observation: payment.observation,
-      isCompleted: payment.isCompleted
+      isCompleted: payment.isCompleted,
     }));
 
     this.logisticsModel.grandTotal = this.grandTotalDisplayed;

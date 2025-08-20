@@ -12,13 +12,13 @@ import {
 export interface ICreateUpdateLogisticsModel {
   id?: string;
   purchase?: string;
-  type: LogisticsTypeEnum;
-  logisticsDate: string;
-  grandTotal: number;
-  status: LogisticsStatusEnum | null;
-  items: ICreateUpdateLogisticsItemModel[];
-  payments: ICreateUpdateLogisticsPaymentModel[];
-  logisticsSheetNumber: string;
+  type?: LogisticsTypeEnum;
+  logisticsDate?: string;
+  grandTotal?: number;
+  status?: LogisticsStatusEnum | null;
+  items?: ICreateUpdateLogisticsItemModel[];
+  payments?: ICreateUpdateLogisticsPaymentModel[];
+  logisticsSheetNumber?: string;
 }
 
 export interface IDetailedReadLogisticsModel {

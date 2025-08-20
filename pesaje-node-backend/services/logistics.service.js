@@ -263,6 +263,11 @@ const getById = async (id) => {
 
 
 const update = async (id, data) => {
+    // Check if this is a status-only update
+    if (Object.keys(data).length === 1 && data.status) {
+        return await updateStatus(id, data.status);
+    }
+
     const transaction = await dbAdapter.logisticsAdapter.startTransaction();
     try {
         const existingLogistics = await dbAdapter.logisticsAdapter.getById(id);
@@ -321,6 +326,17 @@ const update = async (id, data) => {
     }
 };
 
+const updateStatus = async (id, status) => {
+    const existingLogistics = await dbAdapter.logisticsAdapter.getById(id);
+    if (!existingLogistics) {
+        throw new Error('Logistics record not found');
+    }
+
+    // Update only the status field
+    const updatedLogistics = await dbAdapter.logisticsAdapter.update(id, { status });
+    return updatedLogistics;
+};
+
 
 
 const remove = async (id) => {
@@ -334,5 +350,6 @@ module.exports = {
     getAllByParams,
     getById,
     update,
+    updateStatus,
     remove
 };
