@@ -40,6 +40,7 @@ export class RecentLogisticsComponent implements OnInit {
     paging: true,
     pageLength: 10,
     data: [],
+    order: [[1, 'asc']],
     columns: [
       {
         title: 'Numero de Control',
