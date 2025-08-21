@@ -7,7 +7,7 @@
 
     <div class="d-flex gap-2">
       <!-- Back Button -->
-      <button *ngIf="hasRouteId" type="button" class="btn btn-light btn-sm" (click)="goBack()">
+      <button *ngIf="logisticsId" type="button" class="btn btn-light btn-sm" (click)="goBack()">
         <i class="bi bi-arrow-left me-1"></i> Volver
       </button>
 
@@ -176,17 +176,13 @@
   <!-- Fifth Section: Logistics Payments Tracking -->
   <div class="card card-xl-stretch mb-xl-8 mt-2">
     <app-logistics-payments-tracking [logisticsItems]="logisticsItems" [logisticsPayments]="logisticsPayments"
+      [isEditMode]="!!logisticsId" [showValidationErrors]="showPaymentValidationErrors"
       (logisticsPaymentsChange)="handleLogisticsPayments($event)" />
   </div>
   <!-- end::Fifth Section: Logistics Payments Tracking -->
 
-  <!-- Sixth Section: Grand Total -->
+  <!-- Sixth Section: Submit Button -->
   <div class="card card-xl-stretch mb-xl-8 mt-2">
-
-    <div class="card-body py-3 text-end fw-bold fs-4">
-      <label class="me-20">Total a pagar de logística</label>
-      <span>$ {{ grandTotalDisplayed || 0 | number: '1.2-2' }}</span>
-    </div>
 
     <div class="card-footer d-flex justify-content-end py-6 px-9">
       <!-- Submit Button -->
@@ -195,7 +191,7 @@
       </button>
     </div>
   </div>
-  <!-- end::Sixth Section: Grand Total -->
+  <!-- end::Sixth Section: Submit Button -->
 
 </form>
 <!-- end::Logistics Form -->

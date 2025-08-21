@@ -68,18 +68,26 @@
             <!-- Payment Date -->
             <td class="text-center">
               <input type="date" class="form-control form-control-sm" [(ngModel)]="payment.paymentDate"
-                (ngModelChange)="onPaymentDateChange(payment, $event)" [disabled]="payment.paymentStatus !== 'PAID'" />
+                (ngModelChange)="onPaymentDateChange(payment, $event)" [disabled]="payment.paymentStatus !== 'PAID'"
+                [class.is-invalid]="showValidationErrors && !isPaymentDateValid(payment)" />
+              <div *ngIf="showValidationErrors && !isPaymentDateValid(payment)" class="invalid-feedback d-block small">
+                Fecha de pago es requerida
+              </div>
             </td>
 
             <!-- Payment Method -->
             <td class="text-center">
               <select class="form-select form-select-sm" [(ngModel)]="payment.paymentMethod"
-                (ngModelChange)="onPaymentMethodChange(payment, $event)" [disabled]="payment.paymentStatus !== 'PAID'">
+                (ngModelChange)="onPaymentMethodChange(payment, $event)" [disabled]="payment.paymentStatus !== 'PAID'"
+                [class.is-invalid]="showValidationErrors && !isPaymentMethodValid(payment)">
                 <option value="">Seleccionar</option>
                 <option *ngFor="let method of paymentMethods" [ngValue]="method">
                   {{ method.name }}
                 </option>
               </select>
+              <div *ngIf="showValidationErrors && !isPaymentMethodValid(payment)" class="invalid-feedback d-block small">
+                Método de pago es requerido
+              </div>
             </td>
 
             <!-- Has Invoice -->
@@ -96,21 +104,33 @@
             <td class="text-center">
               <input type="text" class="form-control form-control-sm" [(ngModel)]="payment.invoiceNumber"
                 (ngModelChange)="onInvoiceNumberChange(payment, $event)" placeholder="Número"
-                [disabled]="payment.hasInvoice !== 'yes'" />
+                [disabled]="payment.hasInvoice !== 'yes'"
+                [class.is-invalid]="showValidationErrors && !isInvoiceNumberValid(payment)" />
+              <div *ngIf="showValidationErrors && !isInvoiceNumberValid(payment)" class="invalid-feedback d-block small">
+                Número de factura es requerido
+              </div>
             </td>
 
             <!-- Invoice Name -->
             <td class="text-center">
               <input type="text" class="form-control form-control-sm" [(ngModel)]="payment.invoiceName"
                 (ngModelChange)="onInvoiceNameChange(payment, $event)" placeholder="Nombre"
-                [disabled]="payment.hasInvoice !== 'yes'" />
+                [disabled]="payment.hasInvoice !== 'yes'"
+                [class.is-invalid]="showValidationErrors && !isInvoiceNameValid(payment)" />
+              <div *ngIf="showValidationErrors && !isInvoiceNameValid(payment)" class="invalid-feedback d-block small">
+                Nombre de factura es requerido
+              </div>
             </td>
 
             <!-- Person in Charge -->
             <td class="text-center">
               <input type="text" class="form-control form-control-sm" [(ngModel)]="payment.personInCharge"
                 (ngModelChange)="onPersonInChargeChange(payment, $event)" placeholder="Nombre"
-                [disabled]="payment.paymentStatus !== 'PAID'" />
+                [disabled]="payment.paymentStatus !== 'PAID'"
+                [class.is-invalid]="showValidationErrors && !isPersonInChargeValid(payment)" />
+              <div *ngIf="showValidationErrors && !isPersonInChargeValid(payment)" class="invalid-feedback d-block small">
+                Persona encargada es requerida
+              </div>
             </td>
 
             <!-- Complete Information -->

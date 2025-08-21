@@ -22,6 +22,8 @@ import { DateUtilsService } from '../../../../utils/date-utils.service';
 export class LogisticsPaymentsTrackingComponent implements OnInit, OnChanges {
   @Input() logisticsItems: ILogisticsItemModel[] = [];
   @Input() logisticsPayments: ILogisticsPaymentModel[] = [];
+  @Input() isEditMode: boolean = false;
+  @Input() showValidationErrors: boolean = false;
   @Output() logisticsPaymentsChange = new EventEmitter<ILogisticsPaymentModel[]>();
 
   title: string = 'Resumen de Logística';
@@ -83,55 +85,48 @@ export class LogisticsPaymentsTrackingComponent implements OnInit, OnChanges {
       categoryTotals.set(category, currentTotal + item.total);
     });
 
-    // Check if we're in edit mode (existing payments)
-    const isEditMode = this.logisticsPayments.length > 0;
+    // Always create/update payments for categories with items, regardless of edit mode
+    const updatedPayments: ILogisticsPaymentModel[] = [];
 
-    if (isEditMode) {
-      // In edit mode: preserve existing payment data, only update amounts and filter out categories without items
-      const updatedPayments: ILogisticsPaymentModel[] = [];
+    categoryTotals.forEach((total, category) => {
+      // Check if we have an existing payment for this category
+      const existingPayment = this.logisticsPayments.find(p => p.financeCategory === category);
 
-      this.logisticsPayments.forEach(existingPayment => {
-        const categoryTotal = categoryTotals.get(existingPayment.financeCategory);
-        if (categoryTotal !== undefined) {
-          // Category has items, keep the payment with updated amount and format date
-          const updatedPayment = {
-            ...existingPayment,
-            amount: categoryTotal,
-            paymentDate: existingPayment.paymentDate ? this.dateUtils.formatISOToDateInput(existingPayment.paymentDate) : undefined
-          };
+      if (existingPayment && this.isEditMode) {
+        // In edit mode: preserve existing payment data, only update amount and format date
+        const updatedPayment = {
+          ...existingPayment,
+          amount: total,
+          paymentDate: existingPayment.paymentDate ? this.dateUtils.formatISOToDateInput(existingPayment.paymentDate) : undefined
+        };
 
-          // Ensure payment method is properly set for dropdown
-          if (existingPayment.paymentMethod && this.paymentMethods.length > 0) {
-            // Find the matching payment method object from the loaded methods
-            const paymentMethodId = typeof existingPayment.paymentMethod === 'string'
-              ? existingPayment.paymentMethod
-              : existingPayment.paymentMethod?.id;
+        // Ensure payment method is properly set for dropdown
+        if (existingPayment.paymentMethod && this.paymentMethods.length > 0) {
+          // Find the matching payment method object from the loaded methods
+          const paymentMethodId = typeof existingPayment.paymentMethod === 'string'
+            ? existingPayment.paymentMethod
+            : existingPayment.paymentMethod?.id;
 
-            const matchingMethod = this.paymentMethods.find(method => method.id === paymentMethodId);
-            if (matchingMethod) {
-              updatedPayment.paymentMethod = matchingMethod;
-            }
+          const matchingMethod = this.paymentMethods.find(method => method.id === paymentMethodId);
+          if (matchingMethod) {
+            updatedPayment.paymentMethod = matchingMethod;
           }
-
-          updatedPayments.push(updatedPayment);
         }
-        // If categoryTotal is undefined, the category has no items, so we don't include this payment
-      });
 
-      this.logisticsPayments = updatedPayments;
-    } else {
-      // In create mode: create new payments for categories with items
-      this.logisticsPayments = [];
-      categoryTotals.forEach((total, category) => {
-        this.logisticsPayments.push({
+        updatedPayments.push(updatedPayment);
+      } else {
+        // Create new payment for this category
+        updatedPayments.push({
           financeCategory: category as LogisticsFinanceCategoryEnum,
           amount: total,
           paymentStatus: 'NO_PAYMENT',
           hasInvoice: 'no',
           isCompleted: false,
         } as ILogisticsPaymentModel);
-      });
-    }
+      }
+    });
+
+    this.logisticsPayments = updatedPayments;
 
     // Emit changes to update parent component
     this.emitChanges();
@@ -267,5 +262,81 @@ export class LogisticsPaymentsTrackingComponent implements OnInit, OnChanges {
       default:
         return 'Subtotal logística';
     }
+  }
+
+  // Validation methods
+  isPaymentDateRequired(payment: ILogisticsPaymentModel): boolean {
+    return payment.paymentStatus === 'PAID';
+  }
+
+  isPaymentDateValid(payment: ILogisticsPaymentModel): boolean {
+    if (!this.isPaymentDateRequired(payment)) return true;
+    return !!payment.paymentDate;
+  }
+
+  isPaymentMethodRequired(payment: ILogisticsPaymentModel): boolean {
+    return payment.paymentStatus === 'PAID';
+  }
+
+  isPaymentMethodValid(payment: ILogisticsPaymentModel): boolean {
+    if (!this.isPaymentMethodRequired(payment)) return true;
+    return !!(payment.paymentMethod?.id || payment.paymentMethod);
+  }
+
+  isPersonInChargeRequired(payment: ILogisticsPaymentModel): boolean {
+    return payment.paymentStatus === 'PAID';
+  }
+
+  isPersonInChargeValid(payment: ILogisticsPaymentModel): boolean {
+    if (!this.isPersonInChargeRequired(payment)) return true;
+    return !!payment.personInCharge;
+  }
+
+  isInvoiceNumberRequired(payment: ILogisticsPaymentModel): boolean {
+    return payment.paymentStatus === 'PAID' && payment.hasInvoice === 'yes';
+  }
+
+  isInvoiceNumberValid(payment: ILogisticsPaymentModel): boolean {
+    if (!this.isInvoiceNumberRequired(payment)) return true;
+    return !!payment.invoiceNumber;
+  }
+
+  isInvoiceNameRequired(payment: ILogisticsPaymentModel): boolean {
+    return payment.paymentStatus === 'PAID' && payment.hasInvoice === 'yes';
+  }
+
+  isInvoiceNameValid(payment: ILogisticsPaymentModel): boolean {
+    if (!this.isInvoiceNameRequired(payment)) return true;
+    return !!payment.invoiceName;
+  }
+
+  hasValidationErrors(payment: ILogisticsPaymentModel): boolean {
+    return !this.isPaymentDateValid(payment) ||
+           !this.isPaymentMethodValid(payment) ||
+           !this.isPersonInChargeValid(payment) ||
+           !this.isInvoiceNumberValid(payment) ||
+           !this.isInvoiceNameValid(payment);
+  }
+
+  getValidationErrors(payment: ILogisticsPaymentModel): string[] {
+    const errors: string[] = [];
+
+    if (!this.isPaymentDateValid(payment)) {
+      errors.push('Fecha de pago es requerida');
+    }
+    if (!this.isPaymentMethodValid(payment)) {
+      errors.push('Método de pago es requerido');
+    }
+    if (!this.isPersonInChargeValid(payment)) {
+      errors.push('Persona encargada es requerida');
+    }
+    if (!this.isInvoiceNumberValid(payment)) {
+      errors.push('Número de factura es requerido');
+    }
+    if (!this.isInvoiceNameValid(payment)) {
+      errors.push('Nombre de factura es requerido');
+    }
+
+    return errors;
   }
 }

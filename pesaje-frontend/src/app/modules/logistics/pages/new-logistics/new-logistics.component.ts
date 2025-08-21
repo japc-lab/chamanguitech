@@ -36,7 +36,6 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
   PERMISSION_ROUTE = PERMISSION_ROUTES.LOGISTICS.LOGISTICS_FORM;
 
   isOnlyBuyer = false;
-  hasRouteId = false;
   searchSubmitted = false;
   controlNumber: string;
 
@@ -48,6 +47,7 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
 
   logisticsItems: ILogisticsItemModel[] = [];
   logisticsPayments: ILogisticsPaymentModel[] = [];
+  showPaymentValidationErrors: boolean = false;
 
   logisticsId: string | undefined;
 
@@ -88,7 +88,6 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.logisticsId = this.route.snapshot.paramMap.get('id') || undefined;
-    this.hasRouteId = !!this.logisticsId;
     this.isOnlyBuyer = this.authService.isOnlyBuyer;
 
     this.initializeModels();
@@ -160,10 +159,17 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
 
   confirmSave(event: Event, form: NgForm) {
     if (form && form.invalid) {
+      // Mark all controls as touched to trigger validation messages
+      Object.values(form.controls).forEach((control) => {
+        control.markAsTouched();
+        control.markAsDirty();
+      });
       return;
     }
 
     // Check if there are complete items to save
+    const hasCompleteItems =
+      this.logisticsItems && this.logisticsItems.length > 0;
     const completeItems = this.logisticsItems.filter(
       (item) =>
         Number(item.unit) > 0 &&
@@ -173,10 +179,37 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
         item.resourceCategory
     );
 
-    if (completeItems.length === 0) {
+    if (!hasCompleteItems || completeItems.length === 0) {
       this.alertService.showTranslatedAlert({
         alertType: 'info',
         messageKey: 'MESSAGES.NO_COMPLETE_ITEMS',
+      });
+      return;
+    }
+
+    // Check for payment validation errors
+    this.showPaymentValidationErrors = true;
+    const hasPaymentErrors = this.logisticsPayments.some(payment => {
+      // Check if payment status is PAID but required fields are missing
+      if (payment.paymentStatus === 'PAID') {
+        const hasRequiredFields = payment.paymentDate &&
+          (payment.paymentMethod?.id || payment.paymentMethod) &&
+          payment.personInCharge;
+
+        if (!hasRequiredFields) return true;
+
+        // Check invoice fields if invoice is required
+        if (payment.hasInvoice === 'yes') {
+          return !(payment.invoiceNumber && payment.invoiceName);
+        }
+      }
+      return false;
+    });
+
+    if (hasPaymentErrors) {
+      this.alertService.showTranslatedAlert({
+        alertType: 'warning',
+        messageKey: 'MESSAGES.PAYMENT_VALIDATION_ERRORS',
       });
       return;
     }
@@ -411,7 +444,7 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
   }
 
   goBack(): void {
-    this.location.back();
+    this.router.navigate(['/logistics/list']);
   }
 
   handleLogisticsItems(items: ILogisticsItemModel[]) {
