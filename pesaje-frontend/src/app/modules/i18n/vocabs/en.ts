@@ -112,6 +112,8 @@ export const locale = {
       LOGISTICS_LIMIT_REACHED:
         '{{count}} logistics record(s) have already been created for this purchase: {{record}}.',
       NO_SALE_DETAILS_ENTERED: 'No sale details have been entered.',
+      NO_COMPLETE_ITEMS: 'No logistics details have been entered.',
+      PAYMENT_VALIDATION_ERRORS: 'There are payment validation errors. Please complete the required fields.',
       SALE_LIMIT_REACHED: 'A sale has already been created for this purchase.',
       INCOMPLETE_TOTAL_REPORT_INFO:
         'The information for the report is incomplete. Please check the purchase, sale, or logistics information.',

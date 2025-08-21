@@ -69,7 +69,6 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   roles: IRoleModel[];
   isOnlyBuyer = false;
   isLocal = false;
-  hasRouteId = false;
 
   farmPlace: string = '';
   shrimpSize: string = '';
@@ -116,7 +115,6 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.purchaseId = this.route.snapshot.paramMap.get('id') || undefined;
-    this.hasRouteId = !!this.purchaseId;
     this.isOnlyBuyer = this.authService.isOnlyBuyer;
 
     if (this.isOnlyBuyer) {
@@ -491,7 +489,7 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   }
 
   goBack(): void {
-    this.location.back();
+    this.router.navigate(['/purchases/list']);
   }
 
   handleNewSale(): void {
