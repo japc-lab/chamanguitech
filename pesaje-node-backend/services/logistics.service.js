@@ -1,6 +1,93 @@
 const dbAdapter = require('../adapters');
 const { LogisticsTypeEnum, LogisticsStatusEnum } = require('../enums/logistics.enums');
 
+// Helper function to validate logistics data
+const validateLogisticsData = (data, isUpdate = false) => {
+    const validationErrors = [];
+
+    // Validate required fields (only for create, not for update)
+    if (!isUpdate) {
+        if (!data.purchase) {
+            validationErrors.push('Purchase ID is required');
+        }
+        if (!data.type) {
+            validationErrors.push('Logistics type is required');
+        }
+    }
+
+    // Validate common required fields
+    if (!data.logisticsDate) {
+        validationErrors.push('Logistics date is required');
+    }
+    if (data.grandTotal === undefined || data.grandTotal < 0) {
+        validationErrors.push('Grand total must be a non-negative number');
+    }
+    if (!data.logisticsSheetNumber || data.logisticsSheetNumber.trim() === '') {
+        validationErrors.push('Logistics sheet number is required');
+    }
+
+    // Validate items
+    if (!data.items || !Array.isArray(data.items) || data.items.length === 0) {
+        validationErrors.push('At least one item is required');
+    } else {
+        data.items.forEach((item, index) => {
+            if (!item.financeCategory) {
+                validationErrors.push(`Item ${index + 1}: Finance category is required`);
+            }
+            if (!item.resourceCategory) {
+                validationErrors.push(`Item ${index + 1}: Resource category is required`);
+            }
+            if (typeof item.unit !== 'number' || item.unit < 0) {
+                validationErrors.push(`Item ${index + 1}: Unit must be a non-negative number`);
+            }
+            if (typeof item.cost !== 'number' || item.cost < 0) {
+                validationErrors.push(`Item ${index + 1}: Cost must be a non-negative number`);
+            }
+            if (typeof item.total !== 'number' || item.total < 0) {
+                validationErrors.push(`Item ${index + 1}: Total must be a non-negative number`);
+            }
+        });
+    }
+
+    // Validate payments (if provided)
+    if (data.payments && Array.isArray(data.payments)) {
+        data.payments.forEach((payment, index) => {
+            if (typeof payment.amount !== 'number' || payment.amount < 0) {
+                validationErrors.push(`Payment ${index + 1}: Amount must be a non-negative number`);
+            }
+            if (payment.paymentStatus && !['NO_PAYMENT', 'PENDING', 'PAID'].includes(payment.paymentStatus)) {
+                validationErrors.push(`Payment ${index + 1}: Invalid payment status`);
+            }
+            if (payment.hasInvoice && !['yes', 'no', 'not-applicable'].includes(payment.hasInvoice)) {
+                validationErrors.push(`Payment ${index + 1}: Invalid hasInvoice value`);
+            }
+            
+            // Validate PAID payment requirements
+            if (payment.paymentStatus === 'PAID') {
+                if (!payment.paymentDate) {
+                    validationErrors.push(`Payment ${index + 1}: Payment date is required for PAID status`);
+                }
+                if (!payment.paymentMethod) {
+                    validationErrors.push(`Payment ${index + 1}: Payment method is required for PAID status`);
+                }
+                if (!payment.personInCharge) {
+                    validationErrors.push(`Payment ${index + 1}: Person in charge is required for PAID status`);
+                }
+                if (payment.hasInvoice === 'yes') {
+                    if (!payment.invoiceNumber) {
+                        validationErrors.push(`Payment ${index + 1}: Invoice number is required when invoice is yes`);
+                    }
+                    if (!payment.invoiceName) {
+                        validationErrors.push(`Payment ${index + 1}: Invoice name is required when invoice is yes`);
+                    }
+                }
+            }
+        });
+    }
+
+    return validationErrors;
+};
+
 // Helper function to determine logistics status based on payment statuses
 const determineLogisticsStatus = (payments) => {
     if (!payments || payments.length === 0) {
@@ -19,7 +106,7 @@ const determineLogisticsStatus = (payments) => {
         // Check if all payments are completed
         const allCompleted = payments.every(payment => payment.isCompleted === true);
         if (allCompleted) {
-            return LogisticsStatusEnum.CONFIRMED;
+            return LogisticsStatusEnum.COMPLETED;
         }
         return LogisticsStatusEnum.COMPLETED;
     }
@@ -41,6 +128,14 @@ const determineLogisticsStatus = (payments) => {
 };
 
 const create = async (data) => {
+    // 🔍 VALIDATION PHASE - Validate all data before any database operations
+    const validationErrors = validateLogisticsData(data);
+
+    // 🚫 If validation fails, throw error before any database operations
+    if (validationErrors.length > 0) {
+        throw new Error(`Validation failed: ${validationErrors.join(', ')}`);
+    }
+
     const transaction = await dbAdapter.logisticsAdapter.startTransaction();
     try {
         const purchase = await dbAdapter.purchaseAdapter.getById(data.purchase);
@@ -266,6 +361,14 @@ const update = async (id, data) => {
     // Check if this is a status-only update
     if (Object.keys(data).length === 1 && data.status) {
         return await updateStatus(id, data.status);
+    }
+
+    // 🔍 VALIDATION PHASE - Validate all data before any destructive operations
+    const validationErrors = validateLogisticsData(data, true);
+
+    // 🚫 If validation fails, throw error before any destructive operations
+    if (validationErrors.length > 0) {
+        throw new Error(`Validation failed: ${validationErrors.join(', ')}`);
     }
 
     const transaction = await dbAdapter.logisticsAdapter.startTransaction();
