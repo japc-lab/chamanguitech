@@ -2,7 +2,7 @@
 
 const bcrypt = require('bcryptjs');
 
-const { Option, Role, RolePermission, User, PaymentInfo, Person, Broker, Client, Size, Company, Period, SizePrice, ShrimpFarm, Purchase, PaymentMethod, PurchasePaymentMethod, Counter, LogisticsItem, Logistics, Sale, CompanySale, CompanySaleItem, LocalSale, LocalSaleDetail, LocalSaleDetailItem } = require('../models');
+const { Option, Role, RolePermission, User, PaymentInfo, Person, Broker, Client, Size, Company, Period, SizePrice, ShrimpFarm, Purchase, PaymentMethod, PurchasePaymentMethod, Counter, LogisticsItem, LogisticsPayment, Logistics, Sale, CompanySale, CompanySaleItem, LocalSale, LocalSaleDetail, LocalSaleDetailItem } = require('../models');
 const Permission = require('../enums/permission.enum');
 const SizeTypeEnum = require('../enums/size-type.enum');
 const { default: mongoose } = require('mongoose');
@@ -116,19 +116,21 @@ const cleanDatabase = async (keepTxData) => {
         await User.deleteMany({});
         await Period.deleteMany({});
         await SizePrice.deleteMany({});
-        await Counter.deleteMany({});
-        await Purchase.deleteMany({});
-        await PurchasePaymentMethod.deleteMany({});
-        await LogisticsItem.deleteMany({});
-        await Logistics.deleteMany({});
-        await Sale.deleteMany({});
-        await CompanySale.deleteMany({});
-        await CompanySaleItem.deleteMany({});
-        await LocalSale.deleteMany({});
-        await LocalSaleDetail.deleteMany({});
-        await LocalSaleDetailItem.deleteMany({});
         await Company.deleteMany({});
     }
+
+    await Purchase.deleteMany({});
+    await Counter.deleteMany({});
+    await PurchasePaymentMethod.deleteMany({});
+    await LogisticsItem.deleteMany({});
+    await LogisticsPayment.deleteMany({});
+    await Logistics.deleteMany({});
+    await Sale.deleteMany({});
+    await CompanySale.deleteMany({});
+    await CompanySaleItem.deleteMany({});
+    await LocalSale.deleteMany({});
+    await LocalSaleDetail.deleteMany({});
+    await LocalSaleDetailItem.deleteMany({});
 
     await Size.deleteMany({});
     await Option.deleteMany({});
