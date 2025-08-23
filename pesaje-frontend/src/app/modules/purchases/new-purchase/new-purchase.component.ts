@@ -198,7 +198,7 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
         this.isLoading = false;
         this.changeDetectorRef.detectChanges();
 
-        // Initialize form logging after the form is rendered
+        // Initialize autosave after the form is rendered
         setTimeout(() => {
           if (
             !this.isEditMode ||
@@ -262,6 +262,10 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
             next: (response) => {
               this.purchaseId = response.id; // ✅ Store the new ID for future updates
               this.createPurchaseModel.status = response.status;
+
+              // Navigate to edit URL after first draft save
+              this.router.navigate(['/purchases/form', this.purchaseId]);
+
               this.changeDetectorRef.detectChanges();
             },
             error: (error) => {
