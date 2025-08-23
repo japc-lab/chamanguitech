@@ -109,9 +109,15 @@
   <div class="card card-xl-stretch mb-xl-8 mt-2">
     <!-- begin::Header -->
     <div class="card-header border-0 pt-8">
-      <h4 class="card-title align-items-start flex-column">
-        <span class="card-label fw-bolder fs-3 mb-1">Información de Logística</span>
-      </h4>
+      <div class="d-flex flex-column">
+        <h4 class="card-title align-items-start flex-column">
+          <span class="card-label fw-bolder fs-3 mb-1">Información de Logística</span>
+        </h4>
+        <!-- Draft Indicator -->
+        <span *ngIf="isEditMode && logisticsModel.status === 'DRAFT'" class="badge badge-warning fs-7 mt-1">
+          <i class="bi bi-pencil-square me-1"></i> Borrador
+        </span>
+      </div>
     </div>
     <!-- end::Header -->
 
@@ -123,7 +129,7 @@
         <div class="col-md-6">
           <label for="type" class="required fw-semibold fs-6 mb-2">Tipo</label>
           <select id="type" name="type" class="form-select form-select-sm" [(ngModel)]="logisticsModel.type"
-            #type="ngModel" required [disabled]="!!logisticsId">
+            #type="ngModel" required [disabled]="isEditMode && logisticsModel.status !== LogisticsStatusEnum.DRAFT">
             <option value="" disabled selected>Seleccione una opción</option>
             <option *ngFor="let option of logisticsTypes" [ngValue]="option">
               {{ logisticsTypeLabels[option] }}

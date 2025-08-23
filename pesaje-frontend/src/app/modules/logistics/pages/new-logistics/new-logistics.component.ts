@@ -1,4 +1,10 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { Location } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { NgForm } from '@angular/forms';
@@ -35,6 +41,10 @@ import { ILogisticsPaymentModel } from '../../interfaces/logistics-payment.inter
 export class NewLogisticsComponent implements OnInit, OnDestroy {
   PERMISSION_ROUTE = PERMISSION_ROUTES.LOGISTICS.LOGISTICS_FORM;
 
+  LogisticsStatusEnum = LogisticsStatusEnum;
+
+  @ViewChild('logisticsForm') logisticsForm!: NgForm;
+
   isOnlyBuyer = false;
   searchSubmitted = false;
   controlNumber: string;
@@ -50,8 +60,16 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
   showPaymentValidationErrors: boolean = false;
 
   logisticsId: string | undefined;
+  isEditMode = false;
 
+  /** Stores all active subscriptions */
   private unsubscribe: Subscription[] = [];
+
+  /** Stores the form changes subscription */
+  private formChangesSubscription?: Subscription;
+
+  /** Stores the timeout for delayed logging */
+  private logTimeout?: any;
 
   constructor(
     public activeModal: NgbActiveModal,
@@ -114,20 +132,18 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
             this.logisticsItems = logistics.items;
             this.logisticsPayments = logistics.payments || [];
 
-            if (this.purchaseModel.controlNumber?.includes('CO')) {
-              this.logisticsTypeLabels = {
-                [LogisticsTypeEnum.SHIPMENT]: 'Envío a Compañía',
-              };
-              this.logisticsTypes = [LogisticsTypeEnum.SHIPMENT];
-            } else {
-              this.logisticsTypeLabels = {
-                [LogisticsTypeEnum.SHIPMENT]: 'Envío Local',
-                [LogisticsTypeEnum.LOCAL_PROCESSING]: 'Procesamiento Local',
-              };
-              this.logisticsTypes = Object.values(LogisticsTypeEnum);
-            }
+            // Use the same logic as search to determine logistics types
+            this.determineLogisticsTypes();
 
+            this.isEditMode = !!this.logisticsId;
             this.cdr.detectChanges();
+
+            // Initialize autosave if in draft status
+            if (this.logisticsModel.status === LogisticsStatusEnum.DRAFT) {
+              setTimeout(() => {
+                this.initializeAutosave();
+              }, 0);
+            }
           },
           error: (error) => {
             console.error('Error fetching logistics:', error);
@@ -136,18 +152,17 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
         });
 
       this.unsubscribe.push(logisticsSub);
+    } else {
+      // Initialize autosave for new logistics (draft mode)
+      setTimeout(() => {
+        this.initializeAutosave();
+      }, 0);
     }
   }
 
   initializeModels() {
     this.logisticsModel = {
-      type: LogisticsTypeEnum.SHIPMENT,
-      logisticsDate: '',
-      grandTotal: 0,
       status: LogisticsStatusEnum.DRAFT,
-      items: [],
-      payments: [],
-      logisticsSheetNumber: '',
     } as ICreateUpdateLogisticsModel;
 
     this.purchaseModel = {} as IReducedDetailedPurchaseModel;
@@ -155,6 +170,96 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
     this.purchaseModel.broker = {} as IReducedUserModel;
     this.purchaseModel.client = {} as IReducedUserModel;
     this.purchaseModel.shrimpFarm = {} as IReducedShrimpFarmModel;
+  }
+
+  /**
+   * Initializes autosave to monitor field changes
+   */
+  private initializeAutosave(): void {
+    if (this.logisticsForm) {
+      // Subscribe to form value changes
+      this.formChangesSubscription = this.logisticsForm.valueChanges?.subscribe(
+        (formValue) => {
+          this.autosaveFormFieldChanges(formValue);
+        }
+      );
+    }
+  }
+
+  /**
+   * Auto save form changes with a 5-second delay to debounce rapid changes
+   * @param formValue - The entire form value object
+   */
+  private autosaveFormFieldChanges(formValue: any): void {
+    // Clear existing timeout if it exists
+    if (this.logTimeout) {
+      clearTimeout(this.logTimeout);
+    }
+
+    // Set a new timeout for 5 seconds
+    this.logTimeout = setTimeout(() => {
+      // Only allow draft saving when it's a new logistics or when editing logistics is in draft status
+      if (this.canSaveAsDraft()) {
+        this.logisticsModel.purchase = this.purchaseModel.id;
+
+        if (this.logisticsId) {
+          // ✅ Update Logistics if ID exists
+          this.logisticsService
+            .updateLogistics(this.logisticsId, {
+              ...this.logisticsModel,
+              status: LogisticsStatusEnum.DRAFT,
+            })
+            .subscribe({
+              next: (response) => {
+                this.logisticsModel.status = response.status;
+                this.cdr.detectChanges();
+              },
+              error: (error) => {
+                console.error('Error updating logistics:', error);
+              },
+            });
+        } else {
+          // ✅ Create New Logistics if ID does NOT exist
+          this.logisticsService
+            .createLogistics({
+              ...this.logisticsModel,
+              status: LogisticsStatusEnum.DRAFT,
+            })
+            .subscribe({
+              next: (response) => {
+                this.logisticsId = response.id; // ✅ Store the new ID for future updates
+                this.logisticsModel.status = response.status;
+                this.isEditMode = true;
+
+                // Navigate to edit URL after first draft save
+                this.router.navigate(['/logistics/form', this.logisticsId]);
+
+                this.cdr.detectChanges();
+              },
+              error: (error) => {
+                console.error('Error creating logistics:', error);
+              },
+            });
+        }
+      }
+    }, 5000);
+  }
+
+  /**
+   * Determines if the logistics can be saved as draft
+   */
+  private canSaveAsDraft(): boolean {
+    // Allow draft saving for new logistics
+    if (!this.logisticsId) {
+      return true;
+    }
+
+    // Allow draft saving only if current status is DRAFT
+    if (this.logisticsModel.status === LogisticsStatusEnum.DRAFT) {
+      return true;
+    }
+
+    return false;
   }
 
   confirmSave(event: Event, form: NgForm) {
@@ -189,10 +294,11 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
 
     // Check for payment validation errors
     this.showPaymentValidationErrors = true;
-    const hasPaymentErrors = this.logisticsPayments.some(payment => {
+    const hasPaymentErrors = this.logisticsPayments.some((payment) => {
       // Check if payment status is PAID but required fields are missing
       if (payment.paymentStatus === 'PAID') {
-        const hasRequiredFields = payment.paymentDate &&
+        const hasRequiredFields =
+          payment.paymentDate &&
           (payment.paymentMethod?.id || payment.paymentMethod) &&
           payment.personInCharge;
 
@@ -216,6 +322,11 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
 
     this.alertService.confirm().then((result) => {
       if (result.isConfirmed) {
+        // Unsubscribe from form changes BEFORE making API call to prevent autosave trigger
+        if (this.formChangesSubscription) {
+          this.formChangesSubscription.unsubscribe();
+        }
+
         this.submitLogisticsForm();
       }
     });
@@ -277,40 +388,41 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
 
     this.logisticsModel.grandTotal = this.grandTotalDisplayed;
 
-    if (this.logisticsId) {
-      this.logisticsService
-        .updateLogistics(this.logisticsId, this.logisticsModel)
-        .subscribe({
-          next: (response) => {
-            this.alertService.showTranslatedAlert({ alertType: 'success' });
-          },
-          error: (error) => {
-            console.error('Error updating logistics:', error);
-            this.alertService.showTranslatedAlert({ alertType: 'error' });
-          },
-        });
-    } else {
-      this.logisticsService.createLogistics(this.logisticsModel).subscribe({
+    // Ensure all required fields are set from the form
+    if (this.logisticsForm) {
+      this.logisticsModel.logisticsSheetNumber =
+        this.logisticsForm.value.logisticsSheetNumber || '';
+      this.logisticsModel.logisticsDate =
+        this.logisticsForm.value.logisticsDate || '';
+      this.logisticsModel.type =
+        this.logisticsForm.value.type || LogisticsTypeEnum.SHIPMENT;
+    }
+
+    // ✅ Update Logistics (draft is already created via autosave)
+    const { status, ...updateData } = this.logisticsModel;
+    this.logisticsService
+      .updateLogistics(this.logisticsId!, updateData)
+      .subscribe({
         next: (response) => {
-          this.logisticsId = response.id; // ✅ Store the new ID for future updates
-          this.cdr.detectChanges();
+          this.logisticsModel.status = response.status;
           this.alertService.showTranslatedAlert({ alertType: 'success' });
+          this.cdr.detectChanges();
         },
         error: (error) => {
-          console.error('Error creating logistics:', error);
+          console.error('Error updating logistics:', error);
           this.alertService.showTranslatedAlert({ alertType: 'error' });
         },
       });
-    }
   }
 
   canSaveLogistics(): boolean {
     if (this.logisticsId) {
+      // Allow saving if status is not CLOSED
       return this.logisticsModel.status !== LogisticsStatusEnum.CLOSED;
     } else {
+      // For new logistics, require a purchase to be selected
       return !!this.purchaseModel.id;
     }
-    return true;
   }
 
   searchPurchase(): void {
@@ -455,6 +567,88 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
     this.logisticsPayments = payments;
   }
 
+  /**
+   * Determines logistics types based on purchase and existing logistics
+   */
+  private determineLogisticsTypes(): void {
+    if (!this.purchaseModel.id) return;
+
+    const controlNumberIncludesCO =
+      this.purchaseModel.controlNumber?.includes('CO');
+
+    if (controlNumberIncludesCO) {
+      this.logisticsTypeLabels = {
+        [LogisticsTypeEnum.SHIPMENT]: 'Envío a Compañía',
+      };
+      this.logisticsTypes = [LogisticsTypeEnum.SHIPMENT];
+    } else {
+      // For local purchases, check existing logistics to determine available types
+      const userId =
+        this.isOnlyBuyer && this.authService.currentUserValue?.id
+          ? this.authService.currentUserValue.id
+          : null;
+
+      const logisticsSub = this.logisticsService
+        .getLogisticsByParams(
+          false,
+          userId,
+          this.purchaseModel.controlNumber || null
+        )
+        .subscribe({
+          next: (logistics: IReadLogisticsModel[]) => {
+            // Filter out the current logistics being edited
+            const otherLogistics = logistics.filter(
+              (l) => l.id !== this.logisticsId
+            );
+
+            if (otherLogistics.length === 0) {
+              // No other logistics exist, show both types
+              this.logisticsTypeLabels = {
+                [LogisticsTypeEnum.SHIPMENT]: 'Envío Local',
+                [LogisticsTypeEnum.LOCAL_PROCESSING]: 'Procesamiento Local',
+              };
+              this.logisticsTypes = Object.values(LogisticsTypeEnum);
+            } else {
+              // One logistics exists, show only the complementary type
+              const existingType = otherLogistics[0].type;
+              const complementaryType = existingType === LogisticsTypeEnum.SHIPMENT
+                ? LogisticsTypeEnum.LOCAL_PROCESSING
+                : LogisticsTypeEnum.SHIPMENT;
+
+              this.logisticsTypeLabels = {
+                [complementaryType]: this.getTypeLabel(complementaryType),
+              };
+              this.logisticsTypes = [complementaryType];
+            }
+
+            this.cdr.detectChanges();
+          },
+          error: (error) => {
+            console.error(
+              'Error fetching logistics for type determination:',
+              error
+            );
+          },
+        });
+
+      this.unsubscribe.push(logisticsSub);
+    }
+  }
+
+  /**
+   * Gets the display label for a logistics type
+   */
+  private getTypeLabel(type: LogisticsTypeEnum): string {
+    if (type === LogisticsTypeEnum.SHIPMENT) {
+      return this.purchaseModel.company?.name?.toLowerCase() === 'local'
+        ? 'Envío Local'
+        : 'Envío a Compañía';
+    } else if (type === LogisticsTypeEnum.LOCAL_PROCESSING) {
+      return 'Procesamiento Local';
+    }
+    return '';
+  }
+
   onDateChange(event: any): void {
     if (!event) return;
 
@@ -493,5 +687,15 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.unsubscribe.forEach((sub) => sub.unsubscribe());
+
+    // Unsubscribe from form changes subscription
+    if (this.formChangesSubscription) {
+      this.formChangesSubscription.unsubscribe();
+    }
+
+    // Clear any pending timeout
+    if (this.logTimeout) {
+      clearTimeout(this.logTimeout);
+    }
   }
 }
