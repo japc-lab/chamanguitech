@@ -126,16 +126,19 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
               items: [],
               payments: [],
             };
+
             this.controlNumber = logistics.purchase.controlNumber!;
             this.purchaseModel = logistics.purchase;
 
             this.logisticsItems = logistics.items;
             this.logisticsPayments = logistics.payments || [];
 
+            this.isEditMode = !!this.logisticsId;
+
             // Use the same logic as search to determine logistics types
+            // (after purchaseModel is set)
             this.determineLogisticsTypes();
 
-            this.isEditMode = !!this.logisticsId;
             this.cdr.detectChanges();
 
             // Initialize autosave if in draft status
@@ -484,45 +487,8 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
 
                 this.purchaseModel = purchase;
 
-                const controlNumberIncludesCO =
-                  purchase.controlNumber?.includes('CO');
-
-                if (controlNumberIncludesCO) {
-                  this.logisticsTypeLabels = {
-                    [LogisticsTypeEnum.SHIPMENT]: 'Envío a Compañía',
-                  };
-                  this.logisticsTypes = [LogisticsTypeEnum.SHIPMENT];
-
-                  this.cdr.detectChanges();
-                  return;
-                }
-
-                if (logistics.length === 0) {
-                  this.logisticsTypeLabels = {
-                    [LogisticsTypeEnum.SHIPMENT]: 'Envío Local',
-                    [LogisticsTypeEnum.LOCAL_PROCESSING]: 'Procesamiento Local',
-                  };
-                  this.logisticsTypes = Object.values(LogisticsTypeEnum);
-
-                  this.cdr.detectChanges();
-                  return;
-                }
-
-                const existingType = logistics[0].type;
-
-                if (existingType === LogisticsTypeEnum.SHIPMENT) {
-                  this.logisticsTypeLabels = {
-                    [LogisticsTypeEnum.LOCAL_PROCESSING]: 'Procesamiento Local',
-                  };
-                  this.logisticsTypes = [LogisticsTypeEnum.LOCAL_PROCESSING];
-                } else {
-                  this.logisticsTypeLabels = {
-                    [LogisticsTypeEnum.SHIPMENT]: 'Envío Local',
-                  };
-                  this.logisticsTypes = [LogisticsTypeEnum.SHIPMENT];
-                }
-
-                this.cdr.detectChanges();
+                // Use the centralized determineLogisticsTypes method with existing logistics data
+                this.determineLogisticsTypes(logistics);
               },
               error: (error) => {
                 console.error('Error fetching logistics:', error);
@@ -570,7 +536,7 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
   /**
    * Determines logistics types based on purchase and existing logistics
    */
-  private determineLogisticsTypes(): void {
+  private determineLogisticsTypes(existingLogistics?: IReadLogisticsModel[]): void {
     if (!this.purchaseModel.id) return;
 
     const controlNumberIncludesCO =
@@ -581,58 +547,107 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
         [LogisticsTypeEnum.SHIPMENT]: 'Envío a Compañía',
       };
       this.logisticsTypes = [LogisticsTypeEnum.SHIPMENT];
+      this.cdr.detectChanges();
     } else {
-      // For local purchases, check existing logistics to determine available types
-      const userId =
-        this.isOnlyBuyer && this.authService.currentUserValue?.id
-          ? this.authService.currentUserValue.id
-          : null;
+      // If logistics data is provided, use it directly
+      if (existingLogistics) {
+        this.processLogisticsTypes(existingLogistics);
+      } else {
+        // Otherwise, fetch logistics data
+        const userId =
+          this.isOnlyBuyer && this.authService.currentUserValue?.id
+            ? this.authService.currentUserValue.id
+            : null;
 
-      const logisticsSub = this.logisticsService
-        .getLogisticsByParams(
-          false,
-          userId,
-          this.purchaseModel.controlNumber || null
-        )
-        .subscribe({
-          next: (logistics: IReadLogisticsModel[]) => {
-            // Filter out the current logistics being edited
-            const otherLogistics = logistics.filter(
-              (l) => l.id !== this.logisticsId
-            );
+        const logisticsSub = this.logisticsService
+          .getLogisticsByParams(
+            false,
+            userId,
+            this.purchaseModel.controlNumber || null
+          )
+          .subscribe({
+            next: (logistics: IReadLogisticsModel[]) => {
+              this.processLogisticsTypes(logistics);
+            },
+            error: (error) => {
+              console.error(
+                'Error fetching logistics for type determination:',
+                error
+              );
+            },
+          });
 
-            if (otherLogistics.length === 0) {
-              // No other logistics exist, show both types
-              this.logisticsTypeLabels = {
-                [LogisticsTypeEnum.SHIPMENT]: 'Envío Local',
-                [LogisticsTypeEnum.LOCAL_PROCESSING]: 'Procesamiento Local',
-              };
-              this.logisticsTypes = Object.values(LogisticsTypeEnum);
-            } else {
-              // One logistics exists, show only the complementary type
-              const existingType = otherLogistics[0].type;
-              const complementaryType = existingType === LogisticsTypeEnum.SHIPMENT
-                ? LogisticsTypeEnum.LOCAL_PROCESSING
-                : LogisticsTypeEnum.SHIPMENT;
+        this.unsubscribe.push(logisticsSub);
+      }
+    }
+  }
 
-              this.logisticsTypeLabels = {
-                [complementaryType]: this.getTypeLabel(complementaryType),
-              };
-              this.logisticsTypes = [complementaryType];
-            }
+  /**
+   * Processes logistics data to determine available types
+   */
+  private processLogisticsTypes(logistics: IReadLogisticsModel[]): void {
+    // Filter out the current logistics being edited
+    const otherLogistics = logistics.filter(
+      (l) => l.id !== this.logisticsId
+    );
 
-            this.cdr.detectChanges();
-          },
-          error: (error) => {
-            console.error(
-              'Error fetching logistics for type determination:',
-              error
-            );
-          },
+    if (otherLogistics.length === 0) {
+      // No other logistics exist, show both types
+      this.logisticsTypeLabels = {
+        [LogisticsTypeEnum.SHIPMENT]: 'Envío Local',
+        [LogisticsTypeEnum.LOCAL_PROCESSING]: 'Procesamiento Local',
+      };
+      this.logisticsTypes = Object.values(LogisticsTypeEnum);
+    } else if (otherLogistics.length === 1) {
+      // One other logistics exists
+      const existingType = otherLogistics[0].type;
+      const complementaryType = existingType === LogisticsTypeEnum.SHIPMENT
+        ? LogisticsTypeEnum.LOCAL_PROCESSING
+        : LogisticsTypeEnum.SHIPMENT;
+
+      if (this.logisticsId && this.logisticsModel.type) {
+        // In edit mode, show both current type and complementary type
+        // But avoid duplicates if they're the same
+        const typesToShow = [this.logisticsModel.type];
+        if (this.logisticsModel.type !== complementaryType) {
+          typesToShow.push(complementaryType);
+        }
+
+        this.logisticsTypeLabels = {};
+        typesToShow.forEach(type => {
+          this.logisticsTypeLabels[type] = this.getTypeLabel(type);
         });
 
-      this.unsubscribe.push(logisticsSub);
+        this.logisticsTypes = typesToShow;
+      } else {
+        // In create mode, show only the complementary type
+        this.logisticsTypeLabels = {
+          [complementaryType]: this.getTypeLabel(complementaryType),
+        };
+        this.logisticsTypes = [complementaryType];
+      }
+    } else {
+      // Both logistics types already exist (2 or more other logistics)
+      // In edit mode, show only the current type
+      if (this.logisticsId && this.logisticsModel.type) {
+        this.logisticsTypeLabels = {
+          [this.logisticsModel.type]: this.getTypeLabel(this.logisticsModel.type),
+        };
+        this.logisticsTypes = [this.logisticsModel.type];
+      } else {
+        // No types available (should not happen in edit mode)
+        this.logisticsTypeLabels = {};
+        this.logisticsTypes = [];
+      }
     }
+
+    // Force change detection and ensure dropdown is updated
+    this.cdr.detectChanges();
+
+    // Force another change detection cycle to ensure dropdown is properly updated
+    setTimeout(() => {
+      this.cdr.detectChanges();
+    }, 0);
   }
 
   /**
