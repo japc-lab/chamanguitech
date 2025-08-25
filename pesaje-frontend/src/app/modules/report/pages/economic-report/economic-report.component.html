@@ -75,6 +75,13 @@
             <td class="bg-light fw-bold">Estado</td>
             <td>{{ purchaseStatus }}</td>
           </tr>
+          <tr>
+            <td class="bg-light fw-bold">Número de hoja de peso</td>
+            <td>{{ weightSheetNumber }}</td>
+            <td class="bg-light fw-bold">Número de hoja de logística</td>
+            <td>{{ logisticsSheetNumber }}</td>
+            <td colspan="2"></td>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -194,6 +201,11 @@
             <td style="width: 18%;">{{ economicReportModel.purchase.totalToPay | number:'1.2-2' }}</td>
             <td colspan="2"></td>
           </tr>
+          <tr>
+            <td class="bg-light fw-bold" style="width: 15%;">Número de hoja de peso</td>
+            <td style="width: 18%;">{{ weightSheetNumber }}</td>
+            <td colspan="4"></td>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -221,6 +233,11 @@
                 <td class="bg-light fw-bold" style="width: 15%;">Gasto productos e insumos</td>
                 <td style="width: 18%;">{{ logistics.productAndSupplyExpenses | number:'1.2-2' }}</td>
                 <td colspan="2"></td>
+              </tr>
+              <tr>
+                <td class="bg-light fw-bold" style="width: 15%;">Número de hoja de logística</td>
+                <td style="width: 18%;">{{ logistics.logisticsSheetNumber }}</td>
+                <td colspan="4"></td>
               </tr>
               <tr>
                 <td class="bg-light fw-bold" style="width: 15%;">Precio por Libra ($/lb)</td>
@@ -252,6 +269,11 @@
               <td class="bg-light fw-bold" style="width: 15%;">Gasto productos e insumos</td>
               <td style="width: 18%;">{{ singleLogisticsObject.productAndSupplyExpenses | number:'1.2-2' }}</td>
               <td colspan="2"></td>
+            </tr>
+            <tr>
+              <td class="bg-light fw-bold" style="width: 15%;">Número de hoja de logística</td>
+              <td style="width: 18%;">{{ singleLogisticsObject.logisticsSheetNumber }}</td>
+              <td colspan="4"></td>
             </tr>
             <tr>
               <td class="bg-light fw-bold" style="width: 15%;">Precio por Libra ($/lb)</td>

@@ -28,6 +28,8 @@ export class EconomicReportComponent implements OnInit, OnDestroy {
 
   purchaseStatus: string;
   logisticsType: string;
+  weightSheetNumber: string;
+  logisticsSheetNumber: string;
 
   private unsubscribe: Subscription[] = [];
 
@@ -116,6 +118,10 @@ export class EconomicReportComponent implements OnInit, OnDestroy {
           this.purchaseStatus =
             statusMap[this.economicReportModel.purchase?.status] || '-';
 
+          // Set sheet numbers
+          this.weightSheetNumber = this.economicReportModel.purchase?.weightSheetNumber || '-';
+          this.logisticsSheetNumber = this.getLogisticsSheetNumber();
+
           // Format sale dates
           if (this.economicReportModel.sale) {
             if (this.economicReportModel.sale.saleDate) {
@@ -178,6 +184,26 @@ export class EconomicReportComponent implements OnInit, OnDestroy {
         return 'Procesamiento Local';
       default:
         return type;
+    }
+  }
+
+  private getLogisticsSheetNumber(): string {
+    const logistics = this.economicReportModel?.logistics;
+
+    if (!logistics) {
+      return '-';
+    }
+
+    if (Array.isArray(logistics)) {
+      // For local sales, show all logistics sheet numbers
+      const sheetNumbers = logistics
+        .map(log => log.logisticsSheetNumber)
+        .filter(sheet => sheet && sheet.trim() !== '');
+
+      return sheetNumbers.length > 0 ? sheetNumbers.join(', ') : '-';
+    } else {
+      // For company sales, show single logistics sheet number
+      return logistics.logisticsSheetNumber || '-';
     }
   }
 

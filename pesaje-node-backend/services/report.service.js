@@ -44,22 +44,23 @@ const getEconomicReportByParams = async ({ includeDeleted = false, clientId, use
 
     const logisticsList = await dbAdapter.logisticsAdapter.getAllWithRelations(
         { purchase: purchase.id, deletedAt: null },
-        [{ path: 'items', populate: { path: 'logisticsCategory' } }]
+        ['items']
     );
 
     const logisticsProcessed = logisticsList
         .filter(l => !l.deletedAt)
         .map(log => {
             const grouped = log.items.reduce((acc, item) => {
-                if (!item?.logisticsCategory) return acc;
-                const category = item.logisticsCategory.category;
-                acc[category] = (acc[category] || 0) + item.total;
+                if (!item) return acc;
+                const financeCategory = item.financeCategory;
+                acc[financeCategory] = (acc[financeCategory] || 0) + item.total;
                 return acc;
             }, {});
             return {
                 id: log.id,
                 type: log.type,
                 logisticsDate: log.logisticsDate,
+                logisticsSheetNumber: log.logisticsSheetNumber || '',
                 personnelExpenses: grouped.PERSONNEL || 0,
                 productAndSupplyExpenses: grouped.INPUTS || 0,
                 totalToPay: (grouped.PERSONNEL || 0) + (grouped.INPUTS || 0)
@@ -98,7 +99,8 @@ const getEconomicReportByParams = async ({ includeDeleted = false, clientId, use
             pounds2: purchase.pounds2 || 0,
             totalPoundsPurchased: purchase.totalPounds || 0,
             totalToPay: purchase.grandTotal,
-            totalAgreed: purchase.totalAgreedToPay || 0
+            totalAgreed: purchase.totalAgreedToPay || 0,
+            weightSheetNumber: purchase.weightSheetNumber || ''
         },
         sale: isCompany ? {
             saleDate: sale?.saleDate || '',
@@ -167,16 +169,16 @@ const getTotalReportByParams = async ({ includeDeleted = false, clientId, userId
     // Fetch logistics
     const logisticsList = await dbAdapter.logisticsAdapter.getAllWithRelations(
         { purchase: purchase.id, deletedAt: null },
-        [{ path: 'items', populate: { path: 'logisticsCategory' } }]
+        ['items']
     );
 
     const logisticsRecord = logisticsList.find(l => !l.deletedAt);
     let logisticsData = null;
     if (logisticsRecord) {
         const grouped = logisticsRecord.items.reduce((acc, item) => {
-            if (!item?.logisticsCategory) return acc;
-            const category = item.logisticsCategory.category;
-            acc[category] = (acc[category] || 0) + item.total;
+            if (!item) return acc;
+            const financeCategory = item.financeCategory;
+            acc[financeCategory] = (acc[financeCategory] || 0) + item.total;
             return acc;
         }, {});
 
@@ -184,6 +186,7 @@ const getTotalReportByParams = async ({ includeDeleted = false, clientId, userId
             id: logisticsRecord.id,
             type: logisticsRecord.type,
             logisticsDate: logisticsRecord.logisticsDate,
+            logisticsSheetNumber: logisticsRecord.logisticsSheetNumber || '',
             personnelExpenses: grouped.PERSONNEL || 0,
             productAndSupplyExpenses: grouped.INPUTS || 0,
             totalToPay: (grouped.PERSONNEL || 0) + (grouped.INPUTS || 0)
@@ -210,7 +213,8 @@ const getTotalReportByParams = async ({ includeDeleted = false, clientId, userId
             pounds2: purchase.pounds2 || 0,
             totalPoundsPurchased: purchase.totalPounds || 0,
             totalToPay: purchase.grandTotal,
-            totalAgreed: purchase.totalAgreedToPay || 0
+            totalAgreed: purchase.totalAgreedToPay || 0,
+            weightSheetNumber: purchase.weightSheetNumber || ''
         },
         sale: {
             saleDate: sale?.saleDate || '',
