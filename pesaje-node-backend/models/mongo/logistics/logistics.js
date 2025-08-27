@@ -1,33 +1,41 @@
 const { Schema, model } = require('mongoose');
 
-const LogisticsTypeEnum = require('../../../enums/logistics-type.enum');
-const LogisticsStatusEnum = require('../../../enums/logistics-status.enum');
+const { LogisticsTypeEnum, LogisticsStatusEnum } = require('../../../enums/logistics.enums');
 
 
 const LogisticsSchema = Schema({
   purchase: {
     type: Schema.Types.ObjectId,
     ref: 'Purchase',
-    required: true
+    required: function () { return this.status !== 'DRAFT'; }
   },
   logisticsDate: {
     type: Date,
-    required: true,
+    required: function () { return this.status !== 'DRAFT'; },
   },
   type: {
     type: String,
     enum: LogisticsTypeEnum,
-    required: true,
+    required: function () { return this.status !== 'DRAFT'; },
   },
   grandTotal: {
     type: Number,
-    required: true,
+    required: function () { return this.status !== 'DRAFT'; },
     min: 0
+  },
+  logisticsSheetNumber: {
+    type: String,
+    required: function () { return this.status !== 'DRAFT'; }
   },
   items: [{
     type: Schema.Types.ObjectId,
     ref: 'LogisticsItem',
-    required: true
+    required: function () { return this.status !== 'DRAFT'; }
+  }],
+  payments: [{
+    type: Schema.Types.ObjectId,
+    ref: 'LogisticsPayment',
+    required: function () { return this.status !== 'DRAFT'; }
   }],
   status: {
     type: String,

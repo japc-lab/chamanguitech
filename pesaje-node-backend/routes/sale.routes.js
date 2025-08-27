@@ -10,7 +10,6 @@ const {
 const router = Router();
 
 const { query } = require('express-validator');
-const LogisticsTypeEnum = require('../enums/logistics-type.enum');
 
 router.get(
     '/by-params',

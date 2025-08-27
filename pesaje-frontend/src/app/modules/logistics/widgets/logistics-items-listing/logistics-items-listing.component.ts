@@ -1,127 +1,143 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import {
-  AbstractControl,
-  FormArray,
-  FormBuilder,
-  FormGroup,
-} from '@angular/forms';
-import { PERMISSION_ROUTES } from '../../../../constants/routes.constants';
-import { ILogisticsCategoryModel } from '../../../shared/interfaces/logistic-type.interface';
+import { Component, EventEmitter, Input, OnInit, Output, OnChanges, SimpleChanges } from '@angular/core';
 import { ILogisticsItemModel } from '../../interfaces/logistics-item.interface';
+import {
+  LogisticsFinanceCategoryEnum,
+  LogisticsResourceCategoryEnum,
+} from '../../interfaces/logistics.interface';
 import { InputUtilsService } from 'src/app/utils/input-utils.service';
-import { FormUtilsService } from 'src/app/utils/form-utils.service';
-import { debounceTime, Subscription } from 'rxjs';
+import { NgModel } from '@angular/forms';
 
 @Component({
   selector: 'app-logistics-items-listing',
   templateUrl: './logistics-items-listing.component.html',
   styleUrl: './logistics-items-listing.component.scss',
 })
-export class LogisticsItemsListingComponent implements OnInit {
-  PERMISSION_ROUTE = PERMISSION_ROUTES.LOGISTICS.LOGISTICS_FORM;
-
-  private _logisticsItems: ILogisticsItemModel[] = [];
-  private formChangesSub: Subscription;
-
-  @Input() title: string = '';
-  @Input() hasDescription: boolean = false;
-  @Input() logisticsCategories: ILogisticsCategoryModel[];
-
-  @Input()
-  set logisticsItems(value: ILogisticsItemModel[]) {
-    this._logisticsItems = value ?? [];
-
-    if (
-      this.form &&
-      this.formArray.length === this.logisticsCategories.length
-    ) {
-      this._logisticsItems.forEach((item) => {
-        const index = this.logisticsCategories.findIndex(
-          (cat) => cat.id === item.logisticsCategory.id
-        );
-
-        if (index > -1) {
-          const group = this.formArray.at(index);
-          group.patchValue(
-            {
-              unit: item.unit,
-              cost: item.cost,
-              total: item.unit && item.cost ? item.unit * item.cost : 0,
-              description: item.description,
-            },
-            { emitEvent: false }
-          );
-        }
-      });
-
-      this.updateTotalPersonal();
-    }
-  }
-
+export class LogisticsItemsListingComponent implements OnInit, OnChanges {
+  @Input() title: string = 'Detalles de Logística';
+  @Input() logisticsItems: ILogisticsItemModel[] = [];
   @Output() logisticsItemsChange = new EventEmitter<ILogisticsItemModel[]>();
 
-  form: FormGroup;
+  // Finance and Resource category options
+  financeCategories = Object.values(LogisticsFinanceCategoryEnum);
+  resourceCategories = Object.values(LogisticsResourceCategoryEnum);
+
+  // Table rows data
+  tableRows: ILogisticsItemModel[] = [];
   total = 0;
 
-  get formArray(): FormArray {
-    return this.form?.get('items') as FormArray;
-  }
-
-  constructor(
-    private fb: FormBuilder,
-    private inputUtils: InputUtilsService,
-    private formUtils: FormUtilsService
-  ) {}
+  constructor(private inputUtils: InputUtilsService) {}
 
   ngOnInit(): void {
-    this.initializeForm();
+    this.initializeTableRows();
   }
 
-  createItemFormGroup(categoryId: string): FormGroup {
-    return this.fb.group({
-      categoryId: [categoryId],
-      unit: [null],
-      cost: [null],
-      total: [0], // Keep total as 0 for calculation purposes
-      description: [''],
-    });
-  }
-
-  calculateTotal(index: number): void {
-    const group = this.formArray.at(index);
-    const unit = Number(group.get('unit')?.value || 0);
-    const cost = Number(group.get('cost')?.value || 0);
-    const total = unit * cost;
-
-    const currentTotal = Number(group.get('total')?.value || 0);
-    if (currentTotal !== total) {
-      group.get('total')?.setValue(total, { emitEvent: false });
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['logisticsItems'] && this.logisticsItems) {
+      // Only reinitialize if we have items and our table is empty
+      // This prevents re-rendering when user is actively editing
+      if (this.logisticsItems.length > 0 && this.tableRows.length === 0) {
+        this.initializeTableRows();
+      }
     }
-
-    this.updateTotalPersonal();
   }
 
-  updateTotalPersonal(): void {
-    this.total = this.formArray.controls.reduce((sum, group) => {
-      return sum + (Number(group.get('total')?.value) || 0);
-    }, 0);
+  private initializeTableRows(): void {
+    this.tableRows =
+      this.logisticsItems.length > 0
+        ? this.logisticsItems.map((item) => ({
+            financeCategory:
+              item.financeCategory || LogisticsFinanceCategoryEnum.INVOICE,
+            resourceCategory:
+              item.resourceCategory || LogisticsResourceCategoryEnum.PERSONNEL,
+            unit: item.unit || 0,
+            cost: item.cost || 0,
+            total: item.total || 0,
+            description: item.description || '',
+          }))
+        : [];
+    this.calculateTotal();
+  }
+
+  addRow(): void {
+    const newRow: ILogisticsItemModel = {
+      financeCategory: LogisticsFinanceCategoryEnum.INVOICE,
+      resourceCategory: LogisticsResourceCategoryEnum.PERSONNEL,
+      unit: 0,
+      cost: 0,
+      total: 0,
+      description: '',
+    };
+    this.tableRows.push(newRow);
+    this.emitChanges();
+  }
+
+  removeRow(row: ILogisticsItemModel): void {
+    const index = this.tableRows.indexOf(row);
+    if (index > -1) {
+      this.tableRows.splice(index, 1);
+      this.calculateTotal();
+      this.emitChanges();
+    }
+  }
+
+  // Event handlers for template
+  onFinanceCategoryChange(row: ILogisticsItemModel, value: string): void {
+    row.financeCategory = value as LogisticsFinanceCategoryEnum;
+    this.calculateTotal();
+    this.emitChanges();
+  }
+
+  onResourceCategoryChange(row: ILogisticsItemModel, value: string): void {
+    row.resourceCategory = value as LogisticsResourceCategoryEnum;
+    this.emitChanges();
+  }
+
+  onDescriptionChange(row: ILogisticsItemModel, value: string): void {
+    row.description = value;
+    this.emitChanges();
+  }
+
+  onUnitChange(row: ILogisticsItemModel, value: any): void {
+    row.unit = Number(value);
+    this.calculateRowTotal(row);
+    this.calculateTotal();
+    this.emitChanges();
+  }
+
+  onCostChange(row: ILogisticsItemModel, value: any): void {
+    row.cost = value;
+    this.calculateRowTotal(row);
+    this.calculateTotal();
+    this.emitChanges();
+  }
+
+  calculateRowTotal(row: ILogisticsItemModel): void {
+    row.total = (row.unit || 0) * (row.cost || 0);
+  }
+
+  calculateTotal(): void {
+    this.total = this.tableRows.reduce((sum, row) => sum + (row.total || 0), 0);
   }
 
   getValidLogisticsItems(): ILogisticsItemModel[] {
-    return this.formArray.controls
-      .map((group, index) => ({
-        logisticsCategory: this.logisticsCategories[index],
-        unit: group.get('unit')?.value,
-        cost: group.get('cost')?.value,
-        total: group.get('total')?.value,
-        description: group.get('description')?.value,
-      }))
-      .filter(
-        (item) =>
-          Number(item.unit) > 0 &&
-          Number(item.cost) > 0 &&
-          Number(item.total) > 0
-      );
+    const validItems = this.tableRows.filter((item) => {
+      const hasCategories = item.financeCategory && item.resourceCategory;
+      return hasCategories;
+    });
+    return validItems;
+  }
+
+  getCompleteLogisticsItems(): ILogisticsItemModel[] {
+    const completeItems = this.tableRows.filter((item) => {
+      const isComplete =
+        Number(item.unit) > 0 &&
+        Number(item.cost) > 0 &&
+        Number(item.total) > 0 &&
+        item.financeCategory &&
+        item.resourceCategory;
+      return isComplete;
+    });
+    return completeItems;
   }
 
   validateNumber(event: KeyboardEvent) {
@@ -132,39 +148,59 @@ export class LogisticsItemsListingComponent implements OnInit {
     this.inputUtils.validateWholeNumber(event);
   }
 
-  onCostBlur(index: number, control: AbstractControl | null) {
-    if (control) {
-      this.formUtils.formatControlToDecimal(control);
-      this.calculateTotal(index);
-    }
+  formatDecimal(control: NgModel) {
+    if (!control || control.value == null) return;
+
+    const value = parseFloat(control.value).toFixed(2);
+    control.control.setValue(Number(value), { emitEvent: false });
   }
 
-  private initializeForm(): void {
-    const formGroups = this.logisticsCategories.map((category) =>
-      this.fb.group({
-        categoryId: [category.id],
-        unit: [null],
-        cost: [null],
-        total: [0],
-        description: [''],
-      })
+  emitChanges(): void {
+    const validItems = this.getValidLogisticsItems();
+    this.logisticsItemsChange.emit(validItems);
+  }
+
+  // Helper methods for template
+  getFinanceCategoryLabel(category: LogisticsFinanceCategoryEnum): string {
+    const labels = {
+      [LogisticsFinanceCategoryEnum.INVOICE]: 'Factura',
+      [LogisticsFinanceCategoryEnum.PETTY_CASH]: 'Caja Chica',
+      [LogisticsFinanceCategoryEnum.ADDITIONAL]: 'Adicional',
+    };
+    return labels[category] || category;
+  }
+
+  getResourceCategoryLabel(category: LogisticsResourceCategoryEnum): string {
+    const labels = {
+      [LogisticsResourceCategoryEnum.PERSONNEL]: 'Personal',
+      [LogisticsResourceCategoryEnum.RESOURCES]: 'Recursos',
+      [LogisticsResourceCategoryEnum.MATERIALS]: 'Materiales',
+    };
+    return labels[category] || category;
+  }
+
+  // Methods for grouping by finance category
+  getFinanceCategoriesWithItems(): LogisticsFinanceCategoryEnum[] {
+    const categories = new Set(
+      this.tableRows.map((item) => item.financeCategory)
     );
-
-    this.form = this.fb.group({
-      items: this.fb.array(formGroups),
-    });
-
-    this.subscribeToFormChanges();
+    return Array.from(categories).sort();
   }
 
-  private subscribeToFormChanges(): void {
-    this.formChangesSub?.unsubscribe(); // unsubscribe if exists
+  getItemsByFinanceCategory(
+    financeCategory: LogisticsFinanceCategoryEnum
+  ): ILogisticsItemModel[] {
+    return this.tableRows.filter(
+      (item) => item.financeCategory === financeCategory
+    );
+  }
 
-    this.formChangesSub = this.form?.valueChanges
-      .pipe(debounceTime(100))
-      .subscribe(() => {
-        const validItems = this.getValidLogisticsItems();
-        this.logisticsItemsChange.emit(validItems);
-      });
+  getFinanceCategorySubtotal(
+    financeCategory: LogisticsFinanceCategoryEnum
+  ): number {
+    return this.getItemsByFinanceCategory(financeCategory).reduce(
+      (sum, item) => sum + (item.total || 0),
+      0
+    );
   }
 }

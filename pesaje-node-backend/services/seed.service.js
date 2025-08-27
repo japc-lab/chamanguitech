@@ -2,10 +2,9 @@
 
 const bcrypt = require('bcryptjs');
 
-const { Option, Role, RolePermission, User, PaymentInfo, Person, Broker, Client, Size, Company, Period, SizePrice, ShrimpFarm, Purchase, PaymentMethod, PurchasePaymentMethod, Counter, LogisticsItem, Logistics, LogisticsCategory, Sale, CompanySale, CompanySaleItem, LocalSale, LocalSaleDetail, LocalSaleDetailItem } = require('../models');
+const { Option, Role, RolePermission, User, PaymentInfo, Person, Broker, Client, Size, Company, Period, SizePrice, ShrimpFarm, Purchase, PaymentMethod, PurchasePaymentMethod, Counter, LogisticsItem, LogisticsPayment, Logistics, Sale, CompanySale, CompanySaleItem, LocalSale, LocalSaleDetail, LocalSaleDetailItem } = require('../models');
 const Permission = require('../enums/permission.enum');
 const SizeTypeEnum = require('../enums/size-type.enum');
-const LogisticsCategoryEnum = require('../enums/logistics-category.enum');
 const { default: mongoose } = require('mongoose');
 
 const seedDatabase = async (keepTxData = true) => {
@@ -17,7 +16,6 @@ const seedDatabase = async (keepTxData = true) => {
     // await seedCompanies(); // Gestión de compañías creado
     await seedSizes();
     await seedPaymentMethods();
-    await seedLogisticsCategories();
 
     // Encriptar contraseña
     const salt = bcrypt.genSaltSync();
@@ -118,26 +116,27 @@ const cleanDatabase = async (keepTxData) => {
         await User.deleteMany({});
         await Period.deleteMany({});
         await SizePrice.deleteMany({});
-        await Counter.deleteMany({});
-        await Purchase.deleteMany({});
-        await PurchasePaymentMethod.deleteMany({});
-        await LogisticsItem.deleteMany({});
-        await Logistics.deleteMany({});
-        await Sale.deleteMany({});
-        await CompanySale.deleteMany({});
-        await CompanySaleItem.deleteMany({});
-        await LocalSale.deleteMany({});
-        await LocalSaleDetail.deleteMany({});
-        await LocalSaleDetailItem.deleteMany({});
         await Company.deleteMany({});
     }
+
+    await Purchase.deleteMany({});
+    await Counter.deleteMany({});
+    await PurchasePaymentMethod.deleteMany({});
+    await LogisticsItem.deleteMany({});
+    await LogisticsPayment.deleteMany({});
+    await Logistics.deleteMany({});
+    await Sale.deleteMany({});
+    await CompanySale.deleteMany({});
+    await CompanySaleItem.deleteMany({});
+    await LocalSale.deleteMany({});
+    await LocalSaleDetail.deleteMany({});
+    await LocalSaleDetailItem.deleteMany({});
 
     await Size.deleteMany({});
     await Option.deleteMany({});
     await Role.deleteMany({});
     await RolePermission.deleteMany({});
     await PaymentMethod.deleteMany({});
-    await LogisticsCategory.deleteMany({});
     console.log('Cleaning completed');
 };
 
@@ -588,6 +587,7 @@ const seedPaymentMethods = async () => {
             { _id: new mongoose.Types.ObjectId("60f9b7b2c8b3f10ffc2e5a02"), name: "Transferencia" },
             { _id: new mongoose.Types.ObjectId("60f9b7b2c8b3f10ffc2e5a03"), name: "Cheque" },
             { _id: new mongoose.Types.ObjectId("60f9b7b2c8b3f10ffc2e5a04"), name: "Débito" },
+            { _id: new mongoose.Types.ObjectId("60f9b7b2c8b3f10ffc2e5a05"), name: "Otro" },
         ];
 
         // Insert payment methods only if they do not exist
@@ -606,64 +606,6 @@ const seedPaymentMethods = async () => {
         console.log('✅ Payment Methods seeding complete.');
     } catch (error) {
         console.error('❌ Error seeding companies:', error.message);
-    }
-};
-
-const seedLogisticsCategories = async () => {
-    try {
-        const fixedLogisticsCategories = [
-            {
-                _id: new mongoose.Types.ObjectId("60f9b7b2c8b3f10ffc2e5b01"),
-                name: "Trabajadores",
-                category: LogisticsCategoryEnum.PERSONNEL,
-            },
-            {
-                _id: new mongoose.Types.ObjectId("60f9b7b2c8b3f10ffc2e5b02"),
-                name: "Responsable",
-                category: LogisticsCategoryEnum.PERSONNEL,
-            },
-            {
-                _id: new mongoose.Types.ObjectId("60f9b7b2c8b3f10ffc2e5b03"),
-                name: "Responsable 2",
-                category: LogisticsCategoryEnum.PERSONNEL,
-            },
-            {
-                _id: new mongoose.Types.ObjectId("60f9b7b2c8b3f10ffc2e5b04"),
-                name: "Carro",
-                category: LogisticsCategoryEnum.INPUTS,
-            },
-            {
-                _id: new mongoose.Types.ObjectId("60f9b7b2c8b3f10ffc2e5b05"),
-                name: "Hielo",
-                category: LogisticsCategoryEnum.INPUTS,
-            },
-            {
-                _id: new mongoose.Types.ObjectId("60f9b7b2c8b3f10ffc2e5b06"),
-                name: "Comida",
-                category: LogisticsCategoryEnum.INPUTS,
-            },
-            {
-                _id: new mongoose.Types.ObjectId("60f9b7b2c8b3f10ffc2e5b07"),
-                name: "Otros",
-                category: LogisticsCategoryEnum.INPUTS,
-            },
-        ];
-
-        await Promise.all(
-            fixedLogisticsCategories.map(async (cat) => {
-                const exists = await LogisticsCategory.findById(cat._id);
-                if (!exists) {
-                    await LogisticsCategory.create(cat);
-                    console.log(`✅ Inserted logistics category: ${cat.name}`);
-                } else {
-                    console.log(`⚠️ Logistics category already exists: ${cat.name}, skipping...`);
-                }
-            })
-        );
-
-        console.log('✅ Logistics Types seeding complete.');
-    } catch (error) {
-        console.error('❌ Error seeding logistics types:', error.message);
     }
 };
 

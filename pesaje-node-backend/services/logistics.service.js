@@ -1,23 +1,78 @@
 const dbAdapter = require('../adapters');
-const LogisticsTypeEnum = require('../enums/logistics-type.enum');
+const { LogisticsTypeEnum, LogisticsStatusEnum } = require('../enums/logistics.enums');
+
+
+
+// Helper function to determine logistics status based on payment statuses
+const determineLogisticsStatus = (payments) => {
+    if (!payments || payments.length === 0) {
+        return LogisticsStatusEnum.CREATED;
+    }
+
+    const paymentStatuses = payments.map(payment => payment.paymentStatus).filter(Boolean);
+
+    if (paymentStatuses.length === 0) {
+        return LogisticsStatusEnum.CREATED;
+    }
+
+    // Check if all payments are PAID
+    const allPaid = paymentStatuses.every(status => status === 'PAID');
+    if (allPaid) {
+        // Check if all payments are completed
+        const allCompleted = payments.every(payment => payment.isCompleted === true);
+        if (allCompleted) {
+            return LogisticsStatusEnum.COMPLETED;
+        }
+        return LogisticsStatusEnum.COMPLETED;
+    }
+
+    // Check if any payment is PENDING
+    const hasPending = paymentStatuses.some(status => status === 'PENDING');
+    if (hasPending) {
+        return LogisticsStatusEnum.IN_PROGRESS;
+    }
+
+    // Check if all payments are NO_PAYMENT
+    const allNoPayment = paymentStatuses.every(status => status === 'NO_PAYMENT');
+    if (allNoPayment) {
+        return LogisticsStatusEnum.CREATED;
+    }
+
+    // Default case
+    return LogisticsStatusEnum.IN_PROGRESS;
+};
 
 const create = async (data) => {
     const transaction = await dbAdapter.logisticsAdapter.startTransaction();
     try {
-        const purchase = await dbAdapter.purchaseAdapter.getById(data.purchase);
-        if (!purchase) {
-            throw new Error('Purchase does not exist');
+        // Validate purchase exists
+        if (data.purchase) {
+            const purchase = await dbAdapter.purchaseAdapter.getById(data.purchase);
+            if (!purchase) {
+                throw new Error('Purchase does not exist');
+            }
         }
 
-        // Validate and create each LogisticsItem
+        // Create LogisticsItems if provided
         const createdItems = [];
-        for (const item of data.items) {
-            const logisticsCategory = await dbAdapter.logisticsCategoryAdapter.getById(item.logisticsCategory);
-            if (!logisticsCategory) throw new Error(`Invalid logisticsCategory: ${item.logisticsCategory}`);
-
-            const createdItem = await dbAdapter.logisticsItemAdapter.create(item, { session: transaction.session });
-            createdItems.push(createdItem.id);
+        if (data.items && data.items.length > 0) {
+            for (const item of data.items) {
+                const createdItem = await dbAdapter.logisticsItemAdapter.create(item, { session: transaction.session });
+                createdItems.push(createdItem.id);
+            }
         }
+
+        // Create LogisticsPayments if provided
+        const createdPayments = [];
+        if (data.payments && data.payments.length > 0) {
+            for (const payment of data.payments) {
+                const createdPayment = await dbAdapter.logisticsPaymentAdapter.create(payment, { session: transaction.session });
+                createdPayments.push(createdPayment.id);
+            }
+        }
+
+        // Determine logistics status based on payment statuses or use provided status
+        const logisticsStatus = data.status || determineLogisticsStatus(data.payments || []);
 
         // Create the Logistics document
         const logistics = await dbAdapter.logisticsAdapter.create({
@@ -25,7 +80,10 @@ const create = async (data) => {
             type: data.type,
             logisticsDate: data.logisticsDate,
             grandTotal: data.grandTotal,
-            items: createdItems
+            logisticsSheetNumber: data.logisticsSheetNumber,
+            status: logisticsStatus,
+            items: createdItems,
+            payments: createdPayments
         }, { session: transaction.session });
         await transaction.commit();
         return logistics;
@@ -65,6 +123,7 @@ const getAllByParams = async ({ userId, controlNumber, includeDeleted = false })
     const purchaseMap = purchases.reduce((acc, p) => {
         acc[p.id] = {
             controlNumber: p.controlNumber,
+            weightSheetNumber: p.weightSheetNumber,
             companyName: p.company?.name || '',
             totalPounds: p.totalPounds || 0,
             buyer: p.buyer ? {
@@ -87,7 +146,8 @@ const getAllByParams = async ({ userId, controlNumber, includeDeleted = false })
     }
 
     const logistics = await dbAdapter.logisticsAdapter.getAllWithRelations(logisticsQuery, [
-        { path: 'items', populate: { path: 'logisticsCategory' } }
+        { path: 'items' },
+        { path: 'payments', populate: { path: 'paymentMethod' } }
     ]);
 
     return logistics.map(log => {
@@ -104,15 +164,32 @@ const getAllByParams = async ({ userId, controlNumber, includeDeleted = false })
             description = 'Procesamiento Local';
         }
 
+        // Convert payments to apply toJSON transformations
+        const convertedPayments = log.payments.map(payment => {
+            const paymentObj = payment.toObject ? payment.toObject({ transform: true }) : payment;
+
+            // Manually convert payment method if it exists
+            if (paymentObj.paymentMethod && paymentObj.paymentMethod._id) {
+                paymentObj.paymentMethod = {
+                    id: paymentObj.paymentMethod._id,
+                    name: paymentObj.paymentMethod.name
+                };
+            }
+
+            return paymentObj;
+        });
+
         return {
             id: log.id,
             logisticsDate: log.logisticsDate,
             status: log.status || null,
             type: log.type,
             grandTotal: log.grandTotal,
+            logisticsSheetNumber: log.logisticsSheetNumber,
             purchase: log.purchase, // still returning the ID
             totalPounds,
-            items: log.items.map(i => i.id),
+            items: log.items,
+            payments: convertedPayments,
             controlNumber,
             description,
             buyer: purchaseInfo?.buyer || null,
@@ -126,8 +203,11 @@ const getAllByParams = async ({ userId, controlNumber, includeDeleted = false })
 const getById = async (id) => {
     const logistics = await dbAdapter.logisticsAdapter.getByIdWithRelations(id, [
         {
-            path: 'items',
-            populate: { path: 'logisticsCategory' }
+            path: 'items'
+        },
+        {
+            path: 'payments',
+            populate: { path: 'paymentMethod' }
         },
         {
             path: 'purchase',
@@ -143,11 +223,26 @@ const getById = async (id) => {
 
     if (!logistics) throw new Error('Logistics not found');
 
-    const { purchase, items, ...rest } = logistics;
+    const { purchase, items, payments, ...rest } = logistics;
 
     const formatPerson = (user) => user?.person
         ? { id: user._id, fullName: `${user.person.names} ${user.person.lastNames}`.trim() }
         : { id: user?._id || null, fullName: null };
+
+    // Convert payments to apply toJSON transformations
+    const convertedPayments = payments.map(payment => {
+        const paymentObj = payment.toObject ? payment.toObject({ transform: true }) : payment;
+
+        // Manually convert payment method if it exists
+        if (paymentObj.paymentMethod && paymentObj.paymentMethod._id) {
+            paymentObj.paymentMethod = {
+                id: paymentObj.paymentMethod._id,
+                name: paymentObj.paymentMethod.name
+            };
+        }
+
+        return paymentObj;
+    });
 
     return {
         ...rest,
@@ -155,6 +250,7 @@ const getById = async (id) => {
             id: purchase.id,
             controlNumber: purchase.controlNumber,
             purchaseDate: purchase.purchaseDate,
+            weightSheetNumber: purchase.weightSheetNumber,
             buyer: formatPerson(purchase.buyer),
             broker: formatPerson(purchase.broker),
             client: formatPerson(purchase.client),
@@ -169,26 +265,18 @@ const getById = async (id) => {
                 }
                 : null
         },
-        items: items.map(item => ({
-            id: item.id,
-            unit: item.unit,
-            cost: item.cost,
-            total: item.total,
-            description: item.description,
-            deletedAt: item.deletedAt,
-            logisticsCategory: item.logisticsCategory
-                ? {
-                    id: item.logisticsCategory._id,
-                    name: item.logisticsCategory.name,
-                    category: item.logisticsCategory.category
-                }
-                : null
-        }))
+        items: items,
+        payments: convertedPayments
     };
 };
 
 
 const update = async (id, data) => {
+    // Check if this is a status-only update
+    if (Object.keys(data).length === 1 && data.status) {
+        return await updateStatus(id, data.status);
+    }
+
     const transaction = await dbAdapter.logisticsAdapter.startTransaction();
     try {
         const existingLogistics = await dbAdapter.logisticsAdapter.getById(id);
@@ -196,27 +284,56 @@ const update = async (id, data) => {
             throw new Error('Logistics record not found');
         }
 
+        // Validate purchase exists
+        if (data.purchase) {
+            const purchase = await dbAdapter.purchaseAdapter.getById(data.purchase);
+            if (!purchase) {
+                throw new Error('Purchase does not exist');
+            }
+        }
+
         // 🔥 Real deletion of each LogisticsItem using removePermanently
         for (const itemId of existingLogistics.items) {
             await dbAdapter.logisticsItemAdapter.removePermanently(itemId);
         }
 
-        // 🔁 Create new LogisticsItems
-        const newItemIds = [];
-        for (const item of data.items) {
-            const logisticsCategory = await dbAdapter.logisticsCategoryAdapter.getById(item.logisticsCategory);
-            if (!logisticsCategory) throw new Error(`Invalid logisticsCategory: ${item.logisticsCategory}`);
-
-            const newItem = await dbAdapter.logisticsItemAdapter.create(item, { session: transaction.session });
-            newItemIds.push(newItem.id);
+        // 🔥 Real deletion of each LogisticsPayment using removePermanently
+        for (const paymentId of existingLogistics.payments || []) {
+            await dbAdapter.logisticsPaymentAdapter.removePermanently(paymentId);
         }
+
+        // 🔁 Create new LogisticsItems if provided
+        const newItemIds = [];
+        if (data.items && data.items.length > 0) {
+            for (const item of data.items) {
+                const newItem = await dbAdapter.logisticsItemAdapter.create(item, { session: transaction.session });
+                newItemIds.push(newItem.id);
+            }
+        }
+
+        // 🔁 Create new LogisticsPayments if provided
+        const newPaymentIds = [];
+        if (data.payments && data.payments.length > 0) {
+            for (const payment of data.payments) {
+                const newPayment = await dbAdapter.logisticsPaymentAdapter.create(payment, { session: transaction.session });
+                newPaymentIds.push(newPayment.id);
+            }
+        }
+
+        // Determine logistics status based on payment statuses or use provided status
+        const logisticsStatus = data.status || determineLogisticsStatus(data.payments || []);
+
         // ✏️ Update Logistics record
         const updatedLogistics = await dbAdapter.logisticsAdapter.update(
             id,
             {
+                type: data.type,
                 logisticsDate: data.logisticsDate,
                 grandTotal: data.grandTotal,
-                items: newItemIds
+                logisticsSheetNumber: data.logisticsSheetNumber,
+                status: logisticsStatus,
+                items: newItemIds,
+                payments: newPaymentIds
             },
             { session: transaction.session }
         );
@@ -229,6 +346,17 @@ const update = async (id, data) => {
     } finally {
         await transaction.end();
     }
+};
+
+const updateStatus = async (id, status) => {
+    const existingLogistics = await dbAdapter.logisticsAdapter.getById(id);
+    if (!existingLogistics) {
+        throw new Error('Logistics record not found');
+    }
+
+    // Update only the status field
+    const updatedLogistics = await dbAdapter.logisticsAdapter.update(id, { status });
+    return updatedLogistics;
 };
 
 
@@ -244,5 +372,6 @@ module.exports = {
     getAllByParams,
     getById,
     update,
+    updateStatus,
     remove
 };

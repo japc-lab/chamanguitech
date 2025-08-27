@@ -7,7 +7,7 @@
 
     <div class="d-flex gap-2">
       <!-- Back Button -->
-      <button *ngIf="hasRouteId" type="button" class="btn btn-light btn-sm" (click)="goBack()">
+      <button *ngIf="logisticsId" type="button" class="btn btn-light btn-sm" (click)="goBack()">
         <i class="bi bi-arrow-left me-1"></i> Volver
       </button>
 
@@ -109,9 +109,15 @@
   <div class="card card-xl-stretch mb-xl-8 mt-2">
     <!-- begin::Header -->
     <div class="card-header border-0 pt-8">
-      <h4 class="card-title align-items-start flex-column">
-        <span class="card-label fw-bolder fs-3 mb-1">Información de Logística</span>
-      </h4>
+      <div class="d-flex flex-column">
+        <h4 class="card-title align-items-start flex-column">
+          <span class="card-label fw-bolder fs-3 mb-1">Información de Logística</span>
+        </h4>
+        <!-- Draft Indicator -->
+        <span *ngIf="isEditMode && logisticsModel.status === 'DRAFT'" class="badge badge-warning fs-7 mt-1">
+          <i class="bi bi-pencil-square me-1"></i> Borrador
+        </span>
+      </div>
     </div>
     <!-- end::Header -->
 
@@ -123,7 +129,7 @@
         <div class="col-md-6">
           <label for="type" class="required fw-semibold fs-6 mb-2">Tipo</label>
           <select id="type" name="type" class="form-select form-select-sm" [(ngModel)]="logisticsModel.type"
-            #type="ngModel" required [disabled]="!!logisticsId">
+            #type="ngModel" required [disabled]="isEditMode && logisticsModel.status !== LogisticsStatusEnum.DRAFT">
             <option value="" disabled selected>Seleccione una opción</option>
             <option *ngFor="let option of logisticsTypes" [ngValue]="option">
               {{ logisticsTypeLabels[option] }}
@@ -146,38 +152,43 @@
             <div>La fecha de logística es obligatoria.</div>
           </div>
         </div>
+
+        <!-- Logistics Sheet Number -->
+        <div class="col-md-6">
+          <label for="logisticsSheetNumber" class="required fw-semibold fs-6 mb-2"># Hoja de logística</label>
+          <input type="text" id="logisticsSheetNumber" name="logisticsSheetNumber"
+            [(ngModel)]="logisticsModel.logisticsSheetNumber" #logisticsSheetNumber="ngModel"
+            (keypress)="validateNumber($event)" (blur)="formatLogisticsSheetNumberOnBlur($event)"
+            (focus)="onLogisticsSheetNumberFocus($event)" class="form-control form-control-sm" maxlength="8"
+            placeholder="00000000" required />
+          <div *ngIf="logisticsForm.submitted && logisticsSheetNumber.invalid"
+            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+            <div>El número de hoja de logística es obligatorio.</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
   <!-- end::Third Section: Logistics Info -->
 
 
-  <!-- Fourth Section: Personnel Logistics Details -->
+  <!-- Fourth Section: Logistics Items -->
   <div class="card card-xl-stretch mb-xl-8 mt-2">
-
-    <app-logistics-items-listing *ngIf="personnelLogisticsCategoryList.length>0" title="Personal"
-      [logisticsCategories]="personnelLogisticsCategoryList" [logisticsItems]="personnelLogisticsItems"
-      [hasDescription]="true" (logisticsItemsChange)="handlePersonnelLogisticsItems($event)" />
+    <app-logistics-items-listing [logisticsItems]="logisticsItems"
+      (logisticsItemsChange)="handleLogisticsItems($event)" />
   </div>
-  <!-- end::Fourth Section: Personnel Logistics Details -->
+  <!-- end::Fourth Section: Logistics Items -->
 
-  <!-- Fifth Section: Inputs Logistics Details -->
+  <!-- Fifth Section: Logistics Payments Tracking -->
   <div class="card card-xl-stretch mb-xl-8 mt-2">
-
-    <app-logistics-items-listing *ngIf="inputLogisticsCategoryList.length>0" title="Productos e Insumos"
-      [logisticsCategories]="inputLogisticsCategoryList" [logisticsItems]="inputLogisticsItems" [hasDescription]="true"
-      (logisticsItemsChange)="handleInputLogisticsItems($event)" />
-
+    <app-logistics-payments-tracking [logisticsItems]="logisticsItems" [logisticsPayments]="logisticsPayments"
+      [isEditMode]="!!logisticsId" [showValidationErrors]="showPaymentValidationErrors"
+      (logisticsPaymentsChange)="handleLogisticsPayments($event)" />
   </div>
-  <!-- end::Fifth Section: Inputs Logistics Details -->
+  <!-- end::Fifth Section: Logistics Payments Tracking -->
 
-  <!-- Sixth Section: Grand Total -->
+  <!-- Sixth Section: Submit Button -->
   <div class="card card-xl-stretch mb-xl-8 mt-2">
-
-    <div class="card-body py-3 text-end fw-bold fs-4">
-      <label class="me-20">Total a pagar de logística</label>
-      <span>$ {{ grandTotalDisplayed || 0 | number: '1.2-2' }}</span>
-    </div>
 
     <div class="card-footer d-flex justify-content-end py-6 px-9">
       <!-- Submit Button -->
@@ -186,7 +197,7 @@
       </button>
     </div>
   </div>
-  <!-- end::Fifth Section: Inputs Logistics Details -->
+  <!-- end::Sixth Section: Submit Button -->
 
 </form>
 <!-- end::Logistics Form -->

@@ -106,12 +106,14 @@ export const locale = {
       DELETE_CONFIRM_TEXT: 'This action cannot be undone.',
       DELETE_SUCCESS: 'The item was deleted successfully!',
       CONFIRM_TITLE: 'Are you sure?',
-      CONFIRM_PURCHASE_TEXT:
+      CONFIRM_STATUS_TEXT:
         'The information is complete. The status will be updated to Confirmed.',
       PURCHASE_NOT_FOUND: 'Purchase not found.',
       LOGISTICS_LIMIT_REACHED:
         '{{count}} logistics record(s) have already been created for this purchase: {{record}}.',
       NO_SALE_DETAILS_ENTERED: 'No sale details have been entered.',
+      NO_COMPLETE_ITEMS: 'No logistics details have been entered.',
+      PAYMENT_VALIDATION_ERRORS: 'There are payment validation errors. Please complete the required fields.',
       SALE_LIMIT_REACHED: 'A sale has already been created for this purchase.',
       INCOMPLETE_TOTAL_REPORT_INFO:
         'The information for the report is incomplete. Please check the purchase, sale, or logistics information.',

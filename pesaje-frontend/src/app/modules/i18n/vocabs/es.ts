@@ -106,11 +106,14 @@ export const locale = {
       DELETE_CONFIRM_TEXT: 'Esta acción no se puede deshacer.',
       DELETE_SUCCESS: '¡El elemento fue eliminado exitosamente!',
       CONFIRM_TITLE: '¿Estás seguro?',
-      CONFIRM_PURCHASE_TEXT: 'La información está completa. El estado se actualizará a Confirmado.',
+      CONFIRM_STATUS_TEXT:
+        'La información está completa. El estado se actualizará a Confirmado.',
       PURCHASE_NOT_FOUND: 'No se encontró la compra.',
       LOGISTICS_LIMIT_REACHED:
         'Ya se ha(n) creado {{count}} registro(s) logístico(s) permitido(s) para esta compra: {{record}}.',
       NO_SALE_DETAILS_ENTERED: 'No se han ingresado detalles de la venta.',
+      NO_COMPLETE_ITEMS: 'No se han ingresado detalles de logística.',
+      PAYMENT_VALIDATION_ERRORS: 'Hay errores de validación en los pagos. Por favor complete los campos requeridos.',
       SALE_LIMIT_REACHED: 'Ya existe una venta creada para esta compra.',
       INCOMPLETE_TOTAL_REPORT_INFO:
         'La información para el reporte está incompleta. Verifique la información de compra, venta o logística.',

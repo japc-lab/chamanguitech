@@ -10,9 +10,13 @@ import { AuthService } from '../../../auth';
 import { Subscription } from 'rxjs';
 
 import { Router } from '@angular/router';
-import { IReadLogisticsModel } from '../../interfaces/logistics.interface';
+import {
+  IReadLogisticsModel,
+  LogisticsStatusEnum,
+} from '../../interfaces/logistics.interface';
 import { LogisticsService } from '../../services/logistics.service';
 import { AlertService } from 'src/app/utils/alert.service';
+import { PurchaseStatusEnum } from 'src/app/modules/purchases/interfaces/purchase.interface';
 
 @Component({
   selector: 'app-recent-logistics',
@@ -36,12 +40,54 @@ export class RecentLogisticsComponent implements OnInit {
     paging: true,
     pageLength: 10,
     data: [],
+    order: [[1, 'asc']],
     columns: [
       {
         title: 'Numero de Control',
         data: 'controlNumber',
         render: function (data) {
           return data ? data : '-';
+        },
+      },
+      {
+        title: 'Estado',
+        data: 'status',
+        render: function (data: LogisticsStatusEnum, type: any) {
+          if (type === 'sort') {
+            switch (data) {
+              case LogisticsStatusEnum.DRAFT:
+                return 1; // Borrador
+              case LogisticsStatusEnum.CREATED:
+                return 2; // Sin pagos
+              case LogisticsStatusEnum.IN_PROGRESS:
+                return 3; // En progreso
+              case LogisticsStatusEnum.COMPLETED:
+                return 4; // Pago Completo
+              case LogisticsStatusEnum.CONFIRMED:
+                return 5; // Información Completa
+              case LogisticsStatusEnum.CLOSED:
+                return 6; // Cerrado
+              default:
+                return 99;
+            }
+          } else {
+            switch (data) {
+              case LogisticsStatusEnum.DRAFT:
+                return `<span class="badge bg-secondary">Borrador</span>`;
+              case LogisticsStatusEnum.CREATED:
+                return `<span class="badge bg-info text-light">Sin pagos</span>`;
+              case LogisticsStatusEnum.IN_PROGRESS:
+                return `<span class="badge bg-warning text-dark">En progreso</span>`;
+              case LogisticsStatusEnum.COMPLETED:
+                return `<span class="badge bg-success">Pago Completo</span>`;
+              case LogisticsStatusEnum.CONFIRMED:
+                return `<span class="badge bg-primary text-light">Información Completa</span>`;
+              case LogisticsStatusEnum.CLOSED:
+                return `<span class="badge bg-danger">Cerrado</span>`;
+              default:
+                return `<span class="badge bg-light text-dark">Desconocido</span>`;
+            }
+          }
         },
       },
       {
@@ -75,7 +121,7 @@ export class RecentLogisticsComponent implements OnInit {
         },
       },
       {
-        title: 'Total',
+        title: 'Total General',
         data: 'grandTotal',
         render: function (data) {
           if (!data && data !== 0) return '-';
@@ -136,6 +182,37 @@ export class RecentLogisticsComponent implements OnInit {
   ngOnInit(): void {
     this.isOnlyBuyer = this.authService.isOnlyBuyer;
     this.loadRecentLogistics();
+  }
+
+  shouldShowConfirmAction = (row: IReadLogisticsModel): boolean => {
+    return (
+      row?.status !== LogisticsStatusEnum.CONFIRMED &&
+      row?.status !== LogisticsStatusEnum.CLOSED
+    );
+  };
+
+  confirmLogistics(id: string) {
+    this.alertService
+      .confirmTranslated({
+        titleKey: 'MESSAGES.CONFIRM_TITLE',
+        messageKey: 'MESSAGES.CONFIRM_STATUS_TEXT',
+        confirmKey: 'BUTTONS.CONFIRM',
+        cancelKey: 'BUTTONS.CANCEL',
+        icon: 'warning',
+      })
+      .then((result) => {
+        if (!result.isConfirmed) return;
+        this.isLoading = true;
+        const sub = this.logisticsService
+          .updateLogistics(id, { status: LogisticsStatusEnum.CONFIRMED })
+          .subscribe({
+            next: () => this.loadRecentLogistics(),
+            error: () =>
+              this.alertService.showTranslatedAlert({ alertType: 'error' }),
+            complete: () => (this.isLoading = false),
+          });
+        this.unsubscribe.push(sub);
+      });
   }
 
   loadRecentLogistics() {

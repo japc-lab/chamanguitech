@@ -51,7 +51,6 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
   @ViewChild('saleForm') saleForm!: NgForm;
 
   isOnlyBuyer = false;
-  hasRouteId = false;
   searchSubmitted = false;
   controlNumber: string;
 
@@ -126,7 +125,6 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.saleId = this.route.snapshot.paramMap.get('id') || undefined;
-    this.hasRouteId = !!this.saleId;
     this.isOnlyBuyer = this.authService.isOnlyBuyer;
 
     this.initializeModels();
@@ -342,7 +340,7 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
   }
 
   goBack(): void {
-    this.location.back();
+    this.router.navigate(['/sales/list']);
   }
 
   handleLocalSaleWholeDetailsChange(details: ILocalSaleDetailModel[]) {

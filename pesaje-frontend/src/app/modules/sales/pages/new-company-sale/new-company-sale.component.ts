@@ -53,7 +53,6 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
   @ViewChild('saleForm') saleForm!: NgForm;
 
   isOnlyBuyer = false;
-  hasRouteId = false;
   searchSubmitted = false;
   isAddingPayment = false;
   controlNumber: string;
@@ -111,7 +110,6 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.saleId = this.route.snapshot.paramMap.get('id') || undefined;
-    this.hasRouteId = !!this.saleId;
     this.isOnlyBuyer = this.authService.isOnlyBuyer;
 
     this.initializeModels();
@@ -214,10 +212,9 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
       0
     );
     this.companySaleModel.grandTotal = Number(
-      this.companySaleItems.reduce(
-        (sum, item) => sum + Number(item.total || 0),
-        0
-      ).toFixed(2)
+      this.companySaleItems
+        .reduce((sum, item) => sum + Number(item.total || 0), 0)
+        .toFixed(2)
     );
     this.companySaleModel.percentageTotal = this.companySaleItems.reduce(
       (sum, item) => sum + Number(item.percentage || 0),
@@ -365,7 +362,7 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
   }
 
   goBack(): void {
-    this.location.back();
+    this.router.navigate(['/sales/list']);
   }
 
   handleCompanySaleItemsChange(items: ICompanySaleItemModel[]) {

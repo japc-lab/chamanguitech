@@ -13,7 +13,7 @@ const {
 const router = Router();
 
 const { query } = require('express-validator');
-const LogisticsTypeEnum = require('../enums/logistics-type.enum');
+const { LogisticsTypeEnum, LogisticsStatusEnum } = require('../enums/logistics.enums');
 
 router.get(
     '/by-params',
@@ -43,19 +43,57 @@ router.get('/:id', [
 
 router.post('/', [
     validateJWT,
-    check('purchase', 'Purchase ID is required').isMongoId(),
-    check('logisticsDate', 'Valid logisticsDate is required').isISO8601().toDate(),
-    check('grandTotal', 'grandTotal must be a positive number').isFloat({ min: 0 }),
+    // Allow minimal payload when status is DRAFT; otherwise enforce required fields
+    // Default to DRAFT when no status provided
+    (req, _res, next) => {
+        if (!req.body.status) req.body.status = 'DRAFT';
+        next();
+    },
+    check('status').optional().isIn(Object.values(LogisticsStatusEnum)).withMessage('Invalid status'),
+
+    check('purchase', 'Purchase ID is required')
+        .if((value, { req }) => req.body.status !== 'DRAFT')
+        .exists()
+        .isMongoId(),
+    check('logisticsDate', 'Valid logisticsDate is required')
+        .if((value, { req }) => req.body.status !== 'DRAFT')
+        .exists()
+        .isISO8601().toDate(),
+    check('grandTotal', 'grandTotal must be a positive number')
+        .if((value, { req }) => req.body.status !== 'DRAFT')
+        .exists()
+        .isFloat({ min: 0 }),
+    check('logisticsSheetNumber', 'logisticsSheetNumber is required')
+        .if((value, { req }) => req.body.status !== 'DRAFT')
+        .exists()
+        .notEmpty(),
     check('type')
-        .notEmpty()
+        .if((value, { req }) => req.body.status !== 'DRAFT')
+        .exists()
         .withMessage('Type is required')
         .isIn(Object.values(LogisticsTypeEnum))
         .withMessage(`type must be one of: ${Object.values(LogisticsTypeEnum).join(', ')}`),
-    body('items').isArray({ min: 1 }).withMessage('Items must be an array with at least one element'),
-    body('items.*.logisticsCategory', 'Each item must have a valid logisticsCategory ID').isMongoId(),
-    body('items.*.unit', 'Each item unit must be a positive number').isFloat({ min: 0 }),
-    body('items.*.cost', 'Each item cost must be a positive number').isFloat({ min: 0 }),
-    body('items.*.total', 'Each item total must be a positive number').isFloat({ min: 0 }),
+    body('items')
+        .if((value, { req }) => req.body.status !== 'DRAFT')
+        .isArray({ min: 1 })
+        .withMessage('Items must be an array with at least one element'),
+    body('items.*.financeCategory', 'Each item must have a valid financeCategory')
+        .if((value, { req }) => req.body.status !== 'DRAFT'),
+    body('items.*.resourceCategory', 'Each item must have a valid resourceCategory')
+        .if((value, { req }) => req.body.status !== 'DRAFT'),
+    body('items.*.unit', 'Each item unit must be a positive number')
+        .if((value, { req }) => req.body.status !== 'DRAFT')
+        .isFloat({ min: 0 }),
+    body('items.*.cost', 'Each item cost must be a positive number')
+        .if((value, { req }) => req.body.status !== 'DRAFT')
+        .isFloat({ min: 0 }),
+    body('items.*.total', 'Each item total must be a positive number')
+        .if((value, { req }) => req.body.status !== 'DRAFT')
+        .isFloat({ min: 0 }),
+    body('payments').optional().isArray().withMessage('Payments must be an array'),
+    body('payments.*.amount', 'Each payment must have a valid amount').optional().isFloat({ min: 0 }),
+    body('payments.*.paymentStatus', 'Each payment must have a valid paymentStatus').optional().isIn(['NO_PAYMENT', 'PENDING', 'PAID']),
+    body('payments.*.hasInvoice', 'Each payment must have a valid hasInvoice').optional().isIn(['yes', 'no', 'not-applicable']),
     validateFields
 ], createLogistics);
 
@@ -64,13 +102,49 @@ router.put(
     [
         validateJWT,
         check('id', 'Invalid logistics ID').isMongoId(),
-        check('logisticsDate', 'Logistics date must be a valid ISO date').optional().isISO8601(),
-        check('grandTotal', 'grandTotal must be a number >= 0').optional().isFloat({ min: 0 }),
-        body('items').optional().isArray({ min: 1 }),
-        body('items.*.logisticsCategory', 'Each item must have a valid logisticsType ID').isMongoId(),
-        body('items.*.unit', 'Each item must have a numeric unit >= 0').isFloat({ min: 0 }),
-        body('items.*.cost', 'Each item must have a numeric cost >= 0').isFloat({ min: 0 }),
-        body('items.*.total', 'Each item must have a numeric total >= 0').isFloat({ min: 0 }),
+        check('logisticsDate', 'Logistics date must be a valid ISO date')
+            .if((value, { req }) => req.body.status !== 'DRAFT')
+            .exists()
+            .isISO8601(),
+        check('grandTotal', 'grandTotal must be a number >= 0')
+            .if((value, { req }) => req.body.status !== 'DRAFT')
+            .exists()
+            .isFloat({ min: 0 }),
+        check('logisticsSheetNumber', 'logisticsSheetNumber is required')
+            .if((value, { req }) => req.body.status !== 'DRAFT')
+            .exists()
+            .notEmpty(),
+        check('type')
+            .if((value, { req }) => req.body.status !== 'DRAFT')
+            .exists()
+            .withMessage('Type is required')
+            .isIn(Object.values(LogisticsTypeEnum))
+            .withMessage(`type must be one of: ${Object.values(LogisticsTypeEnum).join(', ')}`),
+        body('items')
+            .if((value, { req }) => req.body.status !== 'DRAFT')
+            .optional()
+            .isArray({ min: 1 }),
+        body('items.*.financeCategory', 'Each item must have a valid financeCategory')
+            .if((value, { req }) => req.body.status !== 'DRAFT'),
+        body('items.*.resourceCategory', 'Each item must have a valid resourceCategory')
+            .if((value, { req }) => req.body.status !== 'DRAFT'),
+        body('items.*.unit', 'Each item must have a numeric unit >= 0')
+            .if((value, { req }) => req.body.status !== 'DRAFT')
+            .isFloat({ min: 0 }),
+        body('items.*.cost', 'Each item must have a numeric cost >= 0')
+            .if((value, { req }) => req.body.status !== 'DRAFT')
+            .isFloat({ min: 0 }),
+        body('items.*.total', 'Each item must have a numeric total >= 0')
+            .if((value, { req }) => req.body.status !== 'DRAFT')
+            .isFloat({ min: 0 }),
+        body('payments').optional().isArray().withMessage('Payments must be an array'),
+        body('payments.*.amount', 'Each payment must have a valid amount').optional().isFloat({ min: 0 }),
+        body('payments.*.paymentStatus', 'Each payment must have a valid paymentStatus').optional().isIn(['NO_PAYMENT', 'PENDING', 'PAID']),
+        body('payments.*.hasInvoice', 'Each payment must have a valid hasInvoice').optional().isIn(['yes', 'no', 'not-applicable']),
+        check('status')
+            .optional()
+            .isIn(Object.values(LogisticsStatusEnum))
+            .withMessage('Status must be one of: ' + Object.values(LogisticsStatusEnum).join(', ')),
         validateFields,
     ],
     updateLogistics

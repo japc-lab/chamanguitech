@@ -30,6 +30,7 @@ export interface IPurchaseDetailsModel {
   totalPoundsPurchased: number;
   totalToPay: number;
   totalAgreed: number;
+  weightSheetNumber: string;
 }
 
 export interface ISaleDetailsModel {
@@ -52,6 +53,7 @@ export interface ISaleDetailsModel {
 export interface ILogisticsDetailsModel {
   type: LogisticsTypeEnum;
   logisticsDate: string;
+  logisticsSheetNumber: string;
   personnelExpenses: number;
   productAndSupplyExpenses: number;
   totalToPay: number;

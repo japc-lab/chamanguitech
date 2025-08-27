@@ -1,0 +1,70 @@
+/* Hide number input arrows (Chrome, Safari, Edge) */
+input.no-spinner::-webkit-outer-spin-button,
+input.no-spinner::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Hide number input arrows (Firefox) */
+input.no-spinner[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Payment tracking specific styles */
+.table-responsive {
+  overflow-x: auto;
+}
+
+/* Ensure minimum column widths */
+.min-w-120px {
+  min-width: 120px;
+}
+
+.min-w-150px {
+  min-width: 150px;
+}
+
+.min-w-200px {
+  min-width: 200px;
+}
+
+/* Status badge colors */
+.badge-light-success {
+  background-color: #e8fff3;
+  color: #1bc5bd;
+}
+
+.badge-light-warning {
+  background-color: #fff4de;
+  color: #ffa800;
+}
+
+.badge-light-secondary {
+  background-color: #f3f6f9;
+  color: #7e8299;
+}
+
+/* Complete row highlighting */
+.border-success {
+  border-color: #1bc5bd !important;
+}
+
+/* Table header styling */
+.bg-light-primary {
+  background-color: #f1faff !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .table-responsive {
+    font-size: 0.875rem;
+  }
+
+  .form-control-sm {
+    font-size: 0.75rem;
+  }
+
+  .form-select-sm {
+    font-size: 0.75rem;
+  }
+}
