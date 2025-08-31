@@ -21,7 +21,6 @@ const LogisticsFinanceCategoryEnum = Object.freeze({
 const LogisticsResourceCategoryEnum = Object.freeze({
     PERSONNEL: "PERSONNEL",
     RESOURCES: "RESOURCES",
-    MATERIALS: "MATERIALS"
 });
 
 module.exports = {

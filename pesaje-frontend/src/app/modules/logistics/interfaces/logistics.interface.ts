@@ -76,5 +76,4 @@ export enum LogisticsFinanceCategoryEnum {
 export enum LogisticsResourceCategoryEnum {
   PERSONNEL = 'PERSONNEL',
   RESOURCES = 'RESOURCES',
-  MATERIALS = 'MATERIALS',
 }
