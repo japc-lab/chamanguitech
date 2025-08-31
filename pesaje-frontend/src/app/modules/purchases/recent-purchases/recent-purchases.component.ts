@@ -240,12 +240,12 @@ export class RecentPurchasesComponent implements OnInit {
           title: '¿Factura recibida?',
           data: 'hasInvoice',
           render: function (data) {
-            return data ? 'Si' : 'No';
+            return data === 'yes' ? 'Si' : data === 'no' ? 'No' : 'No aplica';
           },
         },
         {
           title: 'Número Factura',
-          data: 'invoice',
+          data: 'invoiceNumber',
           render: function (data) {
             return data ? data : '-';
           },

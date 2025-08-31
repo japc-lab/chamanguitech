@@ -174,7 +174,6 @@ export class LogisticsItemsListingComponent implements OnInit, OnChanges {
     const labels = {
       [LogisticsResourceCategoryEnum.PERSONNEL]: 'Personal',
       [LogisticsResourceCategoryEnum.RESOURCES]: 'Recursos',
-      [LogisticsResourceCategoryEnum.MATERIALS]: 'Materiales',
     };
     return labels[category] || category;
   }

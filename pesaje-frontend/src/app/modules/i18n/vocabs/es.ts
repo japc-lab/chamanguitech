@@ -132,6 +132,8 @@ export const locale = {
         'Los pagos no pueden exceder el monto total de ${{total}}',
       REPEATED_COMPANY_CODE:
         'El código de Compañía ya está en uso en otra Compañía.',
+      ASSET_PAID_AMOUNT_EXCEEDED:
+        'El monto pagado no puede ser mayor al costo del activo.',
     },
     INFO: {
       TITLE: 'Información',

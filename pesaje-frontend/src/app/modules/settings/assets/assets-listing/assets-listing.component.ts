@@ -228,7 +228,19 @@ export class AssetsListingComponent implements OnInit, OnDestroy {
       return;
     }
 
+        // Validate that paid amount doesn't exceed cost
+    if ((this.assetModel.paidAmount || 0) > (this.assetModel.cost || 0)) {
+      this.alertService.showTranslatedAlert({
+        alertType: 'error',
+        messageKey: 'ERROR.ASSET_PAID_AMOUNT_EXCEEDED'
+      });
+      return;
+    }
+
     this.isLoading = true;
+
+    // Auto assign payment status based on paid amount vs cost
+    const autoPaymentStatus = (this.assetModel.paidAmount || 0) >= (this.assetModel.cost || 0) ? 'paid' : 'pending';
 
     if (this.isEditing && this.editingAssetId) {
       // Update existing asset
@@ -238,7 +250,7 @@ export class AssetsListingComponent implements OnInit, OnDestroy {
         purchaseDate: this.assetModel.purchaseDate,
         cost: this.assetModel.cost,
         desiredLife: this.assetModel.desiredLife,
-        paymentStatus: this.assetModel.paymentStatus,
+        paymentStatus: autoPaymentStatus,
         paidAmount: this.assetModel.paidAmount,
         pendingAmount: this.assetModel.pendingAmount,
         responsible: this.assetModel.responsible,
@@ -273,7 +285,7 @@ export class AssetsListingComponent implements OnInit, OnDestroy {
         purchaseDate: this.assetModel.purchaseDate,
         cost: this.assetModel.cost,
         desiredLife: this.assetModel.desiredLife,
-        paymentStatus: this.assetModel.paymentStatus,
+        paymentStatus: autoPaymentStatus,
         paidAmount: this.assetModel.paidAmount,
         pendingAmount: this.assetModel.pendingAmount,
         responsible: this.assetModel.responsible,
