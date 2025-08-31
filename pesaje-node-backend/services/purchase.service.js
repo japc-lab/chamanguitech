@@ -1,6 +1,14 @@
 const dbAdapter = require('../adapters');
 const PurchaseStatusEnum = require('../enums/purchase-status.enum');
 
+const normalize = (num) => Math.round((Number(num) + Number.EPSILON) * 100) / 100;
+
+const determinePaymentStatus = (totalPaid, totalAgreedToPay) => {
+    if (totalPaid === 0) return PurchaseStatusEnum.CREATED;
+    if (totalPaid >= totalAgreedToPay) return PurchaseStatusEnum.COMPLETED;
+    return PurchaseStatusEnum.IN_PROGRESS;
+};
+
 const getAllByParams = async ({ includeDeleted = false, clientId, userId, companyId, periodId, controlNumber }) => {
     // Build base query
     const query = includeDeleted ? {} : { deletedAt: null };
@@ -153,10 +161,48 @@ const create = async (data) => {
 
 
 const update = async (id, data) => {
-    const purchase = await dbAdapter.purchaseAdapter.getById(id);
-    if (!purchase) throw new Error('Purchase not found');
+    const transaction = await dbAdapter.purchaseAdapter.startTransaction();
+    try {
+        const purchase = await dbAdapter.purchaseAdapter.getById(id);
+        if (!purchase) throw new Error('Purchase not found');
 
-    return await dbAdapter.purchaseAdapter.update(id, data);
+        // Update the purchase first
+        await dbAdapter.purchaseAdapter.update(id, data, { session: transaction.session });
+
+        // Recalculate status based on payments (unless explicitly setting to DRAFT or CONFIRMED/CLOSED)
+        const shouldRecalculateStatus = !data.status || 
+            (data.status !== PurchaseStatusEnum.DRAFT && 
+             data.status !== PurchaseStatusEnum.CONFIRMED && 
+             data.status !== PurchaseStatusEnum.CLOSED);
+
+        if (shouldRecalculateStatus) {
+            // Get all payments for this purchase
+            const payments = await dbAdapter.purchasePaymentMethodAdapter.getAll({
+                purchase: id,
+                deletedAt: null
+            });
+
+            const totalPaid = normalize(payments.reduce((sum, pm) => sum + Number(pm.amount || 0), 0));
+            const totalAgreedToPay = Number(data.totalAgreedToPay || purchase.totalAgreedToPay || 0);
+
+            // Determine correct status based on payments
+            const calculatedStatus = determinePaymentStatus(totalPaid, totalAgreedToPay);
+
+            // Update with calculated status if different from current
+            const updatedPurchase = await dbAdapter.purchaseAdapter.getById(id);
+            if (updatedPurchase.status !== calculatedStatus) {
+                await dbAdapter.purchaseAdapter.update(id, { status: calculatedStatus }, { session: transaction.session });
+            }
+        }
+
+        await transaction.commit();
+        return await dbAdapter.purchaseAdapter.getById(id);
+    } catch (error) {
+        await transaction.rollback();
+        throw new Error(error.message);
+    } finally {
+        await transaction.end();
+    }
 };
 
 const remove = async (id) => {
