@@ -1,8 +1,11 @@
 export interface IUpdateAssetModel {
   id: string;
+  code?: string;
   name?: string;
   purchaseDate?: Date;
-  cost?: number;
+  unitCost?: number;
+  units?: number;
+  totalCost?: number;
   desiredLife?: number;
   paymentStatus?: string;
   paidAmount?: number;
@@ -16,9 +19,12 @@ export interface IUpdateAssetModel {
 }
 
 export interface ICreateAssetModel {
+  code?: string;
   name?: string;
   purchaseDate?: Date;
-  cost?: number;
+  unitCost?: number;
+  units?: number;
+  totalCost?: number;
   desiredLife?: number;
   paymentStatus?: string;
   paidAmount?: number;
@@ -32,9 +38,12 @@ export interface ICreateAssetModel {
 
 export interface IReadAssetModel {
   id: string;
+  code: string;
   name: string;
   purchaseDate: Date;
-  cost: number;
+  unitCost: number;
+  units: number;
+  totalCost: number;
   desiredLife: number;
   paymentStatus: string;
   paidAmount: number;
