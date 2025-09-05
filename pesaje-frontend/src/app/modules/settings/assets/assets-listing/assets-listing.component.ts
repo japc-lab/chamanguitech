@@ -35,18 +35,21 @@ export class AssetsListingComponent implements OnInit, OnDestroy {
   reloadEvent: EventEmitter<boolean> = new EventEmitter();
 
   assetModel: ICreateAssetModel = {
-    name: '',
+    code: undefined,
+    name: undefined,
     purchaseDate: new Date(),
-    cost: 0,
-    desiredLife: 0,
+    unitCost: undefined,
+    units: undefined,
+    totalCost: undefined,
+    desiredLife: undefined,
     paymentStatus: 'pending',
-    paidAmount: 0,
-    pendingAmount: 0,
-    responsible: '',
-    location: '',
+    paidAmount: undefined,
+    pendingAmount: undefined,
+    responsible: undefined,
+    location: undefined,
     currentSituation: undefined,
     disposalDate: undefined,
-    daysOfUse: 0,
+    daysOfUse: undefined,
   } as ICreateAssetModel;
 
   isEditing = false;
@@ -63,7 +66,7 @@ export class AssetsListingComponent implements OnInit, OnDestroy {
     columns: [
       {
         title: 'Código',
-        data: 'id',
+        data: 'code',
         render: function (data) {
           return data ? data : '-';
         },
@@ -83,8 +86,22 @@ export class AssetsListingComponent implements OnInit, OnDestroy {
         },
       },
       {
-        title: 'Costo',
-        data: 'cost',
+        title: 'Costo Unitario',
+        data: 'unitCost',
+        render: function (data) {
+          return data ? `$${data.toLocaleString()}` : '$0';
+        },
+      },
+      {
+        title: 'Unidades',
+        data: 'units',
+        render: function (data) {
+          return data ? data.toLocaleString() : '0';
+        },
+      },
+      {
+        title: 'Costo Total',
+        data: 'totalCost',
         render: function (data) {
           return data ? `$${data.toLocaleString()}` : '$0';
         },
@@ -182,9 +199,12 @@ export class AssetsListingComponent implements OnInit, OnDestroy {
     const asset = this.assets.find((a) => a.id === id);
     if (asset) {
       this.assetModel = {
+        code: asset.code,
         name: asset.name,
         purchaseDate: asset.purchaseDate,
-        cost: asset.cost,
+        unitCost: asset.unitCost,
+        units: asset.units,
+        totalCost: asset.totalCost,
         desiredLife: asset.desiredLife,
         paymentStatus: asset.paymentStatus,
         paidAmount: asset.paidAmount,
@@ -205,18 +225,21 @@ export class AssetsListingComponent implements OnInit, OnDestroy {
 
   create() {
     this.assetModel = {
-      name: '',
+      code: undefined,
+      name: undefined,
       purchaseDate: new Date(),
-      cost: 0,
-      desiredLife: 0,
+      unitCost: undefined,
+      units: undefined,
+      totalCost: undefined,
+      desiredLife: undefined,
       paymentStatus: 'pending',
-      paidAmount: 0,
-      pendingAmount: 0,
-      responsible: '',
-      location: '',
+      paidAmount: undefined,
+      pendingAmount: undefined,
+      responsible: undefined,
+      location: undefined,
       currentSituation: undefined,
       disposalDate: undefined,
-      daysOfUse: 0,
+      daysOfUse: undefined,
     };
     this.isEditing = false;
     this.editingAssetId = null;
@@ -228,27 +251,38 @@ export class AssetsListingComponent implements OnInit, OnDestroy {
       return;
     }
 
-        // Validate that paid amount doesn't exceed cost
-    if ((this.assetModel.paidAmount || 0) > (this.assetModel.cost || 0)) {
+    // Auto-calculate totalCost from unitCost and units
+    if (this.assetModel.unitCost && this.assetModel.units) {
+      this.assetModel.totalCost = this.assetModel.unitCost * this.assetModel.units;
+    }
+
+    // Validate that paid amount doesn't exceed totalCost
+    if ((this.assetModel.paidAmount || 0) > (this.assetModel.totalCost || 0)) {
       this.alertService.showTranslatedAlert({
         alertType: 'error',
-        messageKey: 'ERROR.ASSET_PAID_AMOUNT_EXCEEDED'
+        messageKey: 'ERROR.ASSET_PAID_AMOUNT_EXCEEDED',
       });
       return;
     }
 
     this.isLoading = true;
 
-    // Auto assign payment status based on paid amount vs cost
-    const autoPaymentStatus = (this.assetModel.paidAmount || 0) >= (this.assetModel.cost || 0) ? 'paid' : 'pending';
+    // Auto assign payment status based on paid amount vs totalCost
+    const autoPaymentStatus =
+      (this.assetModel.paidAmount || 0) >= (this.assetModel.totalCost || 0)
+        ? 'paid'
+        : 'pending';
 
     if (this.isEditing && this.editingAssetId) {
-      // Update existing asset
-      const updatePayload: IUpdateAssetModel = {
+      // Update existing asset - build payload with all fields first
+      const fullUpdatePayload = {
         id: this.editingAssetId,
+        code: this.assetModel.code,
         name: this.assetModel.name,
         purchaseDate: this.assetModel.purchaseDate,
-        cost: this.assetModel.cost,
+        unitCost: this.assetModel.unitCost,
+        units: this.assetModel.units,
+        totalCost: this.assetModel.totalCost,
         desiredLife: this.assetModel.desiredLife,
         paymentStatus: autoPaymentStatus,
         paidAmount: this.assetModel.paidAmount,
@@ -260,6 +294,11 @@ export class AssetsListingComponent implements OnInit, OnDestroy {
         daysOfUse: this.assetModel.daysOfUse,
         deletedAt: this.isActive ? null : new Date(),
       };
+
+      // Remove empty values but keep id and deletedAt
+      const updatePayload = this.removeEmptyValues(fullUpdatePayload) as IUpdateAssetModel;
+      updatePayload.id = this.editingAssetId; // Always include id
+      updatePayload.deletedAt = this.isActive ? null : new Date(); // Always include deletedAt
 
       this.assetService
         .updateAsset(this.editingAssetId, updatePayload)
@@ -279,11 +318,14 @@ export class AssetsListingComponent implements OnInit, OnDestroy {
           },
         });
     } else {
-      // Create new asset
-      const assetPayload: ICreateAssetModel = {
+      // Create new asset - build payload with all fields first
+      const fullCreatePayload = {
+        code: this.assetModel.code,
         name: this.assetModel.name,
         purchaseDate: this.assetModel.purchaseDate,
-        cost: this.assetModel.cost,
+        unitCost: this.assetModel.unitCost,
+        units: this.assetModel.units,
+        totalCost: this.assetModel.totalCost,
         desiredLife: this.assetModel.desiredLife,
         paymentStatus: autoPaymentStatus,
         paidAmount: this.assetModel.paidAmount,
@@ -294,6 +336,9 @@ export class AssetsListingComponent implements OnInit, OnDestroy {
         disposalDate: this.assetModel.disposalDate,
         daysOfUse: this.assetModel.daysOfUse,
       };
+
+      // Remove empty values
+      const assetPayload = this.removeEmptyValues(fullCreatePayload) as ICreateAssetModel;
 
       this.assetService.createAsset(assetPayload as any).subscribe({
         next: () => {
@@ -311,9 +356,49 @@ export class AssetsListingComponent implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Calculate total cost from unit cost and units
+   * Called when unitCost or units change
+   */
+  calculateTotalCost(): void {
+    if (this.assetModel.unitCost && this.assetModel.units) {
+      this.assetModel.totalCost = this.assetModel.unitCost * this.assetModel.units;
+      // Also recalculate pending amount when total cost changes
+      this.calculatePendingAmount();
+    } else {
+      this.assetModel.totalCost = 0;
+      this.calculatePendingAmount();
+    }
+  }
+
+  /**
+   * Calculate pending amount from total cost and paid amount
+   * Called when totalCost or paidAmount change
+   */
   calculatePendingAmount(): void {
     this.assetModel.pendingAmount =
-      (this.assetModel.cost || 0) - (this.assetModel.paidAmount || 0);
+      (this.assetModel.totalCost || 0) - (this.assetModel.paidAmount || 0);
+  }
+
+  /**
+   * Handle unit cost changes - recalculate dependent fields
+   */
+  onUnitCostChange(): void {
+    this.calculateTotalCost();
+  }
+
+  /**
+   * Handle units changes - recalculate dependent fields
+   */
+  onUnitsChange(): void {
+    this.calculateTotalCost();
+  }
+
+  /**
+   * Handle paid amount changes - recalculate pending amount
+   */
+  onPaidAmountChange(): void {
+    this.calculatePendingAmount();
   }
 
   calculateDaysOfUse(): void {
@@ -325,6 +410,31 @@ export class AssetsListingComponent implements OnInit, OnDestroy {
           (1000 * 60 * 60 * 24)
       );
     }
+  }
+
+  /**
+   * Helper function to remove empty, undefined, null values from an object
+   * Keeps zero values for numbers as they might be valid
+   */
+  private removeEmptyValues(obj: any): any {
+    const cleaned: any = {};
+
+    for (const [key, value] of Object.entries(obj)) {
+      // Skip if value is null or undefined
+      if (value === null || value === undefined) {
+        continue;
+      }
+
+      // Skip empty strings
+      if (typeof value === 'string' && value.trim() === '') {
+        continue;
+      }
+
+      // Include all other values (including 0 for numbers, dates, etc.)
+      cleaned[key] = value;
+    }
+
+    return cleaned;
   }
 
   ngOnDestroy(): void {

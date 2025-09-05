@@ -16,7 +16,9 @@ router.post(
         // Required fields
         check('name', 'Asset name is required').notEmpty().trim(),
         check('purchaseDate', 'Purchase date is required').notEmpty().isISO8601().toDate(),
-        check('cost', 'Cost is required and must be a positive number').isFloat({ min: 0 }),
+        check('unitCost', 'Unit cost is required and must be a positive number').isFloat({ min: 0 }),
+        check('units', 'Units is required and must be at least 1').isInt({ min: 1 }),
+        check('totalCost', 'Total cost is required and must be a positive number').isFloat({ min: 0 }),
         check('desiredLife', 'Desired life is required and must be a positive number').isInt({ min: 0 }),
         check('paymentStatus', 'Payment status is required').isIn(['paid', 'pending']),
         check('paidAmount', 'Paid amount is required and must be a positive number').isFloat({ min: 0 }),
@@ -41,7 +43,9 @@ router.put(
         // Optional fields for updates
         check('name').optional().notEmpty().trim().withMessage('Asset name cannot be empty'),
         check('purchaseDate').optional().isISO8601().toDate().withMessage('Purchase date must be a valid date'),
-        check('cost').optional().isFloat({ min: 0 }).withMessage('Cost must be a positive number'),
+        check('unitCost').optional().isFloat({ min: 0 }).withMessage('Unit cost must be a positive number'),
+        check('units').optional().isInt({ min: 1 }).withMessage('Units must be at least 1'),
+        check('totalCost').optional().isFloat({ min: 0 }).withMessage('Total cost must be a positive number'),
         check('desiredLife').optional().isInt({ min: 0 }).withMessage('Desired life must be a positive integer'),
         check('paymentStatus').optional().isIn(['paid', 'pending']).withMessage('Payment status must be either "paid" or "pending"'),
         check('paidAmount').optional().isFloat({ min: 0 }).withMessage('Paid amount must be a positive number'),

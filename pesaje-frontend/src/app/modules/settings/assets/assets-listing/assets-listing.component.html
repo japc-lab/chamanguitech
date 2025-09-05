@@ -67,19 +67,42 @@
           </div>
         </div>
 
-        <!-- Costo -->
+        <!-- Costo Unitario -->
         <div class="mb-3">
-          <label for="cost" class="required fw-semibold fs-6 mb-2">Costo</label>
-          <input type="number" class="form-control" id="cost" name="cost" [(ngModel)]="assetModel.cost" required min="0"
-            #cost="ngModel" (ngModelChange)="calculatePendingAmount()">
-          <div *ngIf="(myForm.submitted || cost.dirty || cost.touched) && cost.errors?.['required']"
+          <label for="unitCost" class="required fw-semibold fs-6 mb-2">Costo Unitario</label>
+          <input type="number" class="form-control" id="unitCost" name="unitCost" [(ngModel)]="assetModel.unitCost"
+            required min="0" step="0.01" #unitCost="ngModel" (ngModelChange)="onUnitCostChange()">
+          <div *ngIf="(myForm.submitted || unitCost.dirty || unitCost.touched) && unitCost.errors?.['required']"
             class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-            <div>El costo es obligatorio.</div>
+            <div>El costo unitario es obligatorio.</div>
           </div>
-          <div *ngIf="(myForm.submitted || cost.dirty || cost.touched) && cost.errors?.['min']"
+          <div *ngIf="(myForm.submitted || unitCost.dirty || unitCost.touched) && unitCost.errors?.['min']"
             class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-            <div>El costo debe ser mayor o igual a 0.</div>
+            <div>El costo unitario debe ser mayor o igual a 0.</div>
           </div>
+        </div>
+
+        <!-- Unidades -->
+        <div class="mb-3">
+          <label for="units" class="required fw-semibold fs-6 mb-2">Unidades</label>
+          <input type="number" class="form-control" id="units" name="units" [(ngModel)]="assetModel.units"
+            required min="1" step="1" #units="ngModel" (ngModelChange)="onUnitsChange()">
+          <div *ngIf="(myForm.submitted || units.dirty || units.touched) && units.errors?.['required']"
+            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+            <div>Las unidades son obligatorias.</div>
+          </div>
+          <div *ngIf="(myForm.submitted || units.dirty || units.touched) && units.errors?.['min']"
+            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+            <div>Las unidades deben ser mayor o igual a 1.</div>
+          </div>
+        </div>
+
+        <!-- Costo Total (Calculado) -->
+        <div class="mb-3">
+          <label for="totalCost" class="fw-semibold fs-6 mb-2">Costo Total <small class="text-muted">(Calculado)</small></label>
+          <input type="number" class="form-control" id="totalCost" name="totalCost" [(ngModel)]="assetModel.totalCost"
+            min="0" step="0.01" readonly disabled>
+          <small class="form-text text-muted">Este campo se calcula automáticamente: Costo Unitario × Unidades</small>
         </div>
 
         <!-- Vida Útil Deseada -->
@@ -98,28 +121,21 @@
           </div>
         </div>
 
-        <!-- Estado de Pago -->
+        <!-- Estado de Pago (Calculado) -->
         <div class="mb-3">
-          <label for="paymentStatus" class="required fw-semibold fs-6 mb-2">Estado de Pago</label>
-          <select class="form-control" id="paymentStatus" name="paymentStatus" [(ngModel)]="assetModel.paymentStatus"
-            required #paymentStatus="ngModel">
-            <option value="">Seleccione un estado</option>
-            <option value="paid">Pagado</option>
-            <option value="pending">Pendiente</option>
-          </select>
-          <div
-            *ngIf="(myForm.submitted || paymentStatus.dirty || paymentStatus.touched) && paymentStatus.errors?.['required']"
-            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-            <div>El estado de pago es obligatorio.</div>
-          </div>
+          <label for="paymentStatus" class="fw-semibold fs-6 mb-2">Estado de Pago <small class="text-muted">(Calculado)</small></label>
+          <input type="text" class="form-control" id="paymentStatus" name="paymentStatus"
+            [value]="assetModel.paymentStatus === 'paid' ? 'Pagado' : 'Pendiente'"
+            readonly disabled>
+          <small class="form-text text-muted">Este campo se calcula automáticamente según el monto pagado vs costo total</small>
         </div>
 
         <!-- Monto Pagado -->
         <div class="mb-3">
           <label for="paidAmount" class="required fw-semibold fs-6 mb-2">Monto Pagado</label>
           <input type="number" class="form-control" id="paidAmount" name="paidAmount"
-            [(ngModel)]="assetModel.paidAmount" required min="0" #paidAmount="ngModel"
-            (ngModelChange)="calculatePendingAmount()">
+            [(ngModel)]="assetModel.paidAmount" required min="0" step="0.01" #paidAmount="ngModel"
+            (ngModelChange)="onPaidAmountChange()">
           <div *ngIf="(myForm.submitted || paidAmount.dirty || paidAmount.touched) && paidAmount.errors?.['required']"
             class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
             <div>El monto pagado es obligatorio.</div>
@@ -130,21 +146,12 @@
           </div>
         </div>
 
-        <!-- Monto Pendiente -->
+        <!-- Monto Pendiente (Calculado) -->
         <div class="mb-3">
-          <label for="pendingAmount" class="required fw-semibold fs-6 mb-2">Monto Pendiente</label>
+          <label for="pendingAmount" class="fw-semibold fs-6 mb-2">Monto Pendiente <small class="text-muted">(Calculado)</small></label>
           <input type="number" class="form-control" id="pendingAmount" name="pendingAmount"
-            [(ngModel)]="assetModel.pendingAmount" required min="0" #pendingAmount="ngModel" disabled>
-          <div
-            *ngIf="(myForm.submitted || pendingAmount.dirty || pendingAmount.touched) && pendingAmount.errors?.['required']"
-            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-            <div>El monto pendiente es obligatorio.</div>
-          </div>
-          <div
-            *ngIf="(myForm.submitted || pendingAmount.dirty || pendingAmount.touched) && pendingAmount.errors?.['min']"
-            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-            <div>El monto pendiente debe ser mayor o igual a 0.</div>
-          </div>
+            [(ngModel)]="assetModel.pendingAmount" min="0" step="0.01" readonly disabled>
+          <small class="form-text text-muted">Este campo se calcula automáticamente: Costo Total - Monto Pagado</small>
         </div>
 
         <!-- Responsable -->
