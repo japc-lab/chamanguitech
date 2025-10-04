@@ -29,6 +29,22 @@ router.post(
         check('details.*.items.*.pounds', 'Item pounds is required and must be numeric').isNumeric(),
         check('details.*.items.*.price', 'Item price is required and must be numeric').isNumeric(),
         check('details.*.items.*.total', 'Item total is required and must be numeric').isNumeric(),
+        check('weightSheetNumber', 'weightSheetNumber is required')
+            .if((value, { req }) => req.body.status !== 'DRAFT')
+            .exists()
+            .isString(),
+        check('hasInvoice', 'hasInvoice is required and must be one of: yes, no, not-applicable')
+            .if((value, { req }) => req.body.status !== 'DRAFT')
+            .exists()
+            .isIn(['yes', 'no', 'not-applicable']),
+        check('invoiceNumber')
+            .if((value, { req }) => req.body.status !== 'DRAFT' && req.body.hasInvoice === 'yes')
+            .isString()
+            .withMessage('Invoice number must be a string'),
+        check('invoiceName')
+            .if((value, { req }) => req.body.status !== 'DRAFT' && req.body.hasInvoice === 'yes')
+            .isString()
+            .withMessage('Invoice name must be a string'),
         validateFields
     ],
     createLocalSale
@@ -67,6 +83,17 @@ router.put(
         check('details.*.items.*.pounds', 'Item pounds is required and must be numeric').isNumeric(),
         check('details.*.items.*.price', 'Item price is required and must be numeric').isNumeric(),
         check('details.*.items.*.total', 'Item total is required and must be numeric').isNumeric(),
+        check('weightSheetNumber').optional().isString().withMessage('Weight sheet number must be a string'),
+        check('hasInvoice')
+            .optional()
+            .isIn(['yes', 'no', 'not-applicable']),
+        check('invoiceNumber')
+            .if((value, { req }) => req.body.status !== 'DRAFT' && req.body.hasInvoice === 'yes')
+            .isString().withMessage('Invoice number must be a string'),
+        check('invoiceName')
+            .if((value, { req }) => req.body.status !== 'DRAFT' && req.body.hasInvoice === 'yes')
+            .isString()
+            .withMessage('Invoice name must be a string'),
         validateFields
     ],
     updateLocalSale

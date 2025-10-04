@@ -17,6 +17,7 @@ export interface ISaleModel {
   company: ICompany;
   type: SaleTypeEnum;
   status: CompanySaleStatusEnum;
+  weightSheetNumber?: string;
   deletedAt?: string;
 }
 
@@ -81,6 +82,10 @@ export interface ICreateUpdateLocalSaleModel {
   grandTotal: number;
   seller: string;
   details: ILocalSaleDetailModel[];
+  hasInvoice: 'yes' | 'no' | 'not-applicable';
+  invoiceNumber?: string;
+  invoiceName?: string;
+  weightSheetNumber?: string;
 }
 
 export interface ILocalSaleModel {
@@ -96,6 +101,9 @@ export interface ILocalSaleModel {
   grandTotal: number;
   seller: string;
   details: ILocalSaleDetailModel[];
+  hasInvoice: 'yes' | 'no' | 'not-applicable';
+  invoiceNumber?: string;
+  invoiceName?: string;
 }
 
 export enum SaleTypeEnum {
@@ -106,7 +114,7 @@ export enum SaleTypeEnum {
 export enum SaleStyleEnum {
   WHOLE = 'WHOLE',
   TAIL = 'TAIL',
-  RESIDUAL = 'RESIDUAL'
+  RESIDUAL = 'RESIDUAL',
 }
 
 export enum CompanySaleStatusEnum {

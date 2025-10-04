@@ -15,6 +15,10 @@ const create = async (data) => {
             totalProcessedPounds,
             grandTotal,
             seller,
+            weightSheetNumber,
+            hasInvoice,
+            invoiceNumber,
+            invoiceName,
             details
         } = data;
 
@@ -26,6 +30,7 @@ const create = async (data) => {
         const sale = await dbAdapter.saleAdapter.create({
             purchase,
             saleDate,
+            weightSheetNumber,
             type: SaleTypeEnum.LOCAL
         }, { session: transaction.session });
 
@@ -59,6 +64,9 @@ const create = async (data) => {
             totalProcessedPounds,
             grandTotal,
             seller,
+            hasInvoice,
+            invoiceNumber,
+            invoiceName,
             details: detailIds
         }, { session: transaction.session });
 
@@ -111,12 +119,16 @@ const getBySaleId = async (saleId) => {
         id: localSale.id,
         sale: localSale.sale,
         saleDate: sale.saleDate,
+        weightSheetNumber: sale.weightSheetNumber,
         wholeTotalPounds: localSale.wholeTotalPounds,
         tailTotalPounds: localSale.tailTotalPounds,
         wholeRejectedPounds: localSale.wholeRejectedPounds,
         trashPounds: localSale.trashPounds,
         totalProcessedPounds: localSale.totalProcessedPounds,
         seller: localSale.seller,
+        hasInvoice: localSale.hasInvoice,
+        invoiceNumber: localSale.invoiceNumber,
+        invoiceName: localSale.invoiceName,
         deletedAt: localSale.deletedAt,
         details: localSale.details.map(detail => ({
             id: detail.id,
@@ -178,10 +190,10 @@ const update = async (id, data) => {
         const sale = await dbAdapter.saleAdapter.getById(existingLocalSale.sale);
         if (!sale) throw new Error('Associated Sale not found');
 
-        const { saleDate, wholeTotalPounds, tailTotalPounds, wholeRejectedPounds, trashPounds, totalProcessedPounds, grandTotal, seller, details } = data;
+        const { saleDate, wholeTotalPounds, tailTotalPounds, wholeRejectedPounds, trashPounds, totalProcessedPounds, grandTotal, seller, weightSheetNumber, hasInvoice, invoiceNumber, invoiceName, details } = data;
 
         // Update sale date if changed
-        await dbAdapter.saleAdapter.update(sale.id, { saleDate }, { session: transaction.session });
+        await dbAdapter.saleAdapter.update(sale.id, { saleDate, weightSheetNumber }, { session: transaction.session });
 
         // Delete existing details and their items permanently
         const existingDetails = await dbAdapter.localSaleDetailAdapter.getAll({ _id: { $in: existingLocalSale.details } });
@@ -219,6 +231,10 @@ const update = async (id, data) => {
             totalProcessedPounds,
             grandTotal,
             seller,
+            weightSheetNumber,
+            hasInvoice,
+            invoiceNumber,
+            invoiceName,
             details: newDetailIds
         }, { session: transaction.session });
 

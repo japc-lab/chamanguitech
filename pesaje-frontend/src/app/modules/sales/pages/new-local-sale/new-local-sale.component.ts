@@ -471,6 +471,35 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
     }
   }
 
+  onHasInvoiceChange(hasInvoice: boolean) {
+    if (!hasInvoice) {
+      this.localSaleModel.invoiceNumber = undefined;
+      this.localSaleModel.invoiceName = undefined;
+    }
+  }
+
+  /**
+   * 👉 Formats sheet number to 8 digits with leading zeros when input loses focus
+   */
+  formatWeightSheetNumberOnBlur(event: Event) {
+    this.inputUtils.formatSheetNumberOnBlur(
+      event,
+      'weightSheetNumber',
+      this.localSaleModel
+    );
+  }
+
+  /**
+   * 👉 Handles focus event to clear field if it's all zeros
+   */
+  onWeightSheetNumberFocus(event: Event) {
+    this.inputUtils.onSheetNumberFocus(
+      event,
+      'weightSheetNumber',
+      this.localSaleModel
+    );
+  }
+
   formatDecimal(controlName: string) {
     const control = this.saleForm?.form?.get(controlName);
     if (control) {

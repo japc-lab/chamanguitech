@@ -40,6 +40,18 @@ const LocalSaleSchema = Schema({
     ref: 'LocalSaleDetail',
     required: true
   }],
+  hasInvoice: {
+    type: String,
+    required: true,
+    enum: ['yes', 'no', 'not-applicable']
+  },
+  invoiceNumber: {
+    type: String,
+    sparse: true // Allows multiple `null` values while keeping uniqueness for non-null values
+  },
+  invoiceName: {
+    type: String,
+  },
   deletedAt: {
     type: Date,
     default: null
