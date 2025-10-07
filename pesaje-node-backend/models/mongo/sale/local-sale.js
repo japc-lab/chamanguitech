@@ -6,14 +6,6 @@ const LocalSaleSchema = Schema({
     ref: 'Sale',
     required: true
   },
-  wholeTotalPounds: {
-    type: Number,
-    required: true
-  },
-  tailTotalPounds: {
-    type: Number,
-    required: true
-  },
   wholeRejectedPounds: {
     type: Number,
     required: true
@@ -25,6 +17,13 @@ const LocalSaleSchema = Schema({
   totalProcessedPounds: {
     type: Number,
     required: true,
+  },
+  wholeTotalPounds: {
+    type: Number,
+    required: true
+  },
+  moneyIncomeForRejectedHeads: {
+    type: Number,
   },
   grandTotal: {
     type: Number,

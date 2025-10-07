@@ -75,7 +75,7 @@ export interface ICreateUpdateLocalSaleModel {
   purchase: string;
   saleDate: string;
   wholeTotalPounds: number;
-  tailTotalPounds: number;
+  moneyIncomeForRejectedHeads: number;
   wholeRejectedPounds: number;
   trashPounds: number;
   totalProcessedPounds: number;
@@ -94,7 +94,7 @@ export interface ILocalSaleModel {
   sale: string;
   saleDate: string;
   wholeTotalPounds: number;
-  tailTotalPounds: number;
+  moneyIncomeForRejectedHeads: number;
   wholeRejectedPounds: number;
   trashPounds: number;
   totalProcessedPounds: number;

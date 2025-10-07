@@ -224,16 +224,22 @@
 
         <!-- wholeTotalPounds -->
         <div class="col-md-6">
-          <label for="wholeTotalPounds" class="fw-semibold fs-6 mb-2">Total Lb. Cabeza</label>
+          <label for="wholeTotalPounds" class="fw-semibold fs-6 mb-2">Total Lb. Camarón con cabeza</label>
           <input type="text" id="wholeTotalPounds" name="wholeTotalPounds" class="form-control form-control-sm text-end"
             [value]="localSaleModel.wholeTotalPounds | number: '1.2-2'" disabled />
         </div>
 
-        <!-- tailTotalPounds -->
+        <!-- moneyIncomeForRejectedHeads -->
         <div class="col-md-6">
-          <label for="tailTotalPounds" class="fw-semibold fs-6 mb-2">Total Lb. Sin Cabeza</label>
-          <input type="text" id="tailTotalPounds" name="tailTotalPounds" class="form-control form-control-sm text-end"
-            [value]="localSaleModel.tailTotalPounds | number: '1.2-2'" disabled />
+          <label for="moneyIncomeForRejectedHeads" class="fw-semibold fs-6 mb-2">Ingreso de dinero por rechazo de
+            cabezas</label>
+          <span class="input-group">
+            <span class="input-group-text">$</span>
+            <input type="text" id="moneyIncomeForRejectedHeads" name="moneyIncomeForRejectedHeads"
+              [(ngModel)]="localSaleModel.moneyIncomeForRejectedHeads" #moneyIncomeForRejectedHeads="ngModel"
+              class="form-control form-control-sm" required (keypress)="validateNumber($event)"
+              (blur)="formatDecimal('moneyIncomeForRejectedHeads')" />
+          </span>
         </div>
 
         <!-- totalProcessedPounds -->
@@ -251,8 +257,6 @@
           <input type="text" id="processedRatio" name="processedRatio" class="form-control form-control-sm text-end"
             [value]="processedRatioDisplay" disabled />
         </div>
-
-
       </div>
     </div>
   </div>

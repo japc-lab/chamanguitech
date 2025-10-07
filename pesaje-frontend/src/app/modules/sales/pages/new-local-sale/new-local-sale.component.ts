@@ -101,13 +101,11 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
   get totalProcessedPounds(): number {
     const {
       wholeTotalPounds = 0,
-      tailTotalPounds = 0,
       wholeRejectedPounds = 0,
       trashPounds = 0,
     } = this.localSaleModel;
     return (
       Number(wholeTotalPounds) +
-      Number(tailTotalPounds) +
       Number(wholeRejectedPounds) +
       Number(trashPounds)
     );
@@ -170,7 +168,6 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
   initializeModels() {
     this.localSaleModel = {} as ICreateUpdateLocalSaleModel;
     this.localSaleModel.wholeTotalPounds = 0;
-    this.localSaleModel.tailTotalPounds = 0;
 
     this.purchaseModel = {} as IReducedDetailedPurchaseModel;
     this.purchaseModel.period = {} as IReducedPeriodModel;
@@ -354,7 +351,6 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
 
   handleLocalSaleTailDetailsChange(details: ILocalSaleDetailModel[]) {
     this.localSaleTailDetails = details;
-    this.calculateTailTotalPounds();
     this.updateGroupedDetails(
       this.localSaleWholeDetails,
       this.localSaleTailDetails
@@ -371,18 +367,6 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
     });
 
     this.localSaleModel.wholeTotalPounds = Number(total.toFixed(2));
-  }
-
-  calculateTailTotalPounds(): void {
-    let total = 0;
-
-    this.localSaleTailDetails.forEach((detail) => {
-      detail.items.forEach((item) => {
-        total += item.pounds || 0;
-      });
-    });
-
-    this.localSaleModel.tailTotalPounds = Number(total.toFixed(2));
   }
 
   updateGroupedDetails(

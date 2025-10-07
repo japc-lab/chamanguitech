@@ -9,7 +9,7 @@ const create = async (data) => {
             purchase,
             saleDate,
             wholeTotalPounds,
-            tailTotalPounds,
+            moneyIncomeForRejectedHeads,
             wholeRejectedPounds,
             trashPounds,
             totalProcessedPounds,
@@ -58,7 +58,7 @@ const create = async (data) => {
         const localSale = await dbAdapter.localSaleAdapter.create({
             sale: sale.id,
             wholeTotalPounds,
-            tailTotalPounds,
+            moneyIncomeForRejectedHeads,
             wholeRejectedPounds,
             trashPounds,
             totalProcessedPounds,
@@ -121,7 +121,7 @@ const getBySaleId = async (saleId) => {
         saleDate: sale.saleDate,
         weightSheetNumber: sale.weightSheetNumber,
         wholeTotalPounds: localSale.wholeTotalPounds,
-        tailTotalPounds: localSale.tailTotalPounds,
+        moneyIncomeForRejectedHeads: localSale.moneyIncomeForRejectedHeads,
         wholeRejectedPounds: localSale.wholeRejectedPounds,
         trashPounds: localSale.trashPounds,
         totalProcessedPounds: localSale.totalProcessedPounds,
@@ -190,7 +190,7 @@ const update = async (id, data) => {
         const sale = await dbAdapter.saleAdapter.getById(existingLocalSale.sale);
         if (!sale) throw new Error('Associated Sale not found');
 
-        const { saleDate, wholeTotalPounds, tailTotalPounds, wholeRejectedPounds, trashPounds, totalProcessedPounds, grandTotal, seller, weightSheetNumber, hasInvoice, invoiceNumber, invoiceName, details } = data;
+        const { saleDate, wholeTotalPounds, moneyIncomeForRejectedHeads, wholeRejectedPounds, trashPounds, totalProcessedPounds, grandTotal, seller, weightSheetNumber, hasInvoice, invoiceNumber, invoiceName, details } = data;
 
         // Update sale date if changed
         await dbAdapter.saleAdapter.update(sale.id, { saleDate, weightSheetNumber }, { session: transaction.session });
@@ -225,7 +225,7 @@ const update = async (id, data) => {
         // Update local sale
         const updatedLocalSale = await dbAdapter.localSaleAdapter.update(id, {
             wholeTotalPounds,
-            tailTotalPounds,
+            moneyIncomeForRejectedHeads,
             wholeRejectedPounds,
             trashPounds,
             totalProcessedPounds,
