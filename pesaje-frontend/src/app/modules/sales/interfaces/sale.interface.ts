@@ -2,6 +2,7 @@ import { IReducedDetailedPurchaseModel } from '../../purchases/interfaces/purcha
 import { ICompany } from '../../settings/interfaces/company.interfaces';
 import { IReducedUserModel } from '../../settings/interfaces/user.interface';
 import { ICompanySaleItemModel } from './company-sale-item.interface';
+import { ILocalCompanySaleDetailModel } from './local-company-sale-detail.interface';
 import { ILocalSaleDetailModel } from './local-sale-detail.interface';
 
 export interface ISaleModel {
@@ -82,6 +83,7 @@ export interface ICreateUpdateLocalSaleModel {
   grandTotal: number;
   seller: string;
   details: ILocalSaleDetailModel[];
+  localCompanyDetails: ILocalCompanySaleDetailModel[];
   hasInvoice: 'yes' | 'no' | 'not-applicable';
   invoiceNumber?: string;
   invoiceName?: string;
@@ -101,6 +103,7 @@ export interface ILocalSaleModel {
   grandTotal: number;
   seller: string;
   details: ILocalSaleDetailModel[];
+  localCompanyDetails: ILocalCompanySaleDetailModel[];
   hasInvoice: 'yes' | 'no' | 'not-applicable';
   invoiceNumber?: string;
   invoiceName?: string;

@@ -1,4 +1,3 @@
-import { ILocalSaleDetailItemModel } from './local-sale-detail-item.interface';
 import { SaleStyleEnum } from './sale.interface';
 
 export interface ILocalSaleDetailModel {
@@ -8,4 +7,12 @@ export interface ILocalSaleDetailModel {
   grandTotal: number;
   poundsGrandTotal: number;
   items: ILocalSaleDetailItemModel[];
+}
+
+export interface ILocalSaleDetailItemModel {
+  id?: string;
+  size: string;
+  pounds: number;
+  price: number;
+  total: number;
 }

@@ -1,0 +1,50 @@
+// local-company-sale-details.component.scss
+
+.no-spinner {
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  &[type=number] {
+    -moz-appearance: textfield;
+  }
+}
+
+.table-responsive {
+  .table {
+    th, td {
+      vertical-align: middle;
+      padding: 0.5rem;
+    }
+  }
+}
+
+.card-header {
+  .btn-outline-light {
+    border-color: rgba(255, 255, 255, 0.5);
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.75);
+    }
+  }
+}
+
+// Highlight calculated fields
+.bg-light {
+  background-color: #f8f9fa !important;
+}
+
+// Custom styling for yellow labels
+label[style*="background-color: yellow"] {
+  border-radius: 4px;
+  display: inline-block;
+}
+
+// Custom styling for green labels
+label[style*="background-color: lightgreen"] {
+  border-radius: 4px;
+  display: inline-block;
+}

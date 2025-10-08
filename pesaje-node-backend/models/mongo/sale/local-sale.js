@@ -39,6 +39,10 @@ const LocalSaleSchema = Schema({
     ref: 'LocalSaleDetail',
     required: true
   }],
+  localCompanyDetails: [{
+    type: Schema.Types.ObjectId,
+    ref: 'LocalCompanySaleDetail',
+  }],
   hasInvoice: {
     type: String,
     required: true,

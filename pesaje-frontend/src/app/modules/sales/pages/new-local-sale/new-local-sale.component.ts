@@ -34,6 +34,7 @@ import { IReducedPeriodModel } from 'src/app/modules/shared/interfaces/period.in
 import { CompanySalePaymentListingComponent } from '../../widgets/company-sale-payment-listing/company-sale-payment-listing.component';
 import { LocalSaleService } from '../../services/local-sale.service';
 import { ILocalSaleDetailModel } from '../../interfaces/local-sale-detail.interface';
+import { ILocalCompanySaleDetailModel } from '../../interfaces/local-company-sale-detail.interface';
 import { SaleStyleEnum } from '../../interfaces/sale.interface';
 import { SaleService } from '../../services/sale.service';
 
@@ -59,6 +60,7 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
 
   localSaleWholeDetails: ILocalSaleDetailModel[] = [];
   localSaleTailDetails: ILocalSaleDetailModel[] = [];
+  localCompanySaleDetail: ILocalCompanySaleDetailModel | null = null;
 
   groupedWhole: { size: string; pounds: number; total: number }[] = [];
   groupedTail: { size: string; pounds: number; total: number }[] = [];
@@ -145,6 +147,7 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
             this.localSaleTailDetails = this.localSaleModel.details.filter(
               (det) => det.style === SaleStyleEnum.TAIL
             );
+            this.localCompanySaleDetail = this.localSaleModel.localCompanyDetails?.[0] || null;
             this.updateGroupedDetails(
               this.localSaleWholeDetails,
               this.localSaleTailDetails
@@ -221,6 +224,13 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
       ...this.localSaleWholeDetails,
       ...this.localSaleTailDetails,
     ];
+    // Transform localCompanyDetails to ensure company field contains only ID strings
+    this.localSaleModel.localCompanyDetails = this.localCompanySaleDetail ? [{
+      ...this.localCompanySaleDetail,
+      company: typeof this.localCompanySaleDetail.company === 'object' && this.localCompanySaleDetail.company?.id
+        ? this.localCompanySaleDetail.company.id
+        : this.localCompanySaleDetail.company
+    }] : [];
 
     if (this.localSaleId) {
       this.localSaleService
@@ -355,6 +365,10 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
       this.localSaleWholeDetails,
       this.localSaleTailDetails
     );
+  }
+
+  handleLocalCompanySaleDetailChange(detail: ILocalCompanySaleDetailModel | null) {
+    this.localCompanySaleDetail = detail;
   }
 
   calculateWholeTotalPounds(): void {

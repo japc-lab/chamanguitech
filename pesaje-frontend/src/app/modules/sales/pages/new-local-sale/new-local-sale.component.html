@@ -278,6 +278,12 @@
     <app-local-sale-details [style]="SaleStyleEnum.TAIL" [localSaleDetails]="localSaleTailDetails"
       (localSaleDetailsChange)="handleLocalSaleTailDetailsChange($event)" />
   </div>
+
+  <!-- COMPANY SALE DETAILS -->
+  <div class="col-12">
+    <app-local-company-sale-details [localCompanySaleDetail]="localCompanySaleDetail"
+      (localCompanySaleDetailChange)="handleLocalCompanySaleDetailChange($event)" />
+  </div>
 </div>
 
 <!-- end::Fourth Section: Local Sale Details -->
