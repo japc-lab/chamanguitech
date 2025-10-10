@@ -10,6 +10,13 @@ export interface ILocalCompanySaleDetailModel {
   guideNumber: string;
   weightDifference: number;
   processedWeight: number;
+  poundsGrandTotal: number;
+  grandTotal: number;
+  retentionPercentage?: number;
+  retentionAmount?: number;
+  netGrandTotal: number;
+  otherPenalties?: number;
+  deletedAt?: string;
   items: ILocalCompanySaleDetailItemModel[];
 }
 

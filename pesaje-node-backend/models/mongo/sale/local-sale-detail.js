@@ -33,6 +33,23 @@ const LocalSaleDetailSchema = Schema({
     required: true,
     min: 0
   },
+  retentionPercentage: {
+    type: Number,
+    min: 0
+  },
+  retentionAmount: {
+    type: Number,
+    min: 0
+  },
+  netGrandTotal: {
+    type: Number,
+    required: true,
+    min: 0
+  },
+  otherPenalties: {
+    type: Number,
+    min: 0
+  },
   deletedAt: {
     type: Date,
     default: null

@@ -1,4 +1,12 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  SimpleChanges,
+} from '@angular/core';
 import {
   ILocalSaleDetailModel,
   ILocalSaleDetailItemModel,
@@ -42,6 +50,17 @@ export class LocalSaleDetailComponent implements OnInit, OnChanges {
     // Ensure the detail has the correct style whenever localSaleDetail changes
     if (changes['localSaleDetail'] && this.localSaleDetail) {
       this.localSaleDetail.style = this.style;
+
+      // Ensure default values for optional fields
+      if (this.localSaleDetail.retentionPercentage === undefined || this.localSaleDetail.retentionPercentage === null) {
+        this.localSaleDetail.retentionPercentage = 0;
+      }
+      if (this.localSaleDetail.otherPenalties === undefined || this.localSaleDetail.otherPenalties === null) {
+        this.localSaleDetail.otherPenalties = 0;
+      }
+
+      // Calculate retention amount and net grand total with defaults
+      this.calculateRetentionAndNetTotal(this.localSaleDetail);
     }
   }
 
@@ -57,6 +76,17 @@ export class LocalSaleDetailComponent implements OnInit, OnChanges {
     // Ensure the detail has the correct style if it exists
     if (this.localSaleDetail) {
       this.localSaleDetail.style = this.style;
+
+      // Ensure default values for optional fields
+      if (this.localSaleDetail.retentionPercentage === undefined || this.localSaleDetail.retentionPercentage === null) {
+        this.localSaleDetail.retentionPercentage = 0;
+      }
+      if (this.localSaleDetail.otherPenalties === undefined || this.localSaleDetail.otherPenalties === null) {
+        this.localSaleDetail.otherPenalties = 0;
+      }
+
+      // Calculate retention amount and net grand total with defaults
+      this.calculateRetentionAndNetTotal(this.localSaleDetail);
     }
 
     this.loadPaymentMethods();
@@ -82,6 +112,10 @@ export class LocalSaleDetailComponent implements OnInit, OnChanges {
         grandTotal: 0,
         receivedGrandTotal: 0,
         poundsGrandTotal: 0,
+        retentionPercentage: 0,
+        retentionAmount: 0,
+        netGrandTotal: 0,
+        otherPenalties: 0,
         items: [],
       };
       this.emitChanges();
@@ -135,6 +169,34 @@ export class LocalSaleDetailComponent implements OnInit, OnChanges {
     detail.receivedGrandTotal = Number(receivedTotal.toFixed(2));
     detail.poundsGrandTotal = Number(pounds.toFixed(2));
 
+    // Calculate retention and net totals
+    this.calculateRetentionAndNetTotal(detail);
+
+    this.emitChanges();
+  }
+
+  calculateRetentionAndNetTotal(detail: ILocalSaleDetailModel): void {
+    // Calculate retention amount based on percentage
+    const retentionPercentage = Number(detail.retentionPercentage) || 0;
+    const retentionAmount = Number(
+      ((detail.grandTotal * retentionPercentage) / 100).toFixed(2)
+    );
+    detail.retentionAmount = retentionAmount;
+
+    // Calculate net grand total (grandTotal - retentionAmount - otherPenalties)
+    const otherPenalties = Number(detail.otherPenalties) || 0;
+    detail.netGrandTotal = Number(
+      (detail.grandTotal - retentionAmount - otherPenalties).toFixed(2)
+    );
+  }
+
+  onRetentionPercentageChange(detail: ILocalSaleDetailModel): void {
+    this.calculateRetentionAndNetTotal(detail);
+    this.emitChanges();
+  }
+
+  onOtherPenaltiesChange(detail: ILocalSaleDetailModel): void {
+    this.calculateRetentionAndNetTotal(detail);
     this.emitChanges();
   }
 

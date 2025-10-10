@@ -160,9 +160,51 @@
             <!-- Totals Row -->
             <tr class="fw-bold bg-light" *ngIf="localCompanySaleDetail.items.length > 0">
               <td colspan="2">Subtotal</td>
-              <td class="text-end">{{ localCompanySaleDetail.processedWeight | number: '1.2-2' }}</td>
+              <td class="text-end">{{ localCompanySaleDetail.poundsGrandTotal | number: '1.2-2' }}</td>
               <td></td>
-              <td class="text-end">${{ getTotalAmount(localCompanySaleDetail) | number: '1.2-2' }}</td>
+              <td class="text-end">${{ localCompanySaleDetail.grandTotal | number: '1.2-2' }}</td>
+              <td></td>
+            </tr>
+
+            <!-- Retention Percentage Row -->
+            <tr class="bg-light" *ngIf="localCompanySaleDetail.items.length > 0">
+              <td colspan="4" class="text-end fw-semibold">Porcentaje de Retención (%):</td>
+              <td>
+                <input type="number" [(ngModel)]="localCompanySaleDetail.retentionPercentage"
+                  name="retentionPercentage" #retentionPercentageCtrl="ngModel"
+                  (ngModelChange)="onRetentionPercentageChange(localCompanySaleDetail!)"
+                  (blur)="formatDecimal('retentionPercentage')" (keypress)="validateNumber($event)"
+                  class="form-control form-control-sm text-end no-spinner" min="0" max="100" step="0.01" />
+              </td>
+              <td></td>
+            </tr>
+
+            <!-- Retention Amount Row -->
+            <tr class="bg-light" *ngIf="localCompanySaleDetail.items.length > 0">
+              <td colspan="4" class="text-end fw-semibold">Monto de Retención:</td>
+              <td class="text-end fw-bold">${{ localCompanySaleDetail.retentionAmount | number: '1.2-2' }}</td>
+              <td></td>
+            </tr>
+
+            <!-- Other Penalties Row -->
+            <tr class="bg-light" *ngIf="localCompanySaleDetail.items.length > 0">
+              <td colspan="4" class="text-end fw-semibold">Penalidades Adicionales:</td>
+              <td>
+                <div class="input-group input-group-sm">
+                  <span class="input-group-text">$</span>
+                  <input type="number" [(ngModel)]="localCompanySaleDetail.otherPenalties" name="otherPenalties"
+                    #otherPenaltiesCtrl="ngModel" (ngModelChange)="onOtherPenaltiesChange(localCompanySaleDetail!)"
+                    (blur)="formatDecimal('otherPenalties')" (keypress)="validateNumber($event)"
+                    class="form-control form-control-sm text-end no-spinner" min="0" step="0.01" />
+                </div>
+              </td>
+              <td></td>
+            </tr>
+
+            <!-- Net Grand Total Row -->
+            <tr class="fw-bold bg-light border-top border-2" *ngIf="localCompanySaleDetail.items.length > 0">
+              <td colspan="4" class="text-end">Total Neto:</td>
+              <td class="text-end text-success fs-6">${{ localCompanySaleDetail.netGrandTotal | number: '1.2-2' }}</td>
               <td></td>
             </tr>
           </tbody>

@@ -7,6 +7,10 @@ export interface ILocalSaleDetailModel {
   grandTotal: number;
   receivedGrandTotal: number;
   poundsGrandTotal: number;
+  retentionPercentage?: number;
+  retentionAmount?: number;
+  netGrandTotal: number;
+  otherPenalties?: number;
   items: ILocalSaleDetailItemModel[];
 }
 

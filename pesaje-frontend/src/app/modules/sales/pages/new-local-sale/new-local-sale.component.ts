@@ -272,6 +272,10 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
         grandTotal: this.localSaleWholeDetail.grandTotal,
         receivedGrandTotal: this.localSaleWholeDetail.receivedGrandTotal,
         poundsGrandTotal: this.localSaleWholeDetail.poundsGrandTotal,
+        retentionPercentage: this.localSaleWholeDetail.retentionPercentage,
+        retentionAmount: this.localSaleWholeDetail.retentionAmount,
+        netGrandTotal: this.localSaleWholeDetail.netGrandTotal,
+        otherPenalties: this.localSaleWholeDetail.otherPenalties,
         items: transformedWholeItems,
       });
     }
@@ -296,12 +300,17 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
         grandTotal: this.localSaleTailDetail.grandTotal,
         receivedGrandTotal: this.localSaleTailDetail.receivedGrandTotal,
         poundsGrandTotal: this.localSaleTailDetail.poundsGrandTotal,
+        retentionPercentage: this.localSaleTailDetail.retentionPercentage,
+        retentionAmount: this.localSaleTailDetail.retentionAmount,
+        netGrandTotal: this.localSaleTailDetail.netGrandTotal,
+        otherPenalties: this.localSaleTailDetail.otherPenalties,
         items: transformedTailItems,
       });
     }
 
     // Set the localSaleDetails array
-    this.localSaleModel.localSaleDetails = localSaleDetails;
+    this.localSaleModel.localSaleDetails =
+      localSaleDetails as ILocalSaleDetailModel[];
 
     // Transform localCompanySaleDetail to ensure company field contains only ID string
     if (this.localCompanySaleDetail) {

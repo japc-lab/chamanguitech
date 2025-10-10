@@ -36,6 +36,17 @@ export class LocalCompanySaleDetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadCompanies();
+
+    // Ensure default values for optional fields if detail exists
+    if (this.localCompanySaleDetail) {
+      if (this.localCompanySaleDetail.retentionPercentage === undefined || this.localCompanySaleDetail.retentionPercentage === null) {
+        this.localCompanySaleDetail.retentionPercentage = 0;
+      }
+      if (this.localCompanySaleDetail.otherPenalties === undefined || this.localCompanySaleDetail.otherPenalties === null) {
+        this.localCompanySaleDetail.otherPenalties = 0;
+      }
+    }
+
     this.recalculateAll();
   }
 
@@ -62,6 +73,12 @@ export class LocalCompanySaleDetailComponent implements OnInit {
         guideNumber: '',
         weightDifference: 0,
         processedWeight: 0,
+        poundsGrandTotal: 0,
+        grandTotal: 0,
+        retentionPercentage: 0,
+        retentionAmount: 0,
+        netGrandTotal: 0,
+        otherPenalties: 0,
         items: [],
       };
       this.emitChanges();
@@ -96,10 +113,12 @@ export class LocalCompanySaleDetailComponent implements OnInit {
 
   recalculateTotals(detail: ILocalCompanySaleDetailModel): void {
     let totalProcessedWeight = 0;
+    let totalAmount = 0;
 
     detail.items.forEach((item) => {
       item.total = Number((item.pounds || 0) * (item.price || 0));
       totalProcessedWeight += Number(item.pounds || 0);
+      totalAmount += item.total || 0;
     });
 
     // Update processed weight (sum of all item pounds)
@@ -110,6 +129,38 @@ export class LocalCompanySaleDetailComponent implements OnInit {
       (Number(detail.guideWeight || 0) - detail.processedWeight).toFixed(2)
     );
 
+    // Calculate poundsGrandTotal and grandTotal
+    detail.poundsGrandTotal = Number(totalProcessedWeight.toFixed(2));
+    detail.grandTotal = Number(totalAmount.toFixed(2));
+
+    // Calculate retention and net totals
+    this.calculateRetentionAndNetTotal(detail);
+
+    this.emitChanges();
+  }
+
+  calculateRetentionAndNetTotal(detail: ILocalCompanySaleDetailModel): void {
+    // Calculate retention amount based on percentage
+    const retentionPercentage = Number(detail.retentionPercentage) || 0;
+    const retentionAmount = Number(
+      ((detail.grandTotal * retentionPercentage) / 100).toFixed(2)
+    );
+    detail.retentionAmount = retentionAmount;
+
+    // Calculate net grand total (grandTotal - retentionAmount - otherPenalties)
+    const otherPenalties = Number(detail.otherPenalties) || 0;
+    detail.netGrandTotal = Number(
+      (detail.grandTotal - retentionAmount - otherPenalties).toFixed(2)
+    );
+  }
+
+  onRetentionPercentageChange(detail: ILocalCompanySaleDetailModel): void {
+    this.calculateRetentionAndNetTotal(detail);
+    this.emitChanges();
+  }
+
+  onOtherPenaltiesChange(detail: ILocalCompanySaleDetailModel): void {
+    this.calculateRetentionAndNetTotal(detail);
     this.emitChanges();
   }
 

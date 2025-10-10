@@ -34,6 +34,33 @@ const LocalCompanySaleDetailSchema = Schema({
     type: Number,
     required: true,
   },
+  poundsGrandTotal: {
+    type: Number,
+    required: true,
+    min: 0
+  },
+  grandTotal: {
+    type: Number,
+    required: true,
+    min: 0
+  },
+  retentionPercentage: {
+    type: Number,
+    min: 0
+  },
+  retentionAmount: {
+    type: Number,
+    min: 0
+  },
+  netGrandTotal: {
+    type: Number,
+    required: true,
+    min: 0
+  },
+  otherPenalties: {
+    type: Number,
+    min: 0
+  },
   items: [{
     type: Schema.Types.ObjectId,
     ref: 'LocalCompanySaleDetailItem',

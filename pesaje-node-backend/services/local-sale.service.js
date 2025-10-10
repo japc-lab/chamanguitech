@@ -112,6 +112,10 @@ const create = async (data) => {
                     grandTotal: localSaleDetail.grandTotal,
                     receivedGrandTotal: localSaleDetail.receivedGrandTotal,
                     poundsGrandTotal: localSaleDetail.poundsGrandTotal,
+                    retentionPercentage: localSaleDetail.retentionPercentage,
+                    retentionAmount: localSaleDetail.retentionAmount,
+                    netGrandTotal: localSaleDetail.netGrandTotal,
+                    otherPenalties: localSaleDetail.otherPenalties,
                     items: itemIds
                 }, { session: transaction.session });
             }
@@ -135,6 +139,12 @@ const create = async (data) => {
                 guideNumber: localCompanySaleDetail.guideNumber,
                 weightDifference: localCompanySaleDetail.weightDifference,
                 processedWeight: localCompanySaleDetail.processedWeight,
+                poundsGrandTotal: localCompanySaleDetail.poundsGrandTotal,
+                grandTotal: localCompanySaleDetail.grandTotal,
+                retentionPercentage: localCompanySaleDetail.retentionPercentage,
+                retentionAmount: localCompanySaleDetail.retentionAmount,
+                netGrandTotal: localCompanySaleDetail.netGrandTotal,
+                otherPenalties: localCompanySaleDetail.otherPenalties,
                 items: companyItemIds
             }, { session: transaction.session });
 
@@ -238,6 +248,10 @@ const getBySaleId = async (saleId) => {
             grandTotal: localSaleDetail.grandTotal,
             receivedGrandTotal: localSaleDetail.receivedGrandTotal,
             poundsGrandTotal: localSaleDetail.poundsGrandTotal,
+            retentionPercentage: localSaleDetail.retentionPercentage,
+            retentionAmount: localSaleDetail.retentionAmount,
+            netGrandTotal: localSaleDetail.netGrandTotal,
+            otherPenalties: localSaleDetail.otherPenalties,
             deletedAt: localSaleDetail.deletedAt,
             items: localSaleDetail.items.map(item => ({
                 id: item.id,
@@ -271,6 +285,12 @@ const getBySaleId = async (saleId) => {
             guideNumber: localSale.localCompanySaleDetail.guideNumber,
             weightDifference: localSale.localCompanySaleDetail.weightDifference,
             processedWeight: localSale.localCompanySaleDetail.processedWeight,
+            poundsGrandTotal: localSale.localCompanySaleDetail.poundsGrandTotal,
+            grandTotal: localSale.localCompanySaleDetail.grandTotal,
+            retentionPercentage: localSale.localCompanySaleDetail.retentionPercentage,
+            retentionAmount: localSale.localCompanySaleDetail.retentionAmount,
+            netGrandTotal: localSale.localCompanySaleDetail.netGrandTotal,
+            otherPenalties: localSale.localCompanySaleDetail.otherPenalties,
             deletedAt: localSale.localCompanySaleDetail.deletedAt,
             items: localSale.localCompanySaleDetail.items.map(item => ({
                 id: item.id,
@@ -420,6 +440,10 @@ const update = async (id, data) => {
                     grandTotal: localSaleDetail.grandTotal,
                     receivedGrandTotal: localSaleDetail.receivedGrandTotal,
                     poundsGrandTotal: localSaleDetail.poundsGrandTotal,
+                    retentionPercentage: localSaleDetail.retentionPercentage,
+                    retentionAmount: localSaleDetail.retentionAmount,
+                    netGrandTotal: localSaleDetail.netGrandTotal,
+                    otherPenalties: localSaleDetail.otherPenalties,
                     items: itemIds
                 }, { session: transaction.session });
             }
@@ -445,6 +469,12 @@ const update = async (id, data) => {
                 guideNumber: localCompanySaleDetail.guideNumber,
                 weightDifference: localCompanySaleDetail.weightDifference,
                 processedWeight: localCompanySaleDetail.processedWeight,
+                poundsGrandTotal: localCompanySaleDetail.poundsGrandTotal,
+                grandTotal: localCompanySaleDetail.grandTotal,
+                retentionPercentage: localCompanySaleDetail.retentionPercentage,
+                retentionAmount: localCompanySaleDetail.retentionAmount,
+                netGrandTotal: localCompanySaleDetail.netGrandTotal,
+                otherPenalties: localCompanySaleDetail.otherPenalties,
                 items: companyItemIds
             }, { session: transaction.session });
 
