@@ -210,6 +210,13 @@
           </tbody>
         </table>
       </div>
+
+      <!-- Payments Button -->
+      <div class="d-flex justify-content-end mt-3" *ngIf="canShowPaymentsButton()">
+        <button type="button" class="btn btn-secondary btn-sm" (click)="openPaymentsModal()">
+          <i class="bi bi-cash-stack me-1"></i> Pagos
+        </button>
+      </div>
     </div>
 
     <!-- Empty State (when collapsed) -->

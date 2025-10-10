@@ -12,6 +12,7 @@ import { CompanySalePaymentListingComponent } from './widgets/company-sale-payme
 import { NewLocalSaleComponent } from './pages/new-local-sale/new-local-sale.component';
 import { LocalSaleDetailComponent } from './widgets/local-sale-detail/local-sale-detail.component';
 import { LocalCompanySaleDetailComponent } from './widgets/local-company-sale-detail/local-company-sale-detail.component';
+import { LocalCompanySaleDetailPaymentListingComponent } from './widgets/local-company-sale-detail-payment-listing/local-company-sale-detail-payment-listing.component';
 
 @NgModule({
   declarations: [
@@ -22,6 +23,7 @@ import { LocalCompanySaleDetailComponent } from './widgets/local-company-sale-de
     NewLocalSaleComponent,
     LocalSaleDetailComponent,
     LocalCompanySaleDetailComponent,
+    LocalCompanySaleDetailPaymentListingComponent,
   ],
   imports: [
     CommonModule,

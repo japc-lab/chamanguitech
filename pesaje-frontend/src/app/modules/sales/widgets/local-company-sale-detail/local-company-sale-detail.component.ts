@@ -12,6 +12,8 @@ import { CompanyService } from '../../../settings/services/company.service';
 import { InputUtilsService } from 'src/app/utils/input-utils.service';
 import { FormUtilsService } from 'src/app/utils/form-utils.service';
 import { NgModel, NgForm } from '@angular/forms';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { LocalCompanySaleDetailPaymentListingComponent } from '../local-company-sale-detail-payment-listing/local-company-sale-detail-payment-listing.component';
 
 @Component({
   selector: 'app-local-company-sale-detail',
@@ -27,11 +29,13 @@ export class LocalCompanySaleDetailComponent implements OnInit {
 
   classOptions = ['A', 'B', 'C'];
   companies: ICompany[] = [];
+  private modalRef: NgbModalRef | null = null;
 
   constructor(
     private inputUtils: InputUtilsService,
     private companyService: CompanyService,
-    private formUtils: FormUtilsService
+    private formUtils: FormUtilsService,
+    private modalService: NgbModal
   ) {}
 
   ngOnInit(): void {
@@ -39,10 +43,16 @@ export class LocalCompanySaleDetailComponent implements OnInit {
 
     // Ensure default values for optional fields if detail exists
     if (this.localCompanySaleDetail) {
-      if (this.localCompanySaleDetail.retentionPercentage === undefined || this.localCompanySaleDetail.retentionPercentage === null) {
+      if (
+        this.localCompanySaleDetail.retentionPercentage === undefined ||
+        this.localCompanySaleDetail.retentionPercentage === null
+      ) {
         this.localCompanySaleDetail.retentionPercentage = 0;
       }
-      if (this.localCompanySaleDetail.otherPenalties === undefined || this.localCompanySaleDetail.otherPenalties === null) {
+      if (
+        this.localCompanySaleDetail.otherPenalties === undefined ||
+        this.localCompanySaleDetail.otherPenalties === null
+      ) {
         this.localCompanySaleDetail.otherPenalties = 0;
       }
     }
@@ -217,6 +227,51 @@ export class LocalCompanySaleDetailComponent implements OnInit {
 
   getTotalAmount(detail: ILocalCompanySaleDetailModel): number {
     return detail.items.reduce((sum, item) => sum + (item.total || 0), 0);
+  }
+
+  canShowPaymentsButton(): boolean {
+    // Show payments button only if:
+    // 1. Detail exists and has an ID (saved to database)
+    // 2. Detail has items
+    return !!(
+      this.localCompanySaleDetail?.id &&
+      this.localCompanySaleDetail?.items &&
+      this.localCompanySaleDetail.items.length > 0
+    );
+  }
+
+  async openPaymentsModal(): Promise<any> {
+    if (this.modalRef) {
+      return;
+    }
+
+    if (!this.localCompanySaleDetail?.id) {
+      return;
+    }
+
+    try {
+      this.modalRef = this.modalService.open(
+        LocalCompanySaleDetailPaymentListingComponent,
+        {
+          size: 'lg',
+          centered: true,
+          backdrop: 'static',
+          keyboard: false,
+          windowClass: 'payment-listing-modal',
+        }
+      );
+
+      // Set input safely
+      this.modalRef.componentInstance.localCompanySaleDetailId =
+        this.localCompanySaleDetail.id;
+
+      const result = await this.modalRef.result;
+      return result;
+    } catch (error) {
+      return null;
+    } finally {
+      this.modalRef = null;
+    }
   }
 
   emitChanges(): void {
