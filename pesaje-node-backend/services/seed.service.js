@@ -2,7 +2,7 @@
 
 const bcrypt = require('bcryptjs');
 
-const { Option, Role, RolePermission, User, PaymentInfo, Person, Broker, Client, Size, Company, Period, SizePrice, ShrimpFarm, Purchase, PaymentMethod, PurchasePaymentMethod, Counter, LogisticsItem, LogisticsPayment, Logistics, Sale, CompanySale, CompanySaleItem, LocalSale, LocalSaleDetail, LocalSaleDetailItem, Fisherman, Merchant } = require('../models');
+const { Option, Role, RolePermission, User, PaymentInfo, Person, Broker, Client, Size, Company, Period, SizePrice, ShrimpFarm, Purchase, PaymentMethod, PurchasePaymentMethod, Counter, LogisticsItem, LogisticsPayment, Logistics, Sale, CompanySale, CompanySaleItem, LocalSale, LocalSaleDetail, LocalSaleDetailItem, LocalCompanySaleDetail, LocalCompanySaleDetailItem, Fisherman, Merchant } = require('../models');
 const Permission = require('../enums/permission.enum');
 const SizeTypeEnum = require('../enums/size-type.enum');
 const { default: mongoose } = require('mongoose');
@@ -119,20 +119,23 @@ const cleanDatabase = async (keepTxData) => {
         await Company.deleteMany({});
         await Fisherman.deleteMany({});
         await Merchant.deleteMany({});
+
+        await Purchase.deleteMany({});
+        await Counter.deleteMany({});
+        await PurchasePaymentMethod.deleteMany({});
+        await LogisticsItem.deleteMany({});
+        await LogisticsPayment.deleteMany({});
+        await Logistics.deleteMany({});
     }
 
-    await Purchase.deleteMany({});
-    await Counter.deleteMany({});
-    await PurchasePaymentMethod.deleteMany({});
-    await LogisticsItem.deleteMany({});
-    await LogisticsPayment.deleteMany({});
-    await Logistics.deleteMany({});
     await Sale.deleteMany({});
     await CompanySale.deleteMany({});
     await CompanySaleItem.deleteMany({});
     await LocalSale.deleteMany({});
     await LocalSaleDetail.deleteMany({});
     await LocalSaleDetailItem.deleteMany({});
+    await LocalCompanySaleDetail.deleteMany({});
+    await LocalCompanySaleDetailItem.deleteMany({});
 
     await Size.deleteMany({});
     await Option.deleteMany({});

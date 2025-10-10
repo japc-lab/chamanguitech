@@ -5,13 +5,12 @@
       <div>
         <h3 class="card-title fw-bolder fs-3 mb-1">Venta Local-Compañía Camarón Sin Cabeza</h3>
       </div>
-      <button type="button" class="btn btn-primary btn-sm" (click)="addDetail()"
-        *ngIf="!localCompanySaleDetail">
+      <button type="button" class="btn btn-primary btn-sm" (click)="addDetail()" *ngIf="!localCompanySaleDetail">
         <i class="bi bi-plus-circle me-1"></i> Agregar
       </button>
       <button type="button" class="btn btn-outline-danger btn-sm" (click)="cancelAndCollapse()"
         *ngIf="localCompanySaleDetail">
-        <i class="bi bi-x-circle me-1"></i> Cancelar
+        <i class="bi bi-x-circle me-1"></i> Eliminar
       </button>
     </div>
 
@@ -160,7 +159,7 @@
 
             <!-- Totals Row -->
             <tr class="fw-bold bg-light" *ngIf="localCompanySaleDetail.items.length > 0">
-              <td colspan="2">Total General</td>
+              <td colspan="2">Subtotal</td>
               <td class="text-end">{{ localCompanySaleDetail.processedWeight | number: '1.2-2' }}</td>
               <td></td>
               <td class="text-end">${{ getTotalAmount(localCompanySaleDetail) | number: '1.2-2' }}</td>

@@ -19,31 +19,55 @@ router.post(
         check('totalProcessedPounds', 'totalProcessedPounds is required and must be numeric').isNumeric(),
         check('grandTotal', 'Price grand total is required').isNumeric(),
         check('seller', 'Seller is required').notEmpty(),
-        check('details', 'Details must be a non-empty array').isArray({ min: 1 }),
-        check('details.*.style', 'Style is required').notEmpty(),
-        check('details.*.merchat', 'Merchat is required').notEmpty(),
-        check('details.*.grandTotal', 'grandTotal is required and must be numeric').isNumeric(),
-        check('details.*.poundsGrandTotal', 'poundsGrandTotal is required and must be numeric').isNumeric(),
-        check('details.*.items', 'Each detail must include items').isArray({ min: 1 }),
-        check('details.*.items.*.size', 'Item size is required').notEmpty(),
-        check('details.*.items.*.pounds', 'Item pounds is required and must be numeric').isNumeric(),
-        check('details.*.items.*.price', 'Item price is required and must be numeric').isNumeric(),
-        check('details.*.items.*.total', 'Item total is required and must be numeric').isNumeric(),
-        check('localCompanyDetails', 'Local company details must be a non-empty array').isArray({ min: 1 }),
-        check('localCompanyDetails.*.company', 'Company is required').notEmpty(),
-        check('localCompanyDetails.*.receiptDate', 'Receipt date is required').isISO8601(),
-        check('localCompanyDetails.*.personInCharge', 'Person in charge is required').notEmpty(),
-        check('localCompanyDetails.*.batch', 'Batch is required').notEmpty(),
-        check('localCompanyDetails.*.guideWeight', 'Guide weight is required and must be numeric').isNumeric(),
-        check('localCompanyDetails.*.guideNumber', 'Guide number is required').notEmpty(),
-        check('localCompanyDetails.*.weightDifference', 'Weight difference is required and must be numeric').isNumeric(),
-        check('localCompanyDetails.*.processedWeight', 'Processed weight is required and must be numeric').isNumeric(),
-        check('localCompanyDetails.*.items', 'Each local company detail must include items').isArray({ min: 1 }),
-        check('localCompanyDetails.*.items.*.size', 'Item size is required').notEmpty(),
-        check('localCompanyDetails.*.items.*.class', 'Item class is required').notEmpty(),
-        check('localCompanyDetails.*.items.*.pounds', 'Item pounds is required and must be numeric').isNumeric(),
-        check('localCompanyDetails.*.items.*.price', 'Item price is required and must be numeric').isNumeric(),
-        check('localCompanyDetails.*.items.*.total', 'Item total is required and must be numeric').isNumeric(),
+        check('localSaleDetails', 'Local sale details are required').isArray({ min: 1 }),
+        check('localSaleDetails.*.style', 'Style is required').notEmpty(),
+        check('localSaleDetails.*.grandTotal', 'grandTotal is required and must be numeric').isNumeric(),
+        check('localSaleDetails.*.receivedGrandTotal', 'receivedGrandTotal is required and must be numeric').isNumeric(),
+        check('localSaleDetails.*.poundsGrandTotal', 'poundsGrandTotal is required and must be numeric').isNumeric(),
+        check('localSaleDetails.*.items', 'Detail must include items').isArray({ min: 1 }),
+        check('localSaleDetails.*.items.*.size', 'Item size is required').notEmpty(),
+        check('localSaleDetails.*.items.*.pounds', 'Item pounds is required and must be numeric').isNumeric(),
+        check('localSaleDetails.*.items.*.price', 'Item price is required and must be numeric').isNumeric(),
+        check('localSaleDetails.*.items.*.total', 'Item total is required and must be numeric').isNumeric(),
+        check('localSaleDetails.*.items.*.merchantName', 'Item merchantName is required').notEmpty(),
+        check('localSaleDetails.*.items.*.merchantId', 'Item merchantId is required').notEmpty(),
+        check('localSaleDetails.*.items.*.paymentStatus', 'Item paymentStatus is required').isIn(['NO_PAYMENT', 'PENDING', 'PAID']),
+        check('localSaleDetails.*.items.*.hasInvoice', 'Item hasInvoice is required').isIn(['yes', 'no', 'not-applicable']),
+        check('localSaleDetails.*.items.*.paymentOne', 'Item paymentOne must be numeric').optional().isNumeric(),
+        check('localSaleDetails.*.items.*.paymentTwo', 'Item paymentTwo must be numeric').optional().isNumeric(),
+        check('localSaleDetails.*.items.*.totalPaid', 'Item totalPaid must be numeric').optional().isNumeric(),
+        check('localSaleDetails.*.items.*.paymentMethod', 'Item paymentMethod is required when paymentStatus is PAID')
+            .if((value, { req, path }) => {
+                const pathParts = path.split('.');
+                const detailIndex = pathParts[1];
+                const itemIndex = pathParts[3];
+                return req.body.localSaleDetails?.[detailIndex]?.items?.[itemIndex]?.paymentStatus === 'PAID';
+            })
+            .isMongoId(),
+        check('localSaleDetails.*.items.*.invoiceNumber', 'Item invoiceNumber is required when hasInvoice is yes')
+            .if((value, { req, path }) => {
+                const pathParts = path.split('.');
+                const detailIndex = pathParts[1];
+                const itemIndex = pathParts[3];
+                return req.body.localSaleDetails?.[detailIndex]?.items?.[itemIndex]?.hasInvoice === 'yes';
+            })
+            .notEmpty(),
+        check('localSaleDetails.*.items.*.totalReceived', 'Item totalReceived must be numeric').optional().isNumeric(),
+        check('localCompanySaleDetail', 'Local company detail is optional').optional().notEmpty(),
+        check('localCompanySaleDetail.company', 'Company is required').optional().isMongoId(),
+        check('localCompanySaleDetail.receiptDate', 'Receipt date is required').optional().isISO8601(),
+        check('localCompanySaleDetail.personInCharge', 'Person in charge is required').optional().notEmpty(),
+        check('localCompanySaleDetail.batch', 'Batch is required').optional().notEmpty(),
+        check('localCompanySaleDetail.guideWeight', 'Guide weight is required and must be numeric').optional().isNumeric(),
+        check('localCompanySaleDetail.guideNumber', 'Guide number is required').optional().notEmpty(),
+        check('localCompanySaleDetail.weightDifference', 'Weight difference is required and must be numeric').optional().isNumeric(),
+        check('localCompanySaleDetail.processedWeight', 'Processed weight is required and must be numeric').optional().isNumeric(),
+        check('localCompanySaleDetail.items', 'Local company detail must include items').optional().isArray({ min: 1 }),
+        check('localCompanySaleDetail.items.*.size', 'Item size is required').optional().notEmpty(),
+        check('localCompanySaleDetail.items.*.class', 'Item class is required').optional().notEmpty(),
+        check('localCompanySaleDetail.items.*.pounds', 'Item pounds is required and must be numeric').optional().isNumeric(),
+        check('localCompanySaleDetail.items.*.price', 'Item price is required and must be numeric').optional().isNumeric(),
+        check('localCompanySaleDetail.items.*.total', 'Item total is required and must be numeric').optional().isNumeric(),
         check('weightSheetNumber', 'weightSheetNumber is required')
             .if((value, { req }) => req.body.status !== 'DRAFT')
             .exists()
@@ -88,31 +112,55 @@ router.put(
         check('totalProcessedPounds', 'totalProcessedPounds must be numeric').optional().isNumeric(),
         check('grandTotal', 'grandTotal must be numeric').optional().isNumeric(),
         check('seller', 'Seller is required').optional().notEmpty(),
-        check('details', 'Details must be a non-empty array').isArray({ min: 1 }),
-        check('details.*.style', 'Style is required').notEmpty(),
-        check('details.*.merchat', 'Merchat is required').notEmpty(),
-        check('details.*.grandTotal', 'grandTotal is required and must be numeric').isNumeric(),
-        check('details.*.poundsGrandTotal', 'poundsGrandTotal is required and must be numeric').isNumeric(),
-        check('details.*.items', 'Each detail must include items').isArray({ min: 1 }),
-        check('details.*.items.*.size', 'Item size is required').notEmpty(),
-        check('details.*.items.*.pounds', 'Item pounds is required and must be numeric').isNumeric(),
-        check('details.*.items.*.price', 'Item price is required and must be numeric').isNumeric(),
-        check('details.*.items.*.total', 'Item total is required and must be numeric').isNumeric(),
-        check('localCompanyDetails', 'Local company details must be a non-empty array').isArray({ min: 1 }),
-        check('localCompanyDetails.*.company', 'Company is required').notEmpty(),
-        check('localCompanyDetails.*.receiptDate', 'Receipt date is required').isISO8601(),
-        check('localCompanyDetails.*.personInCharge', 'Person in charge is required').notEmpty(),
-        check('localCompanyDetails.*.batch', 'Batch is required').notEmpty(),
-        check('localCompanyDetails.*.guideWeight', 'Guide weight is required and must be numeric').isNumeric(),
-        check('localCompanyDetails.*.guideNumber', 'Guide number is required').notEmpty(),
-        check('localCompanyDetails.*.weightDifference', 'Weight difference is required and must be numeric').isNumeric(),
-        check('localCompanyDetails.*.processedWeight', 'Processed weight is required and must be numeric').isNumeric(),
-        check('localCompanyDetails.*.items', 'Each local company detail must include items').isArray({ min: 1 }),
-        check('localCompanyDetails.*.items.*.size', 'Item size is required').notEmpty(),
-        check('localCompanyDetails.*.items.*.class', 'Item class is required').notEmpty(),
-        check('localCompanyDetails.*.items.*.pounds', 'Item pounds is required and must be numeric').isNumeric(),
-        check('localCompanyDetails.*.items.*.price', 'Item price is required and must be numeric').isNumeric(),
-        check('localCompanyDetails.*.items.*.total', 'Item total is required and must be numeric').isNumeric(),
+        check('localSaleDetails', 'Local sale details are optional').optional().isArray({ min: 1 }),
+        check('localSaleDetails.*.style', 'Style is required').optional().notEmpty(),
+        check('localSaleDetails.*.grandTotal', 'grandTotal is required and must be numeric').optional().isNumeric(),
+        check('localSaleDetails.*.receivedGrandTotal', 'receivedGrandTotal is required and must be numeric').optional().isNumeric(),
+        check('localSaleDetails.*.poundsGrandTotal', 'poundsGrandTotal is required and must be numeric').optional().isNumeric(),
+        check('localSaleDetails.*.items', 'Detail must include items').optional().isArray({ min: 1 }),
+        check('localSaleDetails.*.items.*.size', 'Item size is required').optional().notEmpty(),
+        check('localSaleDetails.*.items.*.pounds', 'Item pounds is required and must be numeric').optional().isNumeric(),
+        check('localSaleDetails.*.items.*.price', 'Item price is required and must be numeric').optional().isNumeric(),
+        check('localSaleDetails.*.items.*.total', 'Item total is required and must be numeric').optional().isNumeric(),
+        check('localSaleDetails.*.items.*.merchantName', 'Item merchantName is required').optional().notEmpty(),
+        check('localSaleDetails.*.items.*.merchantId', 'Item merchantId is required').optional().notEmpty(),
+        check('localSaleDetails.*.items.*.paymentStatus', 'Item paymentStatus is required').optional().isIn(['NO_PAYMENT', 'PENDING', 'PAID']),
+        check('localSaleDetails.*.items.*.hasInvoice', 'Item hasInvoice is required').optional().isIn(['yes', 'no', 'not-applicable']),
+        check('localSaleDetails.*.items.*.paymentOne', 'Item paymentOne must be numeric').optional().isNumeric(),
+        check('localSaleDetails.*.items.*.paymentTwo', 'Item paymentTwo must be numeric').optional().isNumeric(),
+        check('localSaleDetails.*.items.*.totalPaid', 'Item totalPaid must be numeric').optional().isNumeric(),
+        check('localSaleDetails.*.items.*.paymentMethod', 'Item paymentMethod is required when paymentStatus is PAID')
+            .if((value, { req, path }) => {
+                const pathParts = path.split('.');
+                const detailIndex = pathParts[1];
+                const itemIndex = pathParts[3];
+                return req.body.localSaleDetails?.[detailIndex]?.items?.[itemIndex]?.paymentStatus === 'PAID';
+            })
+            .optional().isMongoId(),
+        check('localSaleDetails.*.items.*.invoiceNumber', 'Item invoiceNumber is required when hasInvoice is yes')
+            .if((value, { req, path }) => {
+                const pathParts = path.split('.');
+                const detailIndex = pathParts[1];
+                const itemIndex = pathParts[3];
+                return req.body.localSaleDetails?.[detailIndex]?.items?.[itemIndex]?.hasInvoice === 'yes';
+            })
+            .optional().notEmpty(),
+        check('localSaleDetails.*.items.*.totalReceived', 'Item totalReceived must be numeric').optional().isNumeric(),
+        check('localCompanySaleDetail', 'Local company detail is optional').optional().notEmpty(),
+        check('localCompanySaleDetail.company', 'Company is required').optional().isMongoId(),
+        check('localCompanySaleDetail.receiptDate', 'Receipt date is required').optional().isISO8601(),
+        check('localCompanySaleDetail.personInCharge', 'Person in charge is required').optional().notEmpty(),
+        check('localCompanySaleDetail.batch', 'Batch is required').optional().notEmpty(),
+        check('localCompanySaleDetail.guideWeight', 'Guide weight is required and must be numeric').optional().isNumeric(),
+        check('localCompanySaleDetail.guideNumber', 'Guide number is required').optional().notEmpty(),
+        check('localCompanySaleDetail.weightDifference', 'Weight difference is required and must be numeric').optional().isNumeric(),
+        check('localCompanySaleDetail.processedWeight', 'Processed weight is required and must be numeric').optional().isNumeric(),
+        check('localCompanySaleDetail.items', 'Local company detail must include items').optional().isArray({ min: 1 }),
+        check('localCompanySaleDetail.items.*.size', 'Item size is required').optional().notEmpty(),
+        check('localCompanySaleDetail.items.*.class', 'Item class is required').optional().notEmpty(),
+        check('localCompanySaleDetail.items.*.pounds', 'Item pounds is required and must be numeric').optional().isNumeric(),
+        check('localCompanySaleDetail.items.*.price', 'Item price is required and must be numeric').optional().isNumeric(),
+        check('localCompanySaleDetail.items.*.total', 'Item total is required and must be numeric').optional().isNumeric(),
         check('weightSheetNumber').optional().isString().withMessage('Weight sheet number must be a string'),
         check('hasInvoice')
             .optional()

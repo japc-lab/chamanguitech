@@ -112,6 +112,7 @@ export const locale = {
       LOGISTICS_LIMIT_REACHED:
         'Ya se ha(n) creado {{count}} registro(s) logístico(s) permitido(s) para esta compra: {{record}}.',
       NO_SALE_DETAILS_ENTERED: 'No se han ingresado detalles de la venta.',
+      LOCAL_COMPANY_SALE_DETAILS_VALIDATION_ERROR: 'Los detalles de la venta local de la Compañía no son válidos.',
       NO_COMPLETE_ITEMS: 'No se han ingresado detalles de logística.',
       PAYMENT_VALIDATION_ERRORS: 'Hay errores de validación en los pagos. Por favor complete los campos requeridos.',
       SALE_LIMIT_REACHED: 'Ya existe una venta creada para esta compra.',

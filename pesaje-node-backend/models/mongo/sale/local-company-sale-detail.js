@@ -1,7 +1,5 @@
 const { Schema, model } = require('mongoose');
 
-const SaleStyleEnum = require('../../../enums/sale-style.enum');
-
 const LocalCompanySaleDetailSchema = Schema({
   company: {
     type: Schema.Types.ObjectId,

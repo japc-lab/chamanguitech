@@ -14,15 +14,14 @@ import { FormUtilsService } from 'src/app/utils/form-utils.service';
 import { NgModel, NgForm } from '@angular/forms';
 
 @Component({
-  selector: 'app-local-company-sale-details',
-  templateUrl: './local-company-sale-details.component.html',
-  styleUrls: ['./local-company-sale-details.component.scss'],
+  selector: 'app-local-company-sale-detail',
+  templateUrl: './local-company-sale-detail.component.html',
+  styleUrls: ['./local-company-sale-detail.component.scss'],
 })
-export class LocalCompanySaleDetailsComponent implements OnInit {
+export class LocalCompanySaleDetailComponent implements OnInit {
   @Input() localCompanySaleDetail: ILocalCompanySaleDetailModel | null = null;
-  @Output() localCompanySaleDetailChange = new EventEmitter<
-    ILocalCompanySaleDetailModel | null
-  >();
+  @Output() localCompanySaleDetailChange =
+    new EventEmitter<ILocalCompanySaleDetailModel | null>();
 
   @ViewChild('companyDetailsForm') companyDetailsForm!: NgForm;
 

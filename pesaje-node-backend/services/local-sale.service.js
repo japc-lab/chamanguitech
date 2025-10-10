@@ -3,7 +3,7 @@ const SaleTypeEnum = require('../enums/sale-type.enum');
 
 const create = async (data) => {
     let transaction;
-    
+
     try {
         transaction = await dbAdapter.localSaleAdapter.startTransaction();
         const {
@@ -20,32 +20,54 @@ const create = async (data) => {
             hasInvoice,
             invoiceNumber,
             invoiceName,
-            details,
-            localCompanyDetails
+            localSaleDetails,
+            localCompanySaleDetail
         } = data;
 
         // 🔍 Validate referenced Purchase
         const purchaseExists = await dbAdapter.purchaseAdapter.getById(purchase);
         if (!purchaseExists) throw new Error('Purchase does not exist');
 
-        // 🔍 Validate local company details if provided
-        if (localCompanyDetails && localCompanyDetails.length > 0) {
-            for (const companyDetail of localCompanyDetails) {
-                if (companyDetail.company) {
-                    const companyExists = await dbAdapter.companyAdapter.getById(companyDetail.company);
-                    if (!companyExists) throw new Error(`Company with ID ${companyDetail.company} does not exist`);
+        // 🔍 Validate local sale details if provided
+        if (localSaleDetails && localSaleDetails.length > 0) {
+            for (const localSaleDetail of localSaleDetails) {
+                if (!localSaleDetail.items || localSaleDetail.items.length === 0) {
+                    throw new Error('Local sale detail must have at least one item');
                 }
-                
-                // Validate required fields
-                if (!companyDetail.items || companyDetail.items.length === 0) {
-                    throw new Error('Local company details must have at least one item');
-                }
-                
-                // Validate each item
-                for (const item of companyDetail.items) {
-                    if (!item.size || !item.class || item.pounds === undefined || item.price === undefined) {
-                        throw new Error('All item fields (size, class, pounds, price) are required');
+
+                // Validate each item and payment methods
+                for (const item of localSaleDetail.items) {
+                    if (!item.size || item.pounds === undefined || item.price === undefined) {
+                        throw new Error('All item fields (size, pounds, price) are required');
                     }
+
+                    // Validate payment method if paymentStatus is PAID
+                    if (item.paymentStatus === 'PAID' && item.paymentMethod) {
+                        const paymentMethodExists = await dbAdapter.paymentMethodAdapter.getById(item.paymentMethod);
+                        if (!paymentMethodExists) {
+                            throw new Error(`Payment method with ID ${item.paymentMethod} does not exist`);
+                        }
+                    }
+                }
+            }
+        }
+
+        // 🔍 Validate local company detail if provided
+        if (localCompanySaleDetail) {
+            if (localCompanySaleDetail.company) {
+                const companyExists = await dbAdapter.companyAdapter.getById(localCompanySaleDetail.company);
+                if (!companyExists) throw new Error(`Company with ID ${localCompanySaleDetail.company} does not exist`);
+            }
+
+            // Validate required fields
+            if (!localCompanySaleDetail.items || localCompanySaleDetail.items.length === 0) {
+                throw new Error('Local company detail must have at least one item');
+            }
+
+            // Validate each item
+            for (const item of localCompanySaleDetail.items) {
+                if (!item.size || !item.class || item.pounds === undefined || item.price === undefined) {
+                    throw new Error('All item fields (size, class, pounds, price) are required');
                 }
             }
         }
@@ -58,55 +80,7 @@ const create = async (data) => {
             type: SaleTypeEnum.LOCAL
         }, { session: transaction.session });
 
-        const detailIds = [];
-
-        for (const detail of details) {
-            const itemIds = [];
-
-            for (const item of detail.items) {
-                const createdItem = await dbAdapter.localSaleDetailItemAdapter.create(item, { session: transaction.session });
-                itemIds.push(createdItem.id);
-            }
-
-            const createdDetail = await dbAdapter.localSaleDetailAdapter.create({
-                style: detail.style,
-                merchat: detail.merchat,
-                grandTotal: detail.grandTotal,
-                poundsGrandTotal: detail.poundsGrandTotal,
-                items: itemIds
-            }, { session: transaction.session });
-
-            detailIds.push(createdDetail.id);
-        }
-
-        // Handle local company details
-        const localCompanyDetailIds = [];
-        
-        if (localCompanyDetails && localCompanyDetails.length > 0) {
-            for (const companyDetail of localCompanyDetails) {
-                const companyItemIds = [];
-
-                for (const item of companyDetail.items) {
-                    const createdItem = await dbAdapter.localCompanySaleDetailItemAdapter.create(item, { session: transaction.session });
-                    companyItemIds.push(createdItem.id);
-                }
-
-                const createdCompanyDetail = await dbAdapter.localCompanySaleDetailAdapter.create({
-                    company: companyDetail.company,
-                    receiptDate: companyDetail.receiptDate,
-                    personInCharge: companyDetail.personInCharge,
-                    batch: companyDetail.batch,
-                    guideWeight: companyDetail.guideWeight,
-                    guideNumber: companyDetail.guideNumber,
-                    weightDifference: companyDetail.weightDifference,
-                    processedWeight: companyDetail.processedWeight,
-                    items: companyItemIds
-                }, { session: transaction.session });
-
-                localCompanyDetailIds.push(createdCompanyDetail.id);
-            }
-        }
-
+        // Create local sale first
         const localSale = await dbAdapter.localSaleAdapter.create({
             sale: sale.id,
             wholeTotalPounds,
@@ -119,9 +93,56 @@ const create = async (data) => {
             hasInvoice,
             invoiceNumber,
             invoiceName,
-            details: detailIds,
-            localCompanyDetails: localCompanyDetailIds
+            localCompanySaleDetail: null // Will be set later if exists
         }, { session: transaction.session });
+
+        // Create local sale details (multiple objects) with reference to localSale
+        if (localSaleDetails && localSaleDetails.length > 0) {
+            for (const localSaleDetail of localSaleDetails) {
+                const itemIds = [];
+
+                for (const item of localSaleDetail.items) {
+                    const createdItem = await dbAdapter.localSaleDetailItemAdapter.create(item, { session: transaction.session });
+                    itemIds.push(createdItem.id);
+                }
+
+                await dbAdapter.localSaleDetailAdapter.create({
+                    localSale: localSale.id,
+                    style: localSaleDetail.style,
+                    grandTotal: localSaleDetail.grandTotal,
+                    receivedGrandTotal: localSaleDetail.receivedGrandTotal,
+                    poundsGrandTotal: localSaleDetail.poundsGrandTotal,
+                    items: itemIds
+                }, { session: transaction.session });
+            }
+        }
+
+        // Handle local company detail (single object)
+        if (localCompanySaleDetail) {
+            const companyItemIds = [];
+
+            for (const item of localCompanySaleDetail.items) {
+                const createdItem = await dbAdapter.localCompanySaleDetailItemAdapter.create(item, { session: transaction.session });
+                companyItemIds.push(createdItem.id);
+            }
+
+            const createdCompanyDetail = await dbAdapter.localCompanySaleDetailAdapter.create({
+                company: localCompanySaleDetail.company,
+                receiptDate: localCompanySaleDetail.receiptDate,
+                personInCharge: localCompanySaleDetail.personInCharge,
+                batch: localCompanySaleDetail.batch,
+                guideWeight: localCompanySaleDetail.guideWeight,
+                guideNumber: localCompanySaleDetail.guideNumber,
+                weightDifference: localCompanySaleDetail.weightDifference,
+                processedWeight: localCompanySaleDetail.processedWeight,
+                items: companyItemIds
+            }, { session: transaction.session });
+
+            // Update localSale with company detail reference
+            await dbAdapter.localSaleAdapter.update(localSale.id, {
+                localCompanySaleDetail: createdCompanyDetail.id
+            }, { session: transaction.session });
+        }
 
         await transaction.commit();
         return localSale;
@@ -151,13 +172,7 @@ const getBySaleId = async (saleId) => {
         { sale: saleId, deletedAt: null },
         [
             {
-                path: 'details',
-                populate: {
-                    path: 'items'
-                }
-            },
-            {
-                path: 'localCompanyDetails',
+                path: 'localCompanySaleDetail',
                 populate: [
                     {
                         path: 'items'
@@ -172,6 +187,16 @@ const getBySaleId = async (saleId) => {
 
     const localSale = localSaleList[0];
     if (!localSale) throw new Error('Local sale not found');
+
+    // Get localSaleDetails by localSale reference
+    const localSaleDetailList = await dbAdapter.localSaleDetailAdapter.getAllWithRelations(
+        { localSale: localSale.id, deletedAt: null },
+        [
+            {
+                path: 'items'
+            }
+        ]
+    );
 
     // Fetch Sale with populated purchase and its relations
     const sale = await dbAdapter.saleAdapter.getByIdWithRelations(saleId, [
@@ -207,37 +232,47 @@ const getBySaleId = async (saleId) => {
         invoiceNumber: localSale.invoiceNumber,
         invoiceName: localSale.invoiceName,
         deletedAt: localSale.deletedAt,
-        details: localSale.details.map(detail => ({
-            id: detail.id,
-            style: detail.style,
-            merchat: detail.merchat,
-            grandTotal: detail.grandTotal,
-            poundsGrandTotal: detail.poundsGrandTotal,
-            deletedAt: detail.deletedAt,
-            items: detail.items.map(item => ({
+        localSaleDetails: localSaleDetailList.map(localSaleDetail => ({
+            id: localSaleDetail.id,
+            style: localSaleDetail.style,
+            grandTotal: localSaleDetail.grandTotal,
+            receivedGrandTotal: localSaleDetail.receivedGrandTotal,
+            poundsGrandTotal: localSaleDetail.poundsGrandTotal,
+            deletedAt: localSaleDetail.deletedAt,
+            items: localSaleDetail.items.map(item => ({
                 id: item.id,
                 size: item.size,
                 pounds: item.pounds,
                 price: item.price,
                 total: item.total,
+                merchantName: item.merchantName,
+                merchantId: item.merchantId,
+                paymentOne: item.paymentOne,
+                paymentTwo: item.paymentTwo,
+                totalPaid: item.totalPaid,
+                paymentStatus: item.paymentStatus,
+                paymentMethod: item.paymentMethod,
+                hasInvoice: item.hasInvoice,
+                invoiceNumber: item.invoiceNumber,
+                totalReceived: item.totalReceived,
                 deletedAt: item.deletedAt
             }))
         })),
-        localCompanyDetails: localSale.localCompanyDetails ? localSale.localCompanyDetails.map(companyDetail => ({
-            id: companyDetail.id,
-            company: companyDetail.company ? {
-                id: companyDetail.company._id || companyDetail.company.id,
-                name: companyDetail.company.name
-            } : companyDetail.company,
-            receiptDate: companyDetail.receiptDate,
-            personInCharge: companyDetail.personInCharge,
-            batch: companyDetail.batch,
-            guideWeight: companyDetail.guideWeight,
-            guideNumber: companyDetail.guideNumber,
-            weightDifference: companyDetail.weightDifference,
-            processedWeight: companyDetail.processedWeight,
-            deletedAt: companyDetail.deletedAt,
-            items: companyDetail.items.map(item => ({
+        localCompanySaleDetail: localSale.localCompanySaleDetail ? {
+            id: localSale.localCompanySaleDetail.id,
+            company: localSale.localCompanySaleDetail.company ? {
+                id: localSale.localCompanySaleDetail.company._id || localSale.localCompanySaleDetail.company.id,
+                name: localSale.localCompanySaleDetail.company.name
+            } : localSale.localCompanySaleDetail.company,
+            receiptDate: localSale.localCompanySaleDetail.receiptDate,
+            personInCharge: localSale.localCompanySaleDetail.personInCharge,
+            batch: localSale.localCompanySaleDetail.batch,
+            guideWeight: localSale.localCompanySaleDetail.guideWeight,
+            guideNumber: localSale.localCompanySaleDetail.guideNumber,
+            weightDifference: localSale.localCompanySaleDetail.weightDifference,
+            processedWeight: localSale.localCompanySaleDetail.processedWeight,
+            deletedAt: localSale.localCompanySaleDetail.deletedAt,
+            items: localSale.localCompanySaleDetail.items.map(item => ({
                 id: item.id,
                 size: item.size,
                 class: item.class,
@@ -246,7 +281,7 @@ const getBySaleId = async (saleId) => {
                 total: item.total,
                 deletedAt: item.deletedAt
             }))
-        })) : [],
+        } : null,
         purchase: {
             id: purchase.id,
             controlNumber: purchase.controlNumber,
@@ -283,7 +318,7 @@ const getBySaleId = async (saleId) => {
 
 const update = async (id, data) => {
     let transaction;
-    
+
     try {
         transaction = await dbAdapter.localSaleAdapter.startTransaction();
         const existingLocalSale = await dbAdapter.localSaleAdapter.getById(id);
@@ -292,26 +327,48 @@ const update = async (id, data) => {
         const sale = await dbAdapter.saleAdapter.getById(existingLocalSale.sale);
         if (!sale) throw new Error('Associated Sale not found');
 
-        const { saleDate, wholeTotalPounds, moneyIncomeForRejectedHeads, wholeRejectedPounds, trashPounds, totalProcessedPounds, grandTotal, seller, weightSheetNumber, hasInvoice, invoiceNumber, invoiceName, details, localCompanyDetails } = data;
+        const { saleDate, wholeTotalPounds, moneyIncomeForRejectedHeads, wholeRejectedPounds, trashPounds, totalProcessedPounds, grandTotal, seller, weightSheetNumber, hasInvoice, invoiceNumber, invoiceName, localSaleDetails, localCompanySaleDetail } = data;
 
-        // 🔍 Validate local company details if provided
-        if (localCompanyDetails && localCompanyDetails.length > 0) {
-            for (const companyDetail of localCompanyDetails) {
-                if (companyDetail.company) {
-                    const companyExists = await dbAdapter.companyAdapter.getById(companyDetail.company);
-                    if (!companyExists) throw new Error(`Company with ID ${companyDetail.company} does not exist`);
+        // 🔍 Validate local sale details if provided
+        if (localSaleDetails && localSaleDetails.length > 0) {
+            for (const localSaleDetail of localSaleDetails) {
+                if (!localSaleDetail.items || localSaleDetail.items.length === 0) {
+                    throw new Error('Local sale detail must have at least one item');
                 }
-                
-                // Validate required fields
-                if (!companyDetail.items || companyDetail.items.length === 0) {
-                    throw new Error('Local company details must have at least one item');
-                }
-                
-                // Validate each item
-                for (const item of companyDetail.items) {
-                    if (!item.size || !item.class || item.pounds === undefined || item.price === undefined) {
-                        throw new Error('All item fields (size, class, pounds, price) are required');
+
+                // Validate each item and payment methods
+                for (const item of localSaleDetail.items) {
+                    if (!item.size || item.pounds === undefined || item.price === undefined) {
+                        throw new Error('All item fields (size, pounds, price) are required');
                     }
+
+                    // Validate payment method if paymentStatus is PAID
+                    if (item.paymentStatus === 'PAID' && item.paymentMethod) {
+                        const paymentMethodExists = await dbAdapter.paymentMethodAdapter.getById(item.paymentMethod);
+                        if (!paymentMethodExists) {
+                            throw new Error(`Payment method with ID ${item.paymentMethod} does not exist`);
+                        }
+                    }
+                }
+            }
+        }
+
+        // 🔍 Validate local company detail if provided
+        if (localCompanySaleDetail) {
+            if (localCompanySaleDetail.company) {
+                const companyExists = await dbAdapter.companyAdapter.getById(localCompanySaleDetail.company);
+                if (!companyExists) throw new Error(`Company with ID ${localCompanySaleDetail.company} does not exist`);
+            }
+
+            // Validate required fields
+            if (!localCompanySaleDetail.items || localCompanySaleDetail.items.length === 0) {
+                throw new Error('Local company detail must have at least one item');
+            }
+
+            // Validate each item
+            for (const item of localCompanySaleDetail.items) {
+                if (!item.size || !item.class || item.pounds === undefined || item.price === undefined) {
+                    throw new Error('All item fields (size, class, pounds, price) are required');
                 }
             }
         }
@@ -319,82 +376,79 @@ const update = async (id, data) => {
         // Update sale date if changed
         await dbAdapter.saleAdapter.update(sale.id, { saleDate, weightSheetNumber }, { session: transaction.session });
 
-        // Delete existing details and their items permanently
-        if (existingLocalSale.details && existingLocalSale.details.length > 0) {
-            const existingDetails = await dbAdapter.localSaleDetailAdapter.getAll({ _id: { $in: existingLocalSale.details } });
-            for (const detail of existingDetails) {
-                // Delete items first
-                if (detail.items && detail.items.length > 0) {
-                    for (const itemId of detail.items) {
-                        await dbAdapter.localSaleDetailItemAdapter.removePermanently(itemId, { session: transaction.session });
-                    }
+        // Delete existing detail and its items permanently (find by localSale reference)
+        const existingDetails = await dbAdapter.localSaleDetailAdapter.getAll({ localSale: existingLocalSale.id });
+        for (const existingDetail of existingDetails) {
+            // Delete items first
+            if (existingDetail.items && existingDetail.items.length > 0) {
+                for (const itemId of existingDetail.items) {
+                    await dbAdapter.localSaleDetailItemAdapter.removePermanently(itemId, { session: transaction.session });
                 }
-                // Then delete the detail
-                await dbAdapter.localSaleDetailAdapter.removePermanently(detail.id, { session: transaction.session });
             }
+            // Then delete the detail
+            await dbAdapter.localSaleDetailAdapter.removePermanently(existingDetail.id, { session: transaction.session });
         }
 
-        // Delete existing local company details and their items permanently
-        if (existingLocalSale.localCompanyDetails && existingLocalSale.localCompanyDetails.length > 0) {
-            const existingCompanyDetails = await dbAdapter.localCompanySaleDetailAdapter.getAll({ _id: { $in: existingLocalSale.localCompanyDetails } });
-            for (const companyDetail of existingCompanyDetails) {
+        // Delete existing local company detail and its items permanently
+        if (existingLocalSale.localCompanySaleDetail) {
+            const existingCompanyDetail = await dbAdapter.localCompanySaleDetailAdapter.getById(existingLocalSale.localCompanySaleDetail);
+            if (existingCompanyDetail) {
                 // Delete items first
-                if (companyDetail.items && companyDetail.items.length > 0) {
-                    for (const itemId of companyDetail.items) {
+                if (existingCompanyDetail.items && existingCompanyDetail.items.length > 0) {
+                    for (const itemId of existingCompanyDetail.items) {
                         await dbAdapter.localCompanySaleDetailItemAdapter.removePermanently(itemId, { session: transaction.session });
                     }
                 }
                 // Then delete the company detail
-                await dbAdapter.localCompanySaleDetailAdapter.removePermanently(companyDetail.id, { session: transaction.session });
+                await dbAdapter.localCompanySaleDetailAdapter.removePermanently(existingCompanyDetail.id, { session: transaction.session });
             }
         }
 
-        // Create new detail items and details
-        const newDetailIds = [];
-        for (const detail of details) {
-            const itemIds = [];
-            for (const item of detail.items) {
-                const newItem = await dbAdapter.localSaleDetailItemAdapter.create(item, { session: transaction.session });
-                itemIds.push(newItem.id);
-            }
+        // Create new local sale details (multiple objects) with reference to localSale
+        if (localSaleDetails && localSaleDetails.length > 0) {
+            for (const localSaleDetail of localSaleDetails) {
+                const itemIds = [];
 
-            const newDetail = await dbAdapter.localSaleDetailAdapter.create({
-                style: detail.style,
-                merchat: detail.merchat,
-                grandTotal: detail.grandTotal,
-                poundsGrandTotal: detail.poundsGrandTotal,
-                items: itemIds
-            }, { session: transaction.session });
-
-            newDetailIds.push(newDetail.id);
-        }
-
-        // Create new local company details
-        const newLocalCompanyDetailIds = [];
-        
-        if (localCompanyDetails && localCompanyDetails.length > 0) {
-            for (const companyDetail of localCompanyDetails) {
-                const companyItemIds = [];
-
-                for (const item of companyDetail.items) {
-                    const newItem = await dbAdapter.localCompanySaleDetailItemAdapter.create(item, { session: transaction.session });
-                    companyItemIds.push(newItem.id);
+                for (const item of localSaleDetail.items) {
+                    const createdItem = await dbAdapter.localSaleDetailItemAdapter.create(item, { session: transaction.session });
+                    itemIds.push(createdItem.id);
                 }
 
-                const newCompanyDetail = await dbAdapter.localCompanySaleDetailAdapter.create({
-                    company: companyDetail.company,
-                    receiptDate: companyDetail.receiptDate,
-                    personInCharge: companyDetail.personInCharge,
-                    batch: companyDetail.batch,
-                    guideWeight: companyDetail.guideWeight,
-                    guideNumber: companyDetail.guideNumber,
-                    weightDifference: companyDetail.weightDifference,
-                    processedWeight: companyDetail.processedWeight,
-                    items: companyItemIds
+                await dbAdapter.localSaleDetailAdapter.create({
+                    localSale: existingLocalSale.id,
+                    style: localSaleDetail.style,
+                    grandTotal: localSaleDetail.grandTotal,
+                    receivedGrandTotal: localSaleDetail.receivedGrandTotal,
+                    poundsGrandTotal: localSaleDetail.poundsGrandTotal,
+                    items: itemIds
                 }, { session: transaction.session });
-
-                newLocalCompanyDetailIds.push(newCompanyDetail.id);
             }
+        }
+
+        // Handle local company detail (single object)
+        let localCompanySaleDetailId = null;
+
+        if (localCompanySaleDetail) {
+            const companyItemIds = [];
+
+            for (const item of localCompanySaleDetail.items) {
+                const createdItem = await dbAdapter.localCompanySaleDetailItemAdapter.create(item, { session: transaction.session });
+                companyItemIds.push(createdItem.id);
+            }
+
+            const createdCompanyDetail = await dbAdapter.localCompanySaleDetailAdapter.create({
+                company: localCompanySaleDetail.company,
+                receiptDate: localCompanySaleDetail.receiptDate,
+                personInCharge: localCompanySaleDetail.personInCharge,
+                batch: localCompanySaleDetail.batch,
+                guideWeight: localCompanySaleDetail.guideWeight,
+                guideNumber: localCompanySaleDetail.guideNumber,
+                weightDifference: localCompanySaleDetail.weightDifference,
+                processedWeight: localCompanySaleDetail.processedWeight,
+                items: companyItemIds
+            }, { session: transaction.session });
+
+            localCompanySaleDetailId = createdCompanyDetail.id;
         }
 
         // Update local sale
@@ -410,8 +464,7 @@ const update = async (id, data) => {
             hasInvoice,
             invoiceNumber,
             invoiceName,
-            details: newDetailIds,
-            localCompanyDetails: newLocalCompanyDetailIds
+            localCompanySaleDetail: localCompanySaleDetailId
         }, { session: transaction.session });
 
         await transaction.commit();

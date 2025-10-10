@@ -150,7 +150,8 @@
             (keypress)="validateNumber($event)" (blur)="formatWeightSheetNumberOnBlur($event)"
             (focus)="onWeightSheetNumberFocus($event)" class="form-control form-control-sm" maxlength="8"
             placeholder="00000000" required />
-          <div *ngIf="saleForm.submitted && weightSheetNumber.invalid"
+          <div
+            *ngIf="(saleForm.submitted || weightSheetNumber.dirty || weightSheetNumber.touched) && weightSheetNumber.errors?.['required']"
             class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
             <div>El número de hoja de peso es obligatorio.</div>
           </div>
@@ -167,7 +168,7 @@
             <option [ngValue]="'no'">No</option>
             <option [ngValue]="'not-applicable'">No aplica</option>
           </select>
-          <div *ngIf="saleForm.submitted && hasInvoice.invalid"
+          <div *ngIf="(saleForm.submitted || hasInvoice.dirty || hasInvoice.touched) && hasInvoice.errors?.['required']"
             class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
             <div>Debe seleccionar una opción.</div>
           </div>
@@ -178,7 +179,8 @@
           <label for="invoiceNumber" class="required fw-semibold fs-6 mb-2">Número de factura</label>
           <input type="text" id="invoiceNumber" name="invoiceNumber" [(ngModel)]="localSaleModel.invoiceNumber"
             #invoiceNumber="ngModel" class="form-control form-control-sm" required />
-          <div *ngIf="saleForm.submitted && invoiceNumber.invalid"
+          <div
+            *ngIf="(saleForm.submitted || invoiceNumber.dirty || invoiceNumber.touched) && invoiceNumber.errors?.['required']"
             class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
             El número de factura es obligatorio.
           </div>
@@ -189,7 +191,8 @@
           <label for="invoiceName" class="required fw-semibold fs-6 mb-2">Nombre en factura</label>
           <input type="text" id="invoiceName" name="invoiceName" [(ngModel)]="localSaleModel.invoiceName"
             #invoiceName="ngModel" class="form-control form-control-sm" required />
-          <div *ngIf="saleForm.submitted && invoiceName.invalid"
+          <div
+            *ngIf="(saleForm.submitted || invoiceName.dirty || invoiceName.touched) && invoiceName.errors?.['required']"
             class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
             El nombre de la factura es obligatorio.
           </div>
@@ -269,19 +272,19 @@
 <div class="row mt-2 gx-4 gy-4">
   <!-- WHOLE -->
   <div class="col-12">
-    <app-local-sale-details [style]="SaleStyleEnum.WHOLE" [localSaleDetails]="localSaleWholeDetails"
-      (localSaleDetailsChange)="handleLocalSaleWholeDetailsChange($event)" />
+    <app-local-sale-detail [style]="SaleStyleEnum.WHOLE" [localSaleDetail]="localSaleWholeDetail"
+      (localSaleDetailChange)="handleLocalSaleWholeDetailChange($event)" />
   </div>
 
   <!-- TAIL -->
   <div class="col-12">
-    <app-local-sale-details [style]="SaleStyleEnum.TAIL" [localSaleDetails]="localSaleTailDetails"
-      (localSaleDetailsChange)="handleLocalSaleTailDetailsChange($event)" />
+    <app-local-sale-detail [style]="SaleStyleEnum.TAIL" [localSaleDetail]="localSaleTailDetail"
+      (localSaleDetailChange)="handleLocalSaleTailDetailChange($event)" />
   </div>
 
   <!-- COMPANY SALE DETAILS -->
   <div class="col-12">
-    <app-local-company-sale-details [localCompanySaleDetail]="localCompanySaleDetail"
+    <app-local-company-sale-detail [localCompanySaleDetail]="localCompanySaleDetail"
       (localCompanySaleDetailChange)="handleLocalCompanySaleDetailChange($event)" />
   </div>
 </div>

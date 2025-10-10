@@ -82,8 +82,8 @@ export interface ICreateUpdateLocalSaleModel {
   totalProcessedPounds: number;
   grandTotal: number;
   seller: string;
-  details: ILocalSaleDetailModel[];
-  localCompanyDetails: ILocalCompanySaleDetailModel[];
+  localSaleDetails: ILocalSaleDetailModel[];
+  localCompanySaleDetail?: ILocalCompanySaleDetailModel;
   hasInvoice: 'yes' | 'no' | 'not-applicable';
   invoiceNumber?: string;
   invoiceName?: string;
@@ -102,8 +102,8 @@ export interface ILocalSaleModel {
   totalProcessedPounds: number;
   grandTotal: number;
   seller: string;
-  details: ILocalSaleDetailModel[];
-  localCompanyDetails: ILocalCompanySaleDetailModel[];
+  localSaleDetails: ILocalSaleDetailModel[];
+  localCompanySaleDetail?: ILocalCompanySaleDetailModel;
   hasInvoice: 'yes' | 'no' | 'not-applicable';
   invoiceNumber?: string;
   invoiceName?: string;

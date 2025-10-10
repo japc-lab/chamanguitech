@@ -3,13 +3,14 @@ const { Schema, model } = require('mongoose');
 const SaleStyleEnum = require('../../../enums/sale-style.enum');
 
 const LocalSaleDetailSchema = Schema({
+  localSale: {
+    type: Schema.Types.ObjectId,
+    ref: 'LocalSale',
+    required: true
+  },
   style: {
     type: String,
     enum: SaleStyleEnum,
-    required: true,
-  },
-  merchat: {
-    type: String,
     required: true,
   },
   items: [{
@@ -18,6 +19,11 @@ const LocalSaleDetailSchema = Schema({
     required: true
   }],
   grandTotal: {
+    type: Number,
+    required: true,
+    min: 0
+  },
+  receivedGrandTotal: {
     type: Number,
     required: true,
     min: 0

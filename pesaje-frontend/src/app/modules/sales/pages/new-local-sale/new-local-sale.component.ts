@@ -58,8 +58,8 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
   localSaleModel: ICreateUpdateLocalSaleModel;
   purchaseModel: IReducedDetailedPurchaseModel;
 
-  localSaleWholeDetails: ILocalSaleDetailModel[] = [];
-  localSaleTailDetails: ILocalSaleDetailModel[] = [];
+  localSaleWholeDetail: ILocalSaleDetailModel | null = null;
+  localSaleTailDetail: ILocalSaleDetailModel | null = null;
   localCompanySaleDetail: ILocalCompanySaleDetailModel | null = null;
 
   groupedWhole: { size: string; pounds: number; total: number }[] = [];
@@ -141,17 +141,30 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
               purchase: purchase.id,
             };
 
-            this.localSaleWholeDetails = this.localSaleModel.details.filter(
-              (det) => det.style === SaleStyleEnum.WHOLE
-            );
-            this.localSaleTailDetails = this.localSaleModel.details.filter(
-              (det) => det.style === SaleStyleEnum.TAIL
-            );
-            this.localCompanySaleDetail = this.localSaleModel.localCompanyDetails?.[0] || null;
-            this.updateGroupedDetails(
-              this.localSaleWholeDetails,
-              this.localSaleTailDetails
-            );
+            // Load multiple localSaleDetails into appropriate sections based on their styles
+            if (
+              this.localSaleModel.localSaleDetails &&
+              this.localSaleModel.localSaleDetails.length > 0
+            ) {
+              // Find WHOLE detail
+              const wholeDetail = this.localSaleModel.localSaleDetails.find(
+                (detail) => detail.style === SaleStyleEnum.WHOLE
+              );
+
+              // Find TAIL detail
+              const tailDetail = this.localSaleModel.localSaleDetails.find(
+                (detail) => detail.style === SaleStyleEnum.TAIL
+              );
+
+              this.localSaleWholeDetail = wholeDetail
+                ? { ...wholeDetail }
+                : null;
+              this.localSaleTailDetail = tailDetail ? { ...tailDetail } : null;
+            }
+
+            this.localCompanySaleDetail =
+              this.localSaleModel.localCompanySaleDetail || null;
+            this.updateGroupedDetails();
 
             this.controlNumber = localSale.purchase.controlNumber!;
             this.purchaseModel = localSale.purchase;
@@ -172,6 +185,11 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
     this.localSaleModel = {} as ICreateUpdateLocalSaleModel;
     this.localSaleModel.wholeTotalPounds = 0;
 
+    // Initialize detail objects as null (will be created when needed)
+    this.localSaleWholeDetail = null;
+    this.localSaleTailDetail = null;
+    this.localCompanySaleDetail = null;
+
     this.purchaseModel = {} as IReducedDetailedPurchaseModel;
     this.purchaseModel.period = {} as IReducedPeriodModel;
     this.purchaseModel.buyer = {} as IReducedUserModel;
@@ -191,18 +209,29 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Check if both lists are empty
+    // Check if both details are empty
     const hasWholeDetails =
-      Array.isArray(this.localSaleWholeDetails) &&
-      this.localSaleWholeDetails.length > 0;
+      this.localSaleWholeDetail &&
+      this.localSaleWholeDetail.items &&
+      this.localSaleWholeDetail.items.length > 0;
     const hasTailDetails =
-      Array.isArray(this.localSaleTailDetails) &&
-      this.localSaleTailDetails.length > 0;
+      this.localSaleTailDetail &&
+      this.localSaleTailDetail.items &&
+      this.localSaleTailDetail.items.length > 0;
 
     if (!hasWholeDetails && !hasTailDetails) {
       this.alertService.showTranslatedAlert({
         alertType: 'info',
         messageKey: 'MESSAGES.NO_SALE_DETAILS_ENTERED',
+      });
+      return;
+    }
+
+    // Validate local company sale details if they exist
+    if (this.localCompanySaleDetail && !this.isLocalCompanySaleDetailValid()) {
+      this.alertService.showTranslatedAlert({
+        alertType: 'warning',
+        messageKey: 'MESSAGES.LOCAL_COMPANY_SALE_DETAILS_VALIDATION_ERROR',
       });
       return;
     }
@@ -220,17 +249,74 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
     this.localSaleModel.grandTotal = Number(
       (this.totalWholeAmount + this.totalTailAmount).toFixed(2)
     );
-    this.localSaleModel.details = [
-      ...this.localSaleWholeDetails,
-      ...this.localSaleTailDetails,
-    ];
-    // Transform localCompanyDetails to ensure company field contains only ID strings
-    this.localSaleModel.localCompanyDetails = this.localCompanySaleDetail ? [{
-      ...this.localCompanySaleDetail,
-      company: typeof this.localCompanySaleDetail.company === 'object' && this.localCompanySaleDetail.company?.id
-        ? this.localCompanySaleDetail.company.id
-        : this.localCompanySaleDetail.company
-    }] : [];
+    // Prepare separate details for WHOLE and TAIL sections
+    const localSaleDetails = [];
+
+    // Add WHOLE detail if it has items
+    if (
+      this.localSaleWholeDetail?.items &&
+      this.localSaleWholeDetail.items.length > 0
+    ) {
+      const transformedWholeItems = this.localSaleWholeDetail.items.map(
+        (item) => ({
+          ...item,
+          paymentMethod:
+            typeof item.paymentMethod === 'object' && item.paymentMethod?.id
+              ? item.paymentMethod.id
+              : item.paymentMethod,
+        })
+      );
+
+      localSaleDetails.push({
+        style: SaleStyleEnum.WHOLE,
+        grandTotal: this.localSaleWholeDetail.grandTotal,
+        receivedGrandTotal: this.localSaleWholeDetail.receivedGrandTotal,
+        poundsGrandTotal: this.localSaleWholeDetail.poundsGrandTotal,
+        items: transformedWholeItems,
+      });
+    }
+
+    // Add TAIL detail if it has items
+    if (
+      this.localSaleTailDetail?.items &&
+      this.localSaleTailDetail.items.length > 0
+    ) {
+      const transformedTailItems = this.localSaleTailDetail.items.map(
+        (item) => ({
+          ...item,
+          paymentMethod:
+            typeof item.paymentMethod === 'object' && item.paymentMethod?.id
+              ? item.paymentMethod.id
+              : item.paymentMethod,
+        })
+      );
+
+      localSaleDetails.push({
+        style: SaleStyleEnum.TAIL,
+        grandTotal: this.localSaleTailDetail.grandTotal,
+        receivedGrandTotal: this.localSaleTailDetail.receivedGrandTotal,
+        poundsGrandTotal: this.localSaleTailDetail.poundsGrandTotal,
+        items: transformedTailItems,
+      });
+    }
+
+    // Set the localSaleDetails array
+    this.localSaleModel.localSaleDetails = localSaleDetails;
+
+    // Transform localCompanySaleDetail to ensure company field contains only ID string
+    if (this.localCompanySaleDetail) {
+      this.localSaleModel.localCompanySaleDetail = {
+        ...this.localCompanySaleDetail,
+        company:
+          typeof this.localCompanySaleDetail.company === 'object' &&
+          this.localCompanySaleDetail.company?.id
+            ? this.localCompanySaleDetail.company.id
+            : this.localCompanySaleDetail.company,
+      };
+    } else {
+      // Don't send localCompanySaleDetail field at all if it's null/undefined
+      delete this.localSaleModel.localCompanySaleDetail;
+    }
 
     if (this.localSaleId) {
       this.localSaleService
@@ -350,56 +436,47 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
     this.router.navigate(['/sales/list']);
   }
 
-  handleLocalSaleWholeDetailsChange(details: ILocalSaleDetailModel[]) {
-    this.localSaleWholeDetails = details;
+  handleLocalSaleWholeDetailChange(detail: ILocalSaleDetailModel) {
+    this.localSaleWholeDetail = detail;
     this.calculateWholeTotalPounds();
-    this.updateGroupedDetails(
-      this.localSaleWholeDetails,
-      this.localSaleTailDetails
-    );
+    this.updateGroupedDetails();
   }
 
-  handleLocalSaleTailDetailsChange(details: ILocalSaleDetailModel[]) {
-    this.localSaleTailDetails = details;
-    this.updateGroupedDetails(
-      this.localSaleWholeDetails,
-      this.localSaleTailDetails
-    );
+  handleLocalSaleTailDetailChange(detail: ILocalSaleDetailModel) {
+    this.localSaleTailDetail = detail;
+    this.updateGroupedDetails();
   }
 
-  handleLocalCompanySaleDetailChange(detail: ILocalCompanySaleDetailModel | null) {
+  handleLocalCompanySaleDetailChange(
+    detail: ILocalCompanySaleDetailModel | null
+  ) {
     this.localCompanySaleDetail = detail;
   }
 
   calculateWholeTotalPounds(): void {
     let total = 0;
 
-    this.localSaleWholeDetails.forEach((detail) => {
-      detail.items.forEach((item) => {
-        total += item.pounds || 0;
-      });
+    this.localSaleWholeDetail?.items.forEach((item) => {
+      total += item.pounds || 0;
     });
 
     this.localSaleModel.wholeTotalPounds = Number(total.toFixed(2));
   }
 
-  updateGroupedDetails(
-    wholeDetails: ILocalSaleDetailModel[],
-    tailDetails: ILocalSaleDetailModel[]
-  ): void {
-    const groupBySize = (details: ILocalSaleDetailModel[]) => {
+  updateGroupedDetails(): void {
+    const groupBySize = (details: ILocalSaleDetailModel | null) => {
       const groupMap: { [size: string]: { pounds: number; total: number } } =
         {};
 
-      details.forEach((detail) => {
-        detail.items.forEach((item) => {
+      if (details?.items) {
+        details.items.forEach((item) => {
           if (!groupMap[item.size]) {
             groupMap[item.size] = { pounds: 0, total: 0 };
           }
           groupMap[item.size].pounds += item.pounds || 0;
           groupMap[item.size].total += item.total || 0;
         });
-      });
+      }
 
       return Object.entries(groupMap).map(([size, data]) => ({
         size,
@@ -408,8 +485,8 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
       }));
     };
 
-    this.groupedWhole = groupBySize(wholeDetails);
-    this.groupedTail = groupBySize(tailDetails);
+    this.groupedWhole = groupBySize(this.localSaleWholeDetail);
+    this.groupedTail = groupBySize(this.localSaleTailDetail);
 
     this.totalWholePounds = this.groupedWhole.reduce(
       (sum, g) => sum + g.pounds,
@@ -511,6 +588,51 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
 
   validateWholeNumber(event: KeyboardEvent) {
     this.inputUtils.validateWholeNumber(event);
+  }
+
+  /**
+   * Validates local company sale details
+   * @returns boolean indicating if validation passes
+   */
+  isLocalCompanySaleDetailValid(): boolean {
+    if (!this.localCompanySaleDetail) {
+      return true; // No details to validate
+    }
+
+    const detail = this.localCompanySaleDetail;
+
+    // Check required fields
+    if (!detail.company) return false;
+    if (!detail.receiptDate?.trim()) return false;
+    if (!detail.personInCharge?.trim()) return false;
+    if (!detail.guideNumber?.trim()) return false;
+    if (
+      detail.batch === undefined ||
+      detail.batch === null ||
+      detail.batch <= 0
+    )
+      return false;
+    if (
+      detail.guideWeight === undefined ||
+      detail.guideWeight === null ||
+      detail.guideWeight <= 0
+    )
+      return false;
+
+    // Check if there are items
+    if (!detail.items || detail.items.length === 0) return false;
+
+    // Validate each item
+    for (const item of detail.items) {
+      if (!item.size?.trim()) return false;
+      if (!item.class?.trim()) return false;
+      if (item.pounds === undefined || item.pounds === null || item.pounds <= 0)
+        return false;
+      if (item.price === undefined || item.price === null || item.price <= 0)
+        return false;
+    }
+
+    return true; // All validations passed
   }
 
   ngOnDestroy(): void {

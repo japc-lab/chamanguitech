@@ -10,8 +10,8 @@ import { CompanySaleItemsListingComponent } from './widgets/company-sale-items-l
 import { RecentSalesComponent } from './pages/recent-sales/recent-sales.component';
 import { CompanySalePaymentListingComponent } from './widgets/company-sale-payment-listing/company-sale-payment-listing.component';
 import { NewLocalSaleComponent } from './pages/new-local-sale/new-local-sale.component';
-import { LocalSaleDetailsComponent } from './widgets/local-sale-details/local-sale-details.component';
-import { LocalCompanySaleDetailsComponent } from './widgets/local-company-sale-details/local-company-sale-details.component';
+import { LocalSaleDetailComponent } from './widgets/local-sale-detail/local-sale-detail.component';
+import { LocalCompanySaleDetailComponent } from './widgets/local-company-sale-detail/local-company-sale-detail.component';
 
 @NgModule({
   declarations: [
@@ -20,8 +20,8 @@ import { LocalCompanySaleDetailsComponent } from './widgets/local-company-sale-d
     CompanySaleItemsListingComponent,
     CompanySalePaymentListingComponent,
     NewLocalSaleComponent,
-    LocalSaleDetailsComponent,
-    LocalCompanySaleDetailsComponent,
+    LocalSaleDetailComponent,
+    LocalCompanySaleDetailComponent,
   ],
   imports: [
     CommonModule,
