@@ -34,8 +34,12 @@ import { IReducedPeriodModel } from 'src/app/modules/shared/interfaces/period.in
 import { CompanySalePaymentListingComponent } from '../../widgets/company-sale-payment-listing/company-sale-payment-listing.component';
 import { LocalSaleService } from '../../services/local-sale.service';
 import { ILocalSaleDetailModel } from '../../interfaces/local-sale-detail.interface';
+import { ILocalCompanySaleDetailModel } from '../../interfaces/local-company-sale-detail.interface';
 import { SaleStyleEnum } from '../../interfaces/sale.interface';
 import { SaleService } from '../../services/sale.service';
+import { IPaymentMethodModel } from '../../../shared/interfaces/payment-method.interface';
+import { PaymentMethodService } from '../../../shared/services/payment-method.service';
+import { LocalCompanySaleDetailPaymentService } from '../../services/local-company-sale-detail-payment.service';
 
 @Component({
   selector: 'app-new-local-sale',
@@ -57,8 +61,9 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
   localSaleModel: ICreateUpdateLocalSaleModel;
   purchaseModel: IReducedDetailedPurchaseModel;
 
-  localSaleWholeDetails: ILocalSaleDetailModel[] = [];
-  localSaleTailDetails: ILocalSaleDetailModel[] = [];
+  localSaleWholeDetail: ILocalSaleDetailModel | null = null;
+  localSaleTailDetail: ILocalSaleDetailModel | null = null;
+  localCompanySaleDetail: ILocalCompanySaleDetailModel | null = null;
 
   groupedWhole: { size: string; pounds: number; total: number }[] = [];
   groupedTail: { size: string; pounds: number; total: number }[] = [];
@@ -71,7 +76,39 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
   saleId: string | undefined;
   localSaleId: string | undefined;
 
+  paymentMethods: IPaymentMethodModel[] = [];
+  companyPaymentTotal: number = 0;
+
   private unsubscribe: Subscription[] = [];
+
+  /**
+   * Public method to refresh company payment total
+   * Can be called from payment components when payments are updated
+   */
+  public refreshCompanyPaymentTotal(): void {
+    this.calculateCompanyPaymentTotal();
+  }
+
+  private calculateCompanyPaymentTotal(): void {
+    if (this.localCompanySaleDetail?.id) {
+      const paymentSub = this.localCompanySaleDetailPaymentService
+        .getPaymentsByLocalCompanySaleDetailId(this.localCompanySaleDetail.id)
+        .subscribe({
+          next: (payments) => {
+            this.companyPaymentTotal = payments.reduce((sum, payment) => sum + (payment.amount || 0), 0);
+            this.cdr.detectChanges(); // Trigger change detection to update the summary
+          },
+          error: (error) => {
+            console.error('Error fetching company payments:', error);
+            this.companyPaymentTotal = 0;
+          }
+        });
+
+      this.unsubscribe.push(paymentSub);
+    } else {
+      this.companyPaymentTotal = 0;
+    }
+  }
 
   constructor(
     public activeModal: NgbActiveModal,
@@ -87,7 +124,9 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private location: Location,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private paymentMethodService: PaymentMethodService,
+    private localCompanySaleDetailPaymentService: LocalCompanySaleDetailPaymentService
   ) {}
 
   get saleDateFormatted(): string | null {
@@ -101,13 +140,11 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
   get totalProcessedPounds(): number {
     const {
       wholeTotalPounds = 0,
-      tailTotalPounds = 0,
       wholeRejectedPounds = 0,
       trashPounds = 0,
     } = this.localSaleModel;
     return (
       Number(wholeTotalPounds) +
-      Number(tailTotalPounds) +
       Number(wholeRejectedPounds) +
       Number(trashPounds)
     );
@@ -128,49 +165,91 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
     this.isOnlyBuyer = this.authService.isOnlyBuyer;
 
     this.initializeModels();
+    this.loadPaymentMethods();
 
     if (this.saleId) {
-      const localSaleSub = this.localSaleService
-        .getLocalSaleBySaleId(this.saleId)
-        .subscribe({
-          next: (localSale: ILocalSaleModel) => {
-            const { purchase, ...rest } = localSale;
-            this.localSaleId = rest.id;
-            this.localSaleModel = {
-              ...rest,
-              purchase: purchase.id,
-            };
-
-            this.localSaleWholeDetails = this.localSaleModel.details.filter(
-              (det) => det.style === SaleStyleEnum.WHOLE
-            );
-            this.localSaleTailDetails = this.localSaleModel.details.filter(
-              (det) => det.style === SaleStyleEnum.TAIL
-            );
-            this.updateGroupedDetails(
-              this.localSaleWholeDetails,
-              this.localSaleTailDetails
-            );
-
-            this.controlNumber = localSale.purchase.controlNumber!;
-            this.purchaseModel = localSale.purchase;
-
-            this.cdr.detectChanges();
-          },
-          error: (error) => {
-            console.error('Error fetching local sale:', error);
-            this.alertService.showTranslatedAlert({ alertType: 'error' });
-          },
-        });
-
-      this.unsubscribe.push(localSaleSub);
+      this.loadLocalSaleBySaleId(this.saleId);
     }
+  }
+
+  loadPaymentMethods(): void {
+    const paymentMethodSub = this.paymentMethodService
+      .getAllPaymentsMethods()
+      .subscribe({
+        next: (paymentMethods: IPaymentMethodModel[]) => {
+          this.paymentMethods = paymentMethods;
+        },
+        error: (error: any) => {
+          console.error('Error loading payment methods:', error);
+        },
+      });
+
+    this.unsubscribe.push(paymentMethodSub);
+  }
+
+  loadLocalSaleBySaleId(saleId: string): void {
+    const localSaleSub = this.localSaleService
+      .getLocalSaleBySaleId(saleId)
+      .subscribe({
+        next: (localSale: ILocalSaleModel) => {
+          const { purchase, ...rest } = localSale;
+          this.localSaleId = rest.id;
+          this.localSaleModel = {
+            ...rest,
+            purchase: purchase.id,
+          };
+
+          // Load multiple localSaleDetails into appropriate sections based on their styles
+          if (
+            this.localSaleModel.localSaleDetails &&
+            this.localSaleModel.localSaleDetails.length > 0
+          ) {
+            // Find WHOLE detail
+            const wholeDetail = this.localSaleModel.localSaleDetails.find(
+              (detail) => detail.style === SaleStyleEnum.WHOLE
+            );
+
+            // Find TAIL detail
+            const tailDetail = this.localSaleModel.localSaleDetails.find(
+              (detail) => detail.style === SaleStyleEnum.TAIL
+            );
+
+            this.localSaleWholeDetail = wholeDetail
+              ? { ...wholeDetail }
+              : null;
+            this.localSaleTailDetail = tailDetail ? { ...tailDetail } : null;
+          }
+
+          this.localCompanySaleDetail =
+            this.localSaleModel.localCompanySaleDetail || null;
+
+          // Calculate company payment total
+          this.calculateCompanyPaymentTotal();
+
+          this.updateGroupedDetails();
+
+          this.controlNumber = localSale.purchase.controlNumber!;
+          this.purchaseModel = localSale.purchase;
+
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error fetching local sale:', error);
+          this.alertService.showTranslatedAlert({ alertType: 'error' });
+        },
+      });
+
+    this.unsubscribe.push(localSaleSub);
   }
 
   initializeModels() {
     this.localSaleModel = {} as ICreateUpdateLocalSaleModel;
     this.localSaleModel.wholeTotalPounds = 0;
-    this.localSaleModel.tailTotalPounds = 0;
+
+    // Initialize detail objects as null (will be created when needed)
+    this.localSaleWholeDetail = null;
+    this.localSaleTailDetail = null;
+    this.localCompanySaleDetail = null;
 
     this.purchaseModel = {} as IReducedDetailedPurchaseModel;
     this.purchaseModel.period = {} as IReducedPeriodModel;
@@ -191,18 +270,29 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Check if both lists are empty
+    // Check if both details are empty
     const hasWholeDetails =
-      Array.isArray(this.localSaleWholeDetails) &&
-      this.localSaleWholeDetails.length > 0;
+      this.localSaleWholeDetail &&
+      this.localSaleWholeDetail.items &&
+      this.localSaleWholeDetail.items.length > 0;
     const hasTailDetails =
-      Array.isArray(this.localSaleTailDetails) &&
-      this.localSaleTailDetails.length > 0;
+      this.localSaleTailDetail &&
+      this.localSaleTailDetail.items &&
+      this.localSaleTailDetail.items.length > 0;
 
     if (!hasWholeDetails && !hasTailDetails) {
       this.alertService.showTranslatedAlert({
         alertType: 'info',
         messageKey: 'MESSAGES.NO_SALE_DETAILS_ENTERED',
+      });
+      return;
+    }
+
+    // Validate local company sale details if they exist
+    if (this.localCompanySaleDetail && !this.isLocalCompanySaleDetailValid()) {
+      this.alertService.showTranslatedAlert({
+        alertType: 'warning',
+        messageKey: 'MESSAGES.LOCAL_COMPANY_SALE_DETAILS_VALIDATION_ERROR',
       });
       return;
     }
@@ -220,10 +310,83 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
     this.localSaleModel.grandTotal = Number(
       (this.totalWholeAmount + this.totalTailAmount).toFixed(2)
     );
-    this.localSaleModel.details = [
-      ...this.localSaleWholeDetails,
-      ...this.localSaleTailDetails,
-    ];
+    // Prepare separate details for WHOLE and TAIL sections
+    const localSaleDetails = [];
+
+    // Add WHOLE detail if it has items
+    if (
+      this.localSaleWholeDetail?.items &&
+      this.localSaleWholeDetail.items.length > 0
+    ) {
+      const transformedWholeItems = this.localSaleWholeDetail.items.map(
+        (item) => ({
+          ...item,
+          paymentMethod:
+            typeof item.paymentMethod === 'object' && item.paymentMethod?.id
+              ? item.paymentMethod.id
+              : item.paymentMethod,
+        })
+      );
+
+      localSaleDetails.push({
+        style: SaleStyleEnum.WHOLE,
+        grandTotal: this.localSaleWholeDetail.grandTotal,
+        receivedGrandTotal: this.localSaleWholeDetail.receivedGrandTotal,
+        poundsGrandTotal: this.localSaleWholeDetail.poundsGrandTotal,
+        retentionPercentage: this.localSaleWholeDetail.retentionPercentage,
+        retentionAmount: this.localSaleWholeDetail.retentionAmount,
+        netGrandTotal: this.localSaleWholeDetail.netGrandTotal,
+        otherPenalties: this.localSaleWholeDetail.otherPenalties,
+        items: transformedWholeItems,
+      });
+    }
+
+    // Add TAIL detail if it has items
+    if (
+      this.localSaleTailDetail?.items &&
+      this.localSaleTailDetail.items.length > 0
+    ) {
+      const transformedTailItems = this.localSaleTailDetail.items.map(
+        (item) => ({
+          ...item,
+          paymentMethod:
+            typeof item.paymentMethod === 'object' && item.paymentMethod?.id
+              ? item.paymentMethod.id
+              : item.paymentMethod,
+        })
+      );
+
+      localSaleDetails.push({
+        style: SaleStyleEnum.TAIL,
+        grandTotal: this.localSaleTailDetail.grandTotal,
+        receivedGrandTotal: this.localSaleTailDetail.receivedGrandTotal,
+        poundsGrandTotal: this.localSaleTailDetail.poundsGrandTotal,
+        retentionPercentage: this.localSaleTailDetail.retentionPercentage,
+        retentionAmount: this.localSaleTailDetail.retentionAmount,
+        netGrandTotal: this.localSaleTailDetail.netGrandTotal,
+        otherPenalties: this.localSaleTailDetail.otherPenalties,
+        items: transformedTailItems,
+      });
+    }
+
+    // Set the localSaleDetails array
+    this.localSaleModel.localSaleDetails =
+      localSaleDetails as ILocalSaleDetailModel[];
+
+    // Transform localCompanySaleDetail to ensure company field contains only ID string
+    if (this.localCompanySaleDetail) {
+      this.localSaleModel.localCompanySaleDetail = {
+        ...this.localCompanySaleDetail,
+        company:
+          typeof this.localCompanySaleDetail.company === 'object' &&
+          this.localCompanySaleDetail.company?.id
+            ? this.localCompanySaleDetail.company.id
+            : this.localCompanySaleDetail.company,
+      };
+    } else {
+      // Don't send localCompanySaleDetail field at all if it's null/undefined
+      delete this.localSaleModel.localCompanySaleDetail;
+    }
 
     if (this.localSaleId) {
       this.localSaleService
@@ -231,6 +394,11 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
         .subscribe({
           next: (response) => {
             this.alertService.showTranslatedAlert({ alertType: 'success' });
+
+            // Reload the sale to get updated detail IDs (especially for company detail)
+            if (this.saleId) {
+              this.loadLocalSaleBySaleId(this.saleId);
+            }
           },
           error: (error) => {
             console.error('Error updating local sale:', error);
@@ -241,7 +409,14 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
       this.localSaleService.createLocalSale(this.localSaleModel).subscribe({
         next: (response) => {
           this.localSaleId = response.id;
-          this.cdr.detectChanges();
+
+          // Navigate to edit URL with saleId to enable subsequent updates and payments
+          // The response contains the sale reference, we need to get the saleId
+          if (response.sale) {
+            this.saleId = response.sale;
+            this.router.navigate(['/sales/local', this.saleId]);
+          }
+
           this.alertService.showTranslatedAlert({ alertType: 'success' });
         },
         error: (error) => {
@@ -343,65 +518,71 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
     this.router.navigate(['/sales/list']);
   }
 
-  handleLocalSaleWholeDetailsChange(details: ILocalSaleDetailModel[]) {
-    this.localSaleWholeDetails = details;
+  handleLocalSaleWholeDetailChange(detail: ILocalSaleDetailModel) {
+    this.localSaleWholeDetail = detail;
     this.calculateWholeTotalPounds();
-    this.updateGroupedDetails(
-      this.localSaleWholeDetails,
-      this.localSaleTailDetails
-    );
+    this.updateGroupedDetails();
+    this.updateLocalSaleModelDetails();
   }
 
-  handleLocalSaleTailDetailsChange(details: ILocalSaleDetailModel[]) {
-    this.localSaleTailDetails = details;
-    this.calculateTailTotalPounds();
-    this.updateGroupedDetails(
-      this.localSaleWholeDetails,
-      this.localSaleTailDetails
-    );
+  handleLocalSaleTailDetailChange(detail: ILocalSaleDetailModel) {
+    this.localSaleTailDetail = detail;
+    this.updateGroupedDetails();
+    this.updateLocalSaleModelDetails();
+  }
+
+  handleLocalCompanySaleDetailChange(
+    detail: ILocalCompanySaleDetailModel | null
+  ) {
+    this.localCompanySaleDetail = detail;
+    // Only update the model details, not the payment total
+    // Payment total should only be refreshed when payments are actually modified
+    this.updateLocalSaleModelDetails();
+  }
+
+  /**
+   * Update localSaleModel with current detail values
+   * This ensures the summary component sees the latest changes
+   */
+  private updateLocalSaleModelDetails(): void {
+    // Update localSaleDetails array
+    const details: ILocalSaleDetailModel[] = [];
+    if (this.localSaleWholeDetail) {
+      details.push(this.localSaleWholeDetail);
+    }
+    if (this.localSaleTailDetail) {
+      details.push(this.localSaleTailDetail);
+    }
+    this.localSaleModel.localSaleDetails = details;
+
+    // Update localCompanySaleDetail (convert null to undefined)
+    this.localSaleModel.localCompanySaleDetail = this.localCompanySaleDetail || undefined;
   }
 
   calculateWholeTotalPounds(): void {
     let total = 0;
 
-    this.localSaleWholeDetails.forEach((detail) => {
-      detail.items.forEach((item) => {
-        total += item.pounds || 0;
-      });
+    this.localSaleWholeDetail?.items.forEach((item) => {
+      total += item.pounds || 0;
     });
 
     this.localSaleModel.wholeTotalPounds = Number(total.toFixed(2));
   }
 
-  calculateTailTotalPounds(): void {
-    let total = 0;
-
-    this.localSaleTailDetails.forEach((detail) => {
-      detail.items.forEach((item) => {
-        total += item.pounds || 0;
-      });
-    });
-
-    this.localSaleModel.tailTotalPounds = Number(total.toFixed(2));
-  }
-
-  updateGroupedDetails(
-    wholeDetails: ILocalSaleDetailModel[],
-    tailDetails: ILocalSaleDetailModel[]
-  ): void {
-    const groupBySize = (details: ILocalSaleDetailModel[]) => {
+  updateGroupedDetails(): void {
+    const groupBySize = (details: ILocalSaleDetailModel | null) => {
       const groupMap: { [size: string]: { pounds: number; total: number } } =
         {};
 
-      details.forEach((detail) => {
-        detail.items.forEach((item) => {
+      if (details?.items) {
+        details.items.forEach((item) => {
           if (!groupMap[item.size]) {
             groupMap[item.size] = { pounds: 0, total: 0 };
           }
           groupMap[item.size].pounds += item.pounds || 0;
           groupMap[item.size].total += item.total || 0;
         });
-      });
+      }
 
       return Object.entries(groupMap).map(([size, data]) => ({
         size,
@@ -410,8 +591,8 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
       }));
     };
 
-    this.groupedWhole = groupBySize(wholeDetails);
-    this.groupedTail = groupBySize(tailDetails);
+    this.groupedWhole = groupBySize(this.localSaleWholeDetail);
+    this.groupedTail = groupBySize(this.localSaleTailDetail);
 
     this.totalWholePounds = this.groupedWhole.reduce(
       (sum, g) => sum + g.pounds,
@@ -471,6 +652,35 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
     }
   }
 
+  onHasInvoiceChange(hasInvoice: boolean) {
+    if (!hasInvoice) {
+      this.localSaleModel.invoiceNumber = undefined;
+      this.localSaleModel.invoiceName = undefined;
+    }
+  }
+
+  /**
+   * 👉 Formats sheet number to 8 digits with leading zeros when input loses focus
+   */
+  formatWeightSheetNumberOnBlur(event: Event) {
+    this.inputUtils.formatSheetNumberOnBlur(
+      event,
+      'weightSheetNumber',
+      this.localSaleModel
+    );
+  }
+
+  /**
+   * 👉 Handles focus event to clear field if it's all zeros
+   */
+  onWeightSheetNumberFocus(event: Event) {
+    this.inputUtils.onSheetNumberFocus(
+      event,
+      'weightSheetNumber',
+      this.localSaleModel
+    );
+  }
+
   formatDecimal(controlName: string) {
     const control = this.saleForm?.form?.get(controlName);
     if (control) {
@@ -484,6 +694,51 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
 
   validateWholeNumber(event: KeyboardEvent) {
     this.inputUtils.validateWholeNumber(event);
+  }
+
+  /**
+   * Validates local company sale details
+   * @returns boolean indicating if validation passes
+   */
+  isLocalCompanySaleDetailValid(): boolean {
+    if (!this.localCompanySaleDetail) {
+      return true; // No details to validate
+    }
+
+    const detail = this.localCompanySaleDetail;
+
+    // Check required fields
+    if (!detail.company) return false;
+    if (!detail.receiptDate?.trim()) return false;
+    if (!detail.personInCharge?.trim()) return false;
+    if (!detail.guideNumber?.trim()) return false;
+    if (
+      detail.batch === undefined ||
+      detail.batch === null ||
+      detail.batch <= 0
+    )
+      return false;
+    if (
+      detail.guideWeight === undefined ||
+      detail.guideWeight === null ||
+      detail.guideWeight <= 0
+    )
+      return false;
+
+    // Check if there are items
+    if (!detail.items || detail.items.length === 0) return false;
+
+    // Validate each item
+    for (const item of detail.items) {
+      if (!item.size?.trim()) return false;
+      if (!item.class?.trim()) return false;
+      if (item.pounds === undefined || item.pounds === null || item.pounds <= 0)
+        return false;
+      if (item.price === undefined || item.price === null || item.price <= 0)
+        return false;
+    }
+
+    return true; // All validations passed
   }
 
   ngOnDestroy(): void {

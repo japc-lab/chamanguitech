@@ -2,6 +2,7 @@ import { IReducedDetailedPurchaseModel } from '../../purchases/interfaces/purcha
 import { ICompany } from '../../settings/interfaces/company.interfaces';
 import { IReducedUserModel } from '../../settings/interfaces/user.interface';
 import { ICompanySaleItemModel } from './company-sale-item.interface';
+import { ILocalCompanySaleDetailModel } from './local-company-sale-detail.interface';
 import { ILocalSaleDetailModel } from './local-sale-detail.interface';
 
 export interface ISaleModel {
@@ -17,6 +18,7 @@ export interface ISaleModel {
   company: ICompany;
   type: SaleTypeEnum;
   status: CompanySaleStatusEnum;
+  weightSheetNumber?: string;
   deletedAt?: string;
 }
 
@@ -74,13 +76,18 @@ export interface ICreateUpdateLocalSaleModel {
   purchase: string;
   saleDate: string;
   wholeTotalPounds: number;
-  tailTotalPounds: number;
+  moneyIncomeForRejectedHeads: number;
   wholeRejectedPounds: number;
   trashPounds: number;
   totalProcessedPounds: number;
   grandTotal: number;
   seller: string;
-  details: ILocalSaleDetailModel[];
+  localSaleDetails: ILocalSaleDetailModel[];
+  localCompanySaleDetail?: ILocalCompanySaleDetailModel;
+  hasInvoice: 'yes' | 'no' | 'not-applicable';
+  invoiceNumber?: string;
+  invoiceName?: string;
+  weightSheetNumber?: string;
 }
 
 export interface ILocalSaleModel {
@@ -89,13 +96,17 @@ export interface ILocalSaleModel {
   sale: string;
   saleDate: string;
   wholeTotalPounds: number;
-  tailTotalPounds: number;
+  moneyIncomeForRejectedHeads: number;
   wholeRejectedPounds: number;
   trashPounds: number;
   totalProcessedPounds: number;
   grandTotal: number;
   seller: string;
-  details: ILocalSaleDetailModel[];
+  localSaleDetails: ILocalSaleDetailModel[];
+  localCompanySaleDetail?: ILocalCompanySaleDetailModel;
+  hasInvoice: 'yes' | 'no' | 'not-applicable';
+  invoiceNumber?: string;
+  invoiceName?: string;
 }
 
 export enum SaleTypeEnum {
@@ -106,7 +117,7 @@ export enum SaleTypeEnum {
 export enum SaleStyleEnum {
   WHOLE = 'WHOLE',
   TAIL = 'TAIL',
-  RESIDUAL = 'RESIDUAL'
+  RESIDUAL = 'RESIDUAL',
 }
 
 export enum CompanySaleStatusEnum {

@@ -113,9 +113,24 @@ export class RecentSalesComponent implements OnInit {
         {
           title: 'Compañía',
           data: 'company.name',
-          render: function (data) {
-            if (!data || data === 'Local') return '-';
-            return data;
+          render: function (data, type, full) {
+            if (!full.isCompanySale) {
+              // For local sales, show "Local - CompanyName"
+              const localCompanyName = full.company?.name || '';
+              const sellCompanyName = full.localSellCompany?.name || '';
+
+              if (localCompanyName && sellCompanyName) {
+                return `${localCompanyName} - ${sellCompanyName}`;
+              } else if (localCompanyName) {
+                return localCompanyName;
+              } else if (sellCompanyName) {
+                return sellCompanyName;
+              }
+              return '-';
+            }
+
+            // For company sales, show the company name
+            return data || '-';
           },
         },
         {
@@ -180,6 +195,27 @@ export class RecentSalesComponent implements OnInit {
         {
           title: 'Cliente',
           data: 'client.fullName',
+          render: function (data) {
+            return data ? data : '-';
+          },
+        },
+        {
+          title: '¿Factura enviada?',
+          data: 'hasInvoice',
+          render: function (data) {
+            return data === 'yes' ? 'Si' : data === 'no' ? 'No' : 'No aplica';
+          },
+        },
+        {
+          title: 'Número Factura',
+          data: 'invoiceNumber',
+          render: function (data) {
+            return data ? data : '-';
+          },
+        },
+        {
+          title: 'Nombre en Factura',
+          data: 'invoiceName',
           render: function (data) {
             return data ? data : '-';
           },

@@ -1,34 +1,45 @@
 const { Schema, model } = require('mongoose');
 
-const SaleStyleEnum = require('../../../enums/sale-style.enum');
-
-const LocalSaleDetailSchema = Schema({
-  localSale: {
+const LocalCompanySaleDetailSchema = Schema({
+  company: {
     type: Schema.Types.ObjectId,
-    ref: 'LocalSale',
-    required: true
+    ref: 'Company',
+    required: true,
   },
-  style: {
+  receiptDate: {
+    type: Date,
+    required: true,
+  },
+  personInCharge: {
     type: String,
-    enum: SaleStyleEnum,
     required: true,
   },
-  items: [{
-    type: Schema.Types.ObjectId,
-    ref: 'LocalSaleDetailItem',
-    required: true
-  }],
-  grandTotal: {
-    type: Number,
+  batch: {
+    type: String,
     required: true,
-    min: 0
   },
-  receivedGrandTotal: {
+  guideWeight: {
     type: Number,
     required: true,
-    min: 0
+  },
+  guideNumber: {
+    type: String,
+    required: true,
+  },
+  weightDifference: {
+    type: Number,
+    required: true,
+  },
+  processedWeight: {
+    type: Number,
+    required: true,
   },
   poundsGrandTotal: {
+    type: Number,
+    required: true,
+    min: 0
+  },
+  grandTotal: {
     type: Number,
     required: true,
     min: 0
@@ -50,6 +61,11 @@ const LocalSaleDetailSchema = Schema({
     type: Number,
     min: 0
   },
+  items: [{
+    type: Schema.Types.ObjectId,
+    ref: 'LocalCompanySaleDetailItem',
+    required: true
+  }],
   deletedAt: {
     type: Date,
     default: null
@@ -58,11 +74,10 @@ const LocalSaleDetailSchema = Schema({
   { timestamps: true },
 );
 
-
-LocalSaleDetailSchema.method('toJSON', function () {
+LocalCompanySaleDetailSchema.method('toJSON', function () {
   const { __v, _id, createdAt, updatedAt, ...object } = this.toObject();
   object.id = _id;
   return object;
 });
 
-module.exports = model('LocalSaleDetail', LocalSaleDetailSchema);
+module.exports = model('LocalCompanySaleDetail', LocalCompanySaleDetailSchema);

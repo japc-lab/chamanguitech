@@ -7,7 +7,7 @@ const getAllByParams = async ({ userId, controlNumber, includeDeleted = false })
     if (userId) purchaseQuery.buyer = userId;
     if (controlNumber) purchaseQuery.controlNumber = controlNumber;
 
-    const purchases = await dbAdapter.purchaseAdapter.getAllWithRelations(purchaseQuery, ['buyer', 'client', 'company']);
+    const purchases = await dbAdapter.purchaseAdapter.getAllWithRelations(purchaseQuery, ['buyer', 'client', 'company', 'localSellCompany']);
     const purchaseIds = purchases.map(p => p.id);
 
     if ((userId || controlNumber) && purchaseIds.length === 0) return [];
@@ -33,6 +33,7 @@ const getAllByParams = async ({ userId, controlNumber, includeDeleted = false })
             buyer: p.buyer ? { id: p.buyer.id, fullName: personMap[p.buyer.person] || 'Unknown' } : null,
             client: p.client ? { id: p.client.id, fullName: personMap[p.client.person] || 'Unknown' } : null,
             company: p.company ? { id: p.company.id, name: p.company.name } : null,
+            localSellCompany: p.localSellCompany ? { id: p.localSellCompany.id, name: p.localSellCompany.name } : null,
         };
         return acc;
     }, {});
@@ -94,7 +95,11 @@ const getAllByParams = async ({ userId, controlNumber, includeDeleted = false })
             buyer: purchaseData?.buyer || null,
             client: purchaseData?.client || null,
             company: purchaseData?.company || null,
-            isCompanySale: isCompany
+            localSellCompany: purchaseData?.localSellCompany || null,
+            isCompanySale: isCompany,
+            hasInvoice: relatedSale?.hasInvoice || null,
+            invoiceNumber: relatedSale?.invoiceNumber || null,
+            invoiceName: relatedSale?.invoiceName || null
         };
     });
 };

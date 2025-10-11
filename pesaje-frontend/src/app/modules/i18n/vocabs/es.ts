@@ -112,8 +112,11 @@ export const locale = {
       LOGISTICS_LIMIT_REACHED:
         'Ya se ha(n) creado {{count}} registro(s) logístico(s) permitido(s) para esta compra: {{record}}.',
       NO_SALE_DETAILS_ENTERED: 'No se han ingresado detalles de la venta.',
+      LOCAL_COMPANY_SALE_DETAILS_VALIDATION_ERROR:
+        'Los detalles de la venta local de la Compañía no son válidos.',
       NO_COMPLETE_ITEMS: 'No se han ingresado detalles de logística.',
-      PAYMENT_VALIDATION_ERRORS: 'Hay errores de validación en los pagos. Por favor complete los campos requeridos.',
+      PAYMENT_VALIDATION_ERRORS:
+        'Hay errores de validación en los pagos. Por favor complete los campos requeridos.',
       SALE_LIMIT_REACHED: 'Ya existe una venta creada para esta compra.',
       INCOMPLETE_TOTAL_REPORT_INFO:
         'La información para el reporte está incompleta. Verifique la información de compra, venta o logística.',
@@ -130,6 +133,8 @@ export const locale = {
         'Los pagos no pueden exceder el monto total acordado de ${{total}}',
       COMPANY_SALE_TOTAL_AGREED_EXCEEDED:
         'Los pagos no pueden exceder el monto total de ${{total}}',
+      PAYMENT_EXCEEDED_NET_TOTAL:
+        'Los pagos no pueden exceder el monto neto de ${{total}}',
       REPEATED_COMPANY_CODE:
         'El código de Compañía ya está en uso en otra Compañía.',
       ASSET_PAID_AMOUNT_EXCEEDED:

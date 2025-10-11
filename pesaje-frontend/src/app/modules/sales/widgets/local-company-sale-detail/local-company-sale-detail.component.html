@@ -1,0 +1,230 @@
+<!-- local-company-sale-details.component.html -->
+<form #companyDetailsForm="ngForm" novalidate>
+  <div class="card card-xl-stretch mb-6">
+    <div class="card-header border-0 pt-5 d-flex justify-content-between align-items-center">
+      <div>
+        <h3 class="card-title fw-bolder fs-3 mb-1">Venta Local-Compañía Camarón Sin Cabeza</h3>
+      </div>
+      <button type="button" class="btn btn-primary btn-sm" (click)="addDetail()" *ngIf="!localCompanySaleDetail">
+        <i class="bi bi-plus-circle me-1"></i> Agregar
+      </button>
+      <button type="button" class="btn btn-outline-danger btn-sm" (click)="cancelAndCollapse()"
+        *ngIf="localCompanySaleDetail">
+        <i class="bi bi-x-circle me-1"></i> Eliminar
+      </button>
+    </div>
+
+    <div class="card-body pt-0" *ngIf="localCompanySaleDetail">
+      <!-- Single Header Table with Company Info (appears only once) -->
+      <div class="card border border-primary mb-4">
+        <div class="card-header bg-primary text-white d-flex justify-content-start align-items-center py-1">
+          <span class="fw-bold">Detalles</span>
+        </div>
+
+        <div class="card-body">
+          <div class="row g-3">
+            <!-- Compania -->
+            <div class="col-md-4">
+              <label class="fw-semibold fs-6 mb-2">Compania:</label>
+              <select [value]="getSelectedCompanyId(localCompanySaleDetail)" name="company0"
+                (change)="onCompanyChange(localCompanySaleDetail, $event)" class="form-select form-select-sm">
+                <option value="">Seleccione una compañía</option>
+                <option *ngFor="let company of companies" [value]="company.id">
+                  {{ company.name }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Lote -->
+            <div class="col-md-4">
+              <label class="fw-semibold fs-6 mb-2">Lote:</label>
+              <input type="text" [(ngModel)]="localCompanySaleDetail.batch" name="batch0"
+                (ngModelChange)="emitChanges()" class="form-control form-control-sm" />
+            </div>
+
+            <!-- Fecha de recepcion -->
+            <div class="col-md-4">
+              <label class="fw-semibold fs-6 mb-2">Fecha de recepcion:</label>
+              <input type="date" [(ngModel)]="localCompanySaleDetail.receiptDate" name="receiptDate0"
+                (ngModelChange)="emitChanges()" class="form-control form-control-sm" />
+            </div>
+
+            <!-- Peso guia (lb) -->
+            <div class="col-md-4">
+              <label class="fw-semibold fs-6 mb-2">Peso guia (lb):</label>
+              <input type="number" [(ngModel)]="localCompanySaleDetail.guideWeight" name="guideWeight0"
+                (ngModelChange)="onGuideWeightChange(localCompanySaleDetail)" (keypress)="validateNumber($event)"
+                (blur)="formatDecimal('guideWeight0')" class="form-control form-control-sm" step="0.01" />
+            </div>
+
+            <!-- Chofer o encargado -->
+            <div class="col-md-4">
+              <label class="fw-semibold fs-6 mb-2">Chofer o encargado:</label>
+              <input type="text" [(ngModel)]="localCompanySaleDetail.personInCharge" name="personInCharge0"
+                (ngModelChange)="emitChanges()" class="form-control form-control-sm"
+                placeholder="Nombre del responsable" />
+            </div>
+
+            <!-- #Guia -->
+            <div class="col-md-4">
+              <label class="fw-semibold fs-6 mb-2">#Guia:</label>
+              <input type="text" [(ngModel)]="localCompanySaleDetail.guideNumber" name="guideNumber0"
+                (ngModelChange)="emitChanges()" class="form-control form-control-sm" placeholder="Número de guía" />
+            </div>
+
+            <!-- Diferencia peso (lb) - Calculated -->
+            <div class="col-md-6">
+              <label class="fw-semibold fs-6 mb-2">Diferencia peso (lb):</label>
+              <div class="form-control form-control-sm bg-light text-end">
+                {{ localCompanySaleDetail.weightDifference | number: '1.2-2' }}
+              </div>
+            </div>
+
+            <!-- Peso procesado (lb) - Calculated -->
+            <div class="col-md-6">
+              <label class="fw-semibold fs-6 mb-2">Peso procesado (lb):</label>
+              <div class="form-control form-control-sm bg-light text-end">
+                {{ localCompanySaleDetail.processedWeight | number: '1.2-2' }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Single Items Table -->
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6 class="mb-0 fw-bold text-muted">Items de Venta</h6>
+        <button class="btn btn-outline-success btn-sm" (click)="addItem()">
+          <i class="bi bi-plus-circle"></i> Agregar Item
+        </button>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-bordered align-middle">
+          <thead>
+            <tr class="bg-light text-muted fw-bold">
+              <th class="text-start">Talla</th>
+              <th class="text-start">Clase</th>
+              <th class="text-end">Libras (lb)</th>
+              <th class="text-end">Precio ($)</th>
+              <th class="text-end">Total ($)</th>
+              <th class="text-center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngIf="localCompanySaleDetail.items.length === 0">
+              <td colspan="6" class="text-center text-muted py-4">
+                <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                <span>No hay items agregados. Haga clic en "Agregar Item" para comenzar.</span>
+              </td>
+            </tr>
+            <tr *ngFor="let item of localCompanySaleDetail.items; let itemIndex = index">
+              <td>
+                <input type="text" [(ngModel)]="item.size" name="size0{{ itemIndex }}" placeholder="36/41"
+                  class="form-control form-control-sm" (keypress)="validateSizeFormat($event)" />
+              </td>
+
+              <td>
+                <select [(ngModel)]="item.class" name="class0{{ itemIndex }}"
+                  (ngModelChange)="recalculateTotals(localCompanySaleDetail)" class="form-select form-select-sm">
+                  <option *ngFor="let option of classOptions" [value]="option">{{ option }}</option>
+                </select>
+              </td>
+
+              <td>
+                <input type="number" [(ngModel)]="item.pounds" name="pounds0{{ itemIndex }}"
+                  (ngModelChange)="recalculateTotals(localCompanySaleDetail)" (keypress)="validateNumber($event)"
+                  (blur)="formatDecimal('pounds0' + itemIndex)" class="form-control form-control-sm text-end no-spinner"
+                  step="0.01" />
+              </td>
+
+              <td>
+                <div class="input-group input-group-sm">
+                  <span class="input-group-text">$</span>
+                  <input type="number" [(ngModel)]="item.price" name="price0{{ itemIndex }}"
+                    (ngModelChange)="recalculateTotals(localCompanySaleDetail)" (keypress)="validateNumber($event)"
+                    (blur)="formatDecimal('price0' + itemIndex)"
+                    class="form-control form-control-sm text-end no-spinner" step="0.01" />
+                </div>
+              </td>
+
+              <td class="text-end">${{ item.total | number: '1.2-2' }}</td>
+
+              <td class="text-center">
+                <button class="btn btn-sm btn-outline-danger" (click)="removeItem(itemIndex)">
+                  <i class="bi bi-x"></i>
+                </button>
+              </td>
+            </tr>
+
+            <!-- Totals Row -->
+            <tr class="fw-bold bg-light" *ngIf="localCompanySaleDetail.items.length > 0">
+              <td colspan="2">Subtotal</td>
+              <td class="text-end">{{ localCompanySaleDetail.poundsGrandTotal | number: '1.2-2' }}</td>
+              <td></td>
+              <td class="text-end">${{ localCompanySaleDetail.grandTotal | number: '1.2-2' }}</td>
+              <td></td>
+            </tr>
+
+            <!-- Retention Percentage Row -->
+            <tr class="bg-light" *ngIf="localCompanySaleDetail.items.length > 0">
+              <td colspan="4" class="text-end fw-semibold">Porcentaje de Retención (%):</td>
+              <td>
+                <input type="number" [(ngModel)]="localCompanySaleDetail.retentionPercentage"
+                  name="retentionPercentage" #retentionPercentageCtrl="ngModel"
+                  (ngModelChange)="onRetentionPercentageChange(localCompanySaleDetail!)"
+                  (blur)="formatDecimal('retentionPercentage')" (keypress)="validateNumber($event)"
+                  class="form-control form-control-sm text-end no-spinner" min="0" max="100" step="0.01" />
+              </td>
+              <td></td>
+            </tr>
+
+            <!-- Retention Amount Row -->
+            <tr class="bg-light" *ngIf="localCompanySaleDetail.items.length > 0">
+              <td colspan="4" class="text-end fw-semibold">Monto de Retención:</td>
+              <td class="text-end fw-bold">${{ localCompanySaleDetail.retentionAmount | number: '1.2-2' }}</td>
+              <td></td>
+            </tr>
+
+            <!-- Other Penalties Row -->
+            <tr class="bg-light" *ngIf="localCompanySaleDetail.items.length > 0">
+              <td colspan="4" class="text-end fw-semibold">Penalidades Adicionales:</td>
+              <td>
+                <div class="input-group input-group-sm">
+                  <span class="input-group-text">$</span>
+                  <input type="number" [(ngModel)]="localCompanySaleDetail.otherPenalties" name="otherPenalties"
+                    #otherPenaltiesCtrl="ngModel" (ngModelChange)="onOtherPenaltiesChange(localCompanySaleDetail!)"
+                    (blur)="formatDecimal('otherPenalties')" (keypress)="validateNumber($event)"
+                    class="form-control form-control-sm text-end no-spinner" min="0" step="0.01" />
+                </div>
+              </td>
+              <td></td>
+            </tr>
+
+            <!-- Net Grand Total Row -->
+            <tr class="fw-bold bg-light border-top border-2" *ngIf="localCompanySaleDetail.items.length > 0">
+              <td colspan="4" class="text-end">Total Neto:</td>
+              <td class="text-end text-success fs-6">${{ localCompanySaleDetail.netGrandTotal | number: '1.2-2' }}</td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Payments Button -->
+      <div class="d-flex justify-content-end mt-3" *ngIf="canShowPaymentsButton()">
+        <button type="button" class="btn btn-secondary btn-sm" (click)="openPaymentsModal()">
+          <i class="bi bi-cash-stack me-1"></i> Pagos
+        </button>
+      </div>
+    </div>
+
+    <!-- Empty State (when collapsed) -->
+    <div class="card-body pt-0 text-center py-5" *ngIf="!localCompanySaleDetail">
+      <i class="bi bi-building fs-1 text-muted mb-3 d-block"></i>
+      <h5 class="text-muted mb-2">Venta Local-Compañía</h5>
+      <p class="text-muted mb-3">Haga clic en "Agregar" para comenzar a registrar la venta local-compañía.</p>
+    </div>
+
+  </div>
+</form>

@@ -44,6 +44,7 @@ app.use('/api/sale', require('./routes/sale.routes'));
 app.use('/api/company-sale', require('./routes/company-sale.routes'));
 app.use('/api/company-sale-payment-method', require('./routes/company-sale-payment-method.routes'));
 app.use('/api/local-sale', require('./routes/local-sale.routes'));
+app.use('/api/local-company-sale-detail-payment', require('./routes/local-company-sale-detail-payment.routes'));
 app.use('/api/report', require('./routes/report.routes'));
 app.use('/api/asset', require('./routes/asset.routes'));
 app.use('/api/merchant', require('./routes/merchant.routes'));

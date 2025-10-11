@@ -17,6 +17,10 @@ const SaleSchema = Schema({
     enum: SaleTypeEnum,
     required: true,
   },
+  weightSheetNumber: {
+    type: String,
+    required: true,
+  },
   deletedAt: {
     type: Date,
     default: null
