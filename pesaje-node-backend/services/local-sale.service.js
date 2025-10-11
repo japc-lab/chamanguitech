@@ -1,5 +1,73 @@
 const dbAdapter = require('../adapters');
 const SaleTypeEnum = require('../enums/sale-type.enum');
+const LocalSaleStatusEnum = require('../enums/local-sale-status.enum');
+
+const normalize = (num) => Math.round((Number(num) + Number.EPSILON) * 100) / 100;
+
+/**
+ * Determines the local sale status based on payment information
+ * @param {Array} localSaleDetails - Array of local sale details with items
+ * @param {String} localCompanySaleDetailId - ID of local company sale detail (optional)
+ * @param {Number} companyDetailNetGrandTotal - Net grand total for company detail
+ * @returns {String} Status: CREATED, IN_PROGRESS, or COMPLETED
+ */
+const determineLocalSaleStatus = async (localSaleDetails, localCompanySaleDetailId, companyDetailNetGrandTotal = 0) => {
+    let hasAnyPayment = false;
+    let allPaid = true;
+    let hasAnyItems = false;
+
+    // Check local sale details (WHOLE and TAIL)
+    if (localSaleDetails && localSaleDetails.length > 0) {
+        for (const detail of localSaleDetails) {
+            if (detail.items && detail.items.length > 0) {
+                for (const item of detail.items) {
+                    hasAnyItems = true;
+                    if (item.paymentStatus === 'PAID') {
+                        hasAnyPayment = true;
+                    } else {
+                        allPaid = false;
+                    }
+                }
+            }
+        }
+    }
+
+    // Check local company sale detail payments
+    if (localCompanySaleDetailId && companyDetailNetGrandTotal > 0) {
+        // Company detail exists and has items (netGrandTotal > 0)
+        hasAnyItems = true;
+        
+        const companyPayments = await dbAdapter.localCompanySaleDetailPaymentAdapter.getAll({
+            localCompanySaleDetail: localCompanySaleDetailId,
+            deletedAt: null
+        });
+
+        if (companyPayments && companyPayments.length > 0) {
+            hasAnyPayment = true;
+            
+            // Check if company detail is fully paid
+            const totalCompanyPaid = normalize(companyPayments.reduce((sum, pm) => sum + Number(pm.amount), 0));
+            if (totalCompanyPaid < companyDetailNetGrandTotal) {
+                allPaid = false;
+            }
+            // If totalCompanyPaid >= companyDetailNetGrandTotal, allPaid stays true (if not already false from items)
+        } else {
+            // No company payments but has company detail with items
+            allPaid = false;  // Company detail not paid yet
+        }
+    }
+
+    // Determine status
+    if (!hasAnyPayment) {
+        return LocalSaleStatusEnum.CREATED;
+    }
+    
+    if (allPaid && hasAnyItems) {
+        return LocalSaleStatusEnum.COMPLETED;
+    }
+    
+    return LocalSaleStatusEnum.IN_PROGRESS;
+};
 
 const create = async (data) => {
     let transaction;
@@ -80,9 +148,11 @@ const create = async (data) => {
             type: SaleTypeEnum.LOCAL
         }, { session: transaction.session });
 
-        // Create local sale first
+        // Create local sale first with default CREATED status
+        // We'll update it after creating company detail if needed
         const localSale = await dbAdapter.localSaleAdapter.create({
             sale: sale.id,
+            status: LocalSaleStatusEnum.CREATED, // Initial status, will be updated after company detail
             wholeTotalPounds,
             moneyIncomeForRejectedHeads,
             wholeRejectedPounds,
@@ -122,6 +192,8 @@ const create = async (data) => {
         }
 
         // Handle local company detail (single object)
+        let createdCompanySaleDetailId = null;
+        
         if (localCompanySaleDetail) {
             const companyItemIds = [];
 
@@ -148,9 +220,30 @@ const create = async (data) => {
                 items: companyItemIds
             }, { session: transaction.session });
 
+            createdCompanySaleDetailId = createdCompanyDetail.id;
+
             // Update localSale with company detail reference
             await dbAdapter.localSaleAdapter.update(localSale.id, {
                 localCompanySaleDetail: createdCompanyDetail.id
+            }, { session: transaction.session });
+        }
+
+        // Now recalculate status with all details created (including company detail ID)
+        const createdLocalSaleDetailList = await dbAdapter.localSaleDetailAdapter.getAllWithRelations(
+            { localSale: localSale.id, deletedAt: null },
+            [{ path: 'items' }]
+        );
+
+        const finalStatus = await determineLocalSaleStatus(
+            createdLocalSaleDetailList,
+            createdCompanySaleDetailId, // Use the created company detail ID (not from localSale object)
+            localCompanySaleDetail?.netGrandTotal || 0
+        );
+
+        // Update status if it changed from initial CREATED
+        if (finalStatus !== LocalSaleStatusEnum.CREATED) {
+            await dbAdapter.localSaleAdapter.update(localSale.id, {
+                status: finalStatus
             }, { session: transaction.session });
         }
 
@@ -230,6 +323,7 @@ const getBySaleId = async (saleId) => {
     return {
         id: localSale.id,
         sale: localSale.sale,
+        status: localSale.status,
         saleDate: sale.saleDate,
         weightSheetNumber: sale.weightSheetNumber,
         wholeTotalPounds: localSale.wholeTotalPounds,
@@ -409,7 +503,7 @@ const update = async (id, data) => {
             await dbAdapter.localSaleDetailAdapter.removePermanently(existingDetail.id, { session: transaction.session });
         }
 
-        // Delete existing local company detail and its items permanently
+        // Delete existing local company detail ITEMS only (keep the detail to preserve payment references)
         if (existingLocalSale.localCompanySaleDetail) {
             const existingCompanyDetail = await dbAdapter.localCompanySaleDetailAdapter.getById(existingLocalSale.localCompanySaleDetail);
             if (existingCompanyDetail) {
@@ -419,8 +513,6 @@ const update = async (id, data) => {
                         await dbAdapter.localCompanySaleDetailItemAdapter.removePermanently(itemId, { session: transaction.session });
                     }
                 }
-                // Then delete the company detail
-                await dbAdapter.localCompanySaleDetailAdapter.removePermanently(existingCompanyDetail.id, { session: transaction.session });
             }
         }
 
@@ -449,8 +541,8 @@ const update = async (id, data) => {
             }
         }
 
-        // Handle local company detail (single object)
-        let localCompanySaleDetailId = null;
+        // Handle local company detail (update existing or create new)
+        let localCompanySaleDetailId = existingLocalSale.localCompanySaleDetail;
 
         if (localCompanySaleDetail) {
             const companyItemIds = [];
@@ -460,29 +552,82 @@ const update = async (id, data) => {
                 companyItemIds.push(createdItem.id);
             }
 
-            const createdCompanyDetail = await dbAdapter.localCompanySaleDetailAdapter.create({
-                company: localCompanySaleDetail.company,
-                receiptDate: localCompanySaleDetail.receiptDate,
-                personInCharge: localCompanySaleDetail.personInCharge,
-                batch: localCompanySaleDetail.batch,
-                guideWeight: localCompanySaleDetail.guideWeight,
-                guideNumber: localCompanySaleDetail.guideNumber,
-                weightDifference: localCompanySaleDetail.weightDifference,
-                processedWeight: localCompanySaleDetail.processedWeight,
-                poundsGrandTotal: localCompanySaleDetail.poundsGrandTotal,
-                grandTotal: localCompanySaleDetail.grandTotal,
-                retentionPercentage: localCompanySaleDetail.retentionPercentage,
-                retentionAmount: localCompanySaleDetail.retentionAmount,
-                netGrandTotal: localCompanySaleDetail.netGrandTotal,
-                otherPenalties: localCompanySaleDetail.otherPenalties,
-                items: companyItemIds
-            }, { session: transaction.session });
+            if (localCompanySaleDetailId) {
+                // Update existing company detail to preserve payment references
+                await dbAdapter.localCompanySaleDetailAdapter.update(localCompanySaleDetailId, {
+                    company: localCompanySaleDetail.company,
+                    receiptDate: localCompanySaleDetail.receiptDate,
+                    personInCharge: localCompanySaleDetail.personInCharge,
+                    batch: localCompanySaleDetail.batch,
+                    guideWeight: localCompanySaleDetail.guideWeight,
+                    guideNumber: localCompanySaleDetail.guideNumber,
+                    weightDifference: localCompanySaleDetail.weightDifference,
+                    processedWeight: localCompanySaleDetail.processedWeight,
+                    poundsGrandTotal: localCompanySaleDetail.poundsGrandTotal,
+                    grandTotal: localCompanySaleDetail.grandTotal,
+                    retentionPercentage: localCompanySaleDetail.retentionPercentage,
+                    retentionAmount: localCompanySaleDetail.retentionAmount,
+                    netGrandTotal: localCompanySaleDetail.netGrandTotal,
+                    otherPenalties: localCompanySaleDetail.otherPenalties,
+                    items: companyItemIds
+                }, { session: transaction.session });
+            } else {
+                // Create new company detail if it didn't exist before
+                const createdCompanyDetail = await dbAdapter.localCompanySaleDetailAdapter.create({
+                    company: localCompanySaleDetail.company,
+                    receiptDate: localCompanySaleDetail.receiptDate,
+                    personInCharge: localCompanySaleDetail.personInCharge,
+                    batch: localCompanySaleDetail.batch,
+                    guideWeight: localCompanySaleDetail.guideWeight,
+                    guideNumber: localCompanySaleDetail.guideNumber,
+                    weightDifference: localCompanySaleDetail.weightDifference,
+                    processedWeight: localCompanySaleDetail.processedWeight,
+                    poundsGrandTotal: localCompanySaleDetail.poundsGrandTotal,
+                    grandTotal: localCompanySaleDetail.grandTotal,
+                    retentionPercentage: localCompanySaleDetail.retentionPercentage,
+                    retentionAmount: localCompanySaleDetail.retentionAmount,
+                    netGrandTotal: localCompanySaleDetail.netGrandTotal,
+                    otherPenalties: localCompanySaleDetail.otherPenalties,
+                    items: companyItemIds
+                }, { session: transaction.session });
 
-            localCompanySaleDetailId = createdCompanyDetail.id;
+                localCompanySaleDetailId = createdCompanyDetail.id;
+            }
+        } else if (existingLocalSale.localCompanySaleDetail) {
+            // If localCompanySaleDetail was removed (user deleted it), delete the company detail and its payments
+            const existingCompanyDetail = await dbAdapter.localCompanySaleDetailAdapter.getById(existingLocalSale.localCompanySaleDetail);
+            if (existingCompanyDetail) {
+                // Delete all associated payments first
+                const existingPayments = await dbAdapter.localCompanySaleDetailPaymentAdapter.getAll({
+                    localCompanySaleDetail: existingLocalSale.localCompanySaleDetail,
+                    deletedAt: null
+                });
+                for (const payment of existingPayments) {
+                    await dbAdapter.localCompanySaleDetailPaymentAdapter.removePermanently(payment.id, { session: transaction.session });
+                }
+                
+                // Then delete the company detail
+                await dbAdapter.localCompanySaleDetailAdapter.removePermanently(existingCompanyDetail.id, { session: transaction.session });
+            }
+            localCompanySaleDetailId = null;
         }
+
+        // Recalculate status based on updated payment information
+        // Need to get the created details to check their items' payment status
+        const updatedLocalSaleDetailList = await dbAdapter.localSaleDetailAdapter.getAllWithRelations(
+            { localSale: existingLocalSale.id, deletedAt: null },
+            [{ path: 'items' }]
+        );
+
+        const updatedStatus = await determineLocalSaleStatus(
+            updatedLocalSaleDetailList,
+            localCompanySaleDetailId,
+            localCompanySaleDetail?.netGrandTotal || 0
+        );
 
         // Update local sale
         const updatedLocalSale = await dbAdapter.localSaleAdapter.update(id, {
+            status: updatedStatus,
             wholeTotalPounds,
             moneyIncomeForRejectedHeads,
             wholeRejectedPounds,
@@ -521,4 +666,53 @@ const update = async (id, data) => {
 };
 
 
-module.exports = { create, getBySaleId, update };
+/**
+ * Recalculates and updates the status of a local sale
+ * Called by payment service when payments are created/updated/deleted
+ * @param {String} localSaleId - ID of the local sale to update
+ * @param {Object} session - Optional transaction session
+ */
+const recalculateAndUpdateStatus = async (localSaleId, session = null) => {
+    try {
+        const localSale = await dbAdapter.localSaleAdapter.getById(localSaleId);
+        if (!localSale) throw new Error('Local Sale not found');
+
+        // Get local sale details with items
+        const localSaleDetailList = await dbAdapter.localSaleDetailAdapter.getAllWithRelations(
+            { localSale: localSaleId, deletedAt: null },
+            [{ path: 'items' }]
+        );
+
+        // Get company detail if exists
+        let companyDetailNetGrandTotal = 0;
+        if (localSale.localCompanySaleDetail) {
+            const companyDetail = await dbAdapter.localCompanySaleDetailAdapter.getById(localSale.localCompanySaleDetail);
+            if (companyDetail) {
+                companyDetailNetGrandTotal = companyDetail.netGrandTotal || 0;
+            }
+        }
+
+        // Calculate new status
+        const newStatus = await determineLocalSaleStatus(
+            localSaleDetailList,
+            localSale.localCompanySaleDetail,
+            companyDetailNetGrandTotal
+        );
+
+        // Update status if changed
+        if (localSale.status !== newStatus) {
+            await dbAdapter.localSaleAdapter.update(
+                localSaleId,
+                { status: newStatus },
+                session ? { session } : {}
+            );
+        }
+
+        return newStatus;
+    } catch (error) {
+        console.error('Error recalculating status:', error);
+        throw error;
+    }
+};
+
+module.exports = { create, getBySaleId, update, recalculateAndUpdateStatus };

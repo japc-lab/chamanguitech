@@ -15,7 +15,6 @@ import { SaleStyleEnum } from '../../interfaces/sale.interface';
 import { InputUtilsService } from 'src/app/utils/input-utils.service';
 import { NgModel } from '@angular/forms';
 import { IPaymentMethodModel } from '../../../shared/interfaces/payment-method.interface';
-import { PaymentMethodService } from '../../../shared/services/payment-method.service';
 
 @Component({
   selector: 'app-local-sale-detail',
@@ -25,11 +24,11 @@ import { PaymentMethodService } from '../../../shared/services/payment-method.se
 export class LocalSaleDetailComponent implements OnInit, OnChanges {
   @Input() style: SaleStyleEnum;
   @Input() localSaleDetail: ILocalSaleDetailModel | null = null;
+  @Input() paymentMethods: IPaymentMethodModel[] = [];
   @Output() localSaleDetailChange = new EventEmitter<ILocalSaleDetailModel>();
 
   title = '';
   sizePlaceholder = '';
-  paymentMethods: IPaymentMethodModel[] = [];
   paymentStatuses = [
     { value: 'NO_PAYMENT', label: 'Sin pagos' },
     { value: 'PENDING', label: 'Pendiente' },
@@ -42,8 +41,7 @@ export class LocalSaleDetailComponent implements OnInit, OnChanges {
   ];
 
   constructor(
-    private inputUtils: InputUtilsService,
-    private paymentMethodService: PaymentMethodService
+    private inputUtils: InputUtilsService
   ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -89,19 +87,7 @@ export class LocalSaleDetailComponent implements OnInit, OnChanges {
       this.calculateRetentionAndNetTotal(this.localSaleDetail);
     }
 
-    this.loadPaymentMethods();
     this.recalculateAll();
-  }
-
-  loadPaymentMethods(): void {
-    this.paymentMethodService.getAllPaymentsMethods().subscribe({
-      next: (paymentMethods: IPaymentMethodModel[]) => {
-        this.paymentMethods = paymentMethods;
-      },
-      error: (error: any) => {
-        console.error('Error loading payment methods:', error);
-      },
-    });
   }
 
   addDetail(): void {

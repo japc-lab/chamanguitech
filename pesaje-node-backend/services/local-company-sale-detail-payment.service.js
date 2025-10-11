@@ -1,4 +1,5 @@
 const dbAdapter = require('../adapters');
+const { recalculateAndUpdateStatus } = require('./local-sale.service');
 
 const normalize = (num) => Math.round((Number(num) + Number.EPSILON) * 100) / 100;
 
@@ -22,6 +23,17 @@ const createPayment = async (data) => {
         }
 
         const newPayment = await dbAdapter.localCompanySaleDetailPaymentAdapter.create(data, { session: transaction.session });
+
+        // Get the associated local sale and update its status
+        const localSaleList = await dbAdapter.localSaleAdapter.getAll({ 
+            localCompanySaleDetail: data.localCompanySaleDetail,
+            deletedAt: null 
+        });
+        
+        if (localSaleList && localSaleList.length > 0) {
+            const localSale = localSaleList[0];
+            await recalculateAndUpdateStatus(localSale.id, transaction.session);
+        }
 
         await transaction.commit();
         return newPayment;
@@ -61,6 +73,17 @@ const updatePayment = async (id, data) => {
 
         await dbAdapter.localCompanySaleDetailPaymentAdapter.update(id, data, { session: transaction.session });
 
+        // Get the associated local sale and update its status
+        const localSaleList = await dbAdapter.localSaleAdapter.getAll({ 
+            localCompanySaleDetail: payment.localCompanySaleDetail,
+            deletedAt: null 
+        });
+        
+        if (localSaleList && localSaleList.length > 0) {
+            const localSale = localSaleList[0];
+            await recalculateAndUpdateStatus(localSale.id, transaction.session);
+        }
+
         await transaction.commit();
         return { id, ...data };
     } catch (error) {
@@ -90,6 +113,17 @@ const removePayment = async (id) => {
 
         // Permanently delete payment
         await dbAdapter.localCompanySaleDetailPaymentAdapter.removePermanently(id, { session: transaction.session });
+
+        // Get the associated local sale and update its status
+        const localSaleList = await dbAdapter.localSaleAdapter.getAll({ 
+            localCompanySaleDetail: payment.localCompanySaleDetail,
+            deletedAt: null 
+        });
+        
+        if (localSaleList && localSaleList.length > 0) {
+            const localSale = localSaleList[0];
+            await recalculateAndUpdateStatus(localSale.id, transaction.session);
+        }
 
         await transaction.commit();
     } catch (error) {

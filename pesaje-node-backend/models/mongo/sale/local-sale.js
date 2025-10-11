@@ -1,10 +1,17 @@
 const { Schema, model } = require('mongoose');
 
+const LocalSaleStatusEnum = require('../../../enums/local-sale-status.enum');
+
 const LocalSaleSchema = Schema({
   sale: {
     type: Schema.Types.ObjectId,
     ref: 'Sale',
     required: true
+  },
+  status: {
+    type: String,
+    enum: LocalSaleStatusEnum,
+    required: true,
   },
   wholeRejectedPounds: {
     type: Number,

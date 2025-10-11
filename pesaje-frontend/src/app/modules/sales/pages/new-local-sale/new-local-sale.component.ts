@@ -37,6 +37,8 @@ import { ILocalSaleDetailModel } from '../../interfaces/local-sale-detail.interf
 import { ILocalCompanySaleDetailModel } from '../../interfaces/local-company-sale-detail.interface';
 import { SaleStyleEnum } from '../../interfaces/sale.interface';
 import { SaleService } from '../../services/sale.service';
+import { IPaymentMethodModel } from '../../../shared/interfaces/payment-method.interface';
+import { PaymentMethodService } from '../../../shared/services/payment-method.service';
 
 @Component({
   selector: 'app-new-local-sale',
@@ -73,6 +75,8 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
   saleId: string | undefined;
   localSaleId: string | undefined;
 
+  paymentMethods: IPaymentMethodModel[] = [];
+
   private unsubscribe: Subscription[] = [];
 
   constructor(
@@ -89,7 +93,8 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private location: Location,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private paymentMethodService: PaymentMethodService
   ) {}
 
   get saleDateFormatted(): string | null {
@@ -128,57 +133,77 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
     this.isOnlyBuyer = this.authService.isOnlyBuyer;
 
     this.initializeModels();
+    this.loadPaymentMethods();
 
     if (this.saleId) {
-      const localSaleSub = this.localSaleService
-        .getLocalSaleBySaleId(this.saleId)
-        .subscribe({
-          next: (localSale: ILocalSaleModel) => {
-            const { purchase, ...rest } = localSale;
-            this.localSaleId = rest.id;
-            this.localSaleModel = {
-              ...rest,
-              purchase: purchase.id,
-            };
-
-            // Load multiple localSaleDetails into appropriate sections based on their styles
-            if (
-              this.localSaleModel.localSaleDetails &&
-              this.localSaleModel.localSaleDetails.length > 0
-            ) {
-              // Find WHOLE detail
-              const wholeDetail = this.localSaleModel.localSaleDetails.find(
-                (detail) => detail.style === SaleStyleEnum.WHOLE
-              );
-
-              // Find TAIL detail
-              const tailDetail = this.localSaleModel.localSaleDetails.find(
-                (detail) => detail.style === SaleStyleEnum.TAIL
-              );
-
-              this.localSaleWholeDetail = wholeDetail
-                ? { ...wholeDetail }
-                : null;
-              this.localSaleTailDetail = tailDetail ? { ...tailDetail } : null;
-            }
-
-            this.localCompanySaleDetail =
-              this.localSaleModel.localCompanySaleDetail || null;
-            this.updateGroupedDetails();
-
-            this.controlNumber = localSale.purchase.controlNumber!;
-            this.purchaseModel = localSale.purchase;
-
-            this.cdr.detectChanges();
-          },
-          error: (error) => {
-            console.error('Error fetching local sale:', error);
-            this.alertService.showTranslatedAlert({ alertType: 'error' });
-          },
-        });
-
-      this.unsubscribe.push(localSaleSub);
+      this.loadLocalSaleBySaleId(this.saleId);
     }
+  }
+
+  loadPaymentMethods(): void {
+    const paymentMethodSub = this.paymentMethodService
+      .getAllPaymentsMethods()
+      .subscribe({
+        next: (paymentMethods: IPaymentMethodModel[]) => {
+          this.paymentMethods = paymentMethods;
+        },
+        error: (error: any) => {
+          console.error('Error loading payment methods:', error);
+        },
+      });
+
+    this.unsubscribe.push(paymentMethodSub);
+  }
+
+  loadLocalSaleBySaleId(saleId: string): void {
+    const localSaleSub = this.localSaleService
+      .getLocalSaleBySaleId(saleId)
+      .subscribe({
+        next: (localSale: ILocalSaleModel) => {
+          const { purchase, ...rest } = localSale;
+          this.localSaleId = rest.id;
+          this.localSaleModel = {
+            ...rest,
+            purchase: purchase.id,
+          };
+
+          // Load multiple localSaleDetails into appropriate sections based on their styles
+          if (
+            this.localSaleModel.localSaleDetails &&
+            this.localSaleModel.localSaleDetails.length > 0
+          ) {
+            // Find WHOLE detail
+            const wholeDetail = this.localSaleModel.localSaleDetails.find(
+              (detail) => detail.style === SaleStyleEnum.WHOLE
+            );
+
+            // Find TAIL detail
+            const tailDetail = this.localSaleModel.localSaleDetails.find(
+              (detail) => detail.style === SaleStyleEnum.TAIL
+            );
+
+            this.localSaleWholeDetail = wholeDetail
+              ? { ...wholeDetail }
+              : null;
+            this.localSaleTailDetail = tailDetail ? { ...tailDetail } : null;
+          }
+
+          this.localCompanySaleDetail =
+            this.localSaleModel.localCompanySaleDetail || null;
+          this.updateGroupedDetails();
+
+          this.controlNumber = localSale.purchase.controlNumber!;
+          this.purchaseModel = localSale.purchase;
+
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error fetching local sale:', error);
+          this.alertService.showTranslatedAlert({ alertType: 'error' });
+        },
+      });
+
+    this.unsubscribe.push(localSaleSub);
   }
 
   initializeModels() {
@@ -333,6 +358,11 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
         .subscribe({
           next: (response) => {
             this.alertService.showTranslatedAlert({ alertType: 'success' });
+
+            // Reload the sale to get updated detail IDs (especially for company detail)
+            if (this.saleId) {
+              this.loadLocalSaleBySaleId(this.saleId);
+            }
           },
           error: (error) => {
             console.error('Error updating local sale:', error);
@@ -343,7 +373,14 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
       this.localSaleService.createLocalSale(this.localSaleModel).subscribe({
         next: (response) => {
           this.localSaleId = response.id;
-          this.cdr.detectChanges();
+
+          // Navigate to edit URL with saleId to enable subsequent updates and payments
+          // The response contains the sale reference, we need to get the saleId
+          if (response.sale) {
+            this.saleId = response.sale;
+            this.router.navigate(['/sales/local', this.saleId]);
+          }
+
           this.alertService.showTranslatedAlert({ alertType: 'success' });
         },
         error: (error) => {

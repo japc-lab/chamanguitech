@@ -273,13 +273,13 @@
   <!-- WHOLE -->
   <div class="col-12">
     <app-local-sale-detail [style]="SaleStyleEnum.WHOLE" [localSaleDetail]="localSaleWholeDetail"
-      (localSaleDetailChange)="handleLocalSaleWholeDetailChange($event)" />
+      [paymentMethods]="paymentMethods" (localSaleDetailChange)="handleLocalSaleWholeDetailChange($event)" />
   </div>
 
   <!-- TAIL -->
   <div class="col-12">
     <app-local-sale-detail [style]="SaleStyleEnum.TAIL" [localSaleDetail]="localSaleTailDetail"
-      (localSaleDetailChange)="handleLocalSaleTailDetailChange($event)" />
+      [paymentMethods]="paymentMethods" (localSaleDetailChange)="handleLocalSaleTailDetailChange($event)" />
   </div>
 
   <!-- COMPANY SALE DETAILS -->
