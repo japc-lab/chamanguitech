@@ -522,19 +522,41 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
     this.localSaleWholeDetail = detail;
     this.calculateWholeTotalPounds();
     this.updateGroupedDetails();
+    this.updateLocalSaleModelDetails();
   }
 
   handleLocalSaleTailDetailChange(detail: ILocalSaleDetailModel) {
     this.localSaleTailDetail = detail;
     this.updateGroupedDetails();
+    this.updateLocalSaleModelDetails();
   }
 
   handleLocalCompanySaleDetailChange(
     detail: ILocalCompanySaleDetailModel | null
   ) {
     this.localCompanySaleDetail = detail;
-    // Refresh payment total when company detail changes
-    this.refreshCompanyPaymentTotal();
+    // Only update the model details, not the payment total
+    // Payment total should only be refreshed when payments are actually modified
+    this.updateLocalSaleModelDetails();
+  }
+
+  /**
+   * Update localSaleModel with current detail values
+   * This ensures the summary component sees the latest changes
+   */
+  private updateLocalSaleModelDetails(): void {
+    // Update localSaleDetails array
+    const details: ILocalSaleDetailModel[] = [];
+    if (this.localSaleWholeDetail) {
+      details.push(this.localSaleWholeDetail);
+    }
+    if (this.localSaleTailDetail) {
+      details.push(this.localSaleTailDetail);
+    }
+    this.localSaleModel.localSaleDetails = details;
+
+    // Update localCompanySaleDetail (convert null to undefined)
+    this.localSaleModel.localCompanySaleDetail = this.localCompanySaleDetail || undefined;
   }
 
   calculateWholeTotalPounds(): void {

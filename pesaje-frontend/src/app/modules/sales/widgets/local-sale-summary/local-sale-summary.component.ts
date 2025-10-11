@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, DoCheck } from '@angular/core';
 import { ILocalSaleDetailModel } from '../../interfaces/local-sale-detail.interface';
 import { ILocalCompanySaleDetailModel } from '../../interfaces/local-company-sale-detail.interface';
 import { IReducedDetailedPurchaseModel } from '../../../purchases/interfaces/purchase.interface';
@@ -12,10 +12,14 @@ import {
   templateUrl: './local-sale-summary.component.html',
   styleUrls: ['./local-sale-summary.component.scss'],
 })
-export class LocalSaleSummaryComponent implements OnChanges {
+export class LocalSaleSummaryComponent implements OnChanges, DoCheck {
   @Input() purchaseModel: IReducedDetailedPurchaseModel | null = null;
   @Input() localSaleModel: ICreateUpdateLocalSaleModel | null = null;
   @Input() companyPaymentTotal: number = 0; // Total payments for company detail
+
+  private previousLocalSaleModelString: string = '';
+  private previousPurchaseModelString: string = '';
+  private previousCompanyPaymentTotal: number = 0;
 
   // Quantity and Yield Calculations
   totalPurchasedPounds = 0;
@@ -57,6 +61,29 @@ export class LocalSaleSummaryComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     this.calculateSummary();
+    this.updatePreviousValues();
+  }
+
+  ngDoCheck(): void {
+    // Check for deep changes by comparing stringified versions
+    const currentLocalSaleModelString = JSON.stringify(this.localSaleModel);
+    const currentPurchaseModelString = JSON.stringify(this.purchaseModel);
+    const currentCompanyPaymentTotal = this.companyPaymentTotal;
+
+    if (
+      currentLocalSaleModelString !== this.previousLocalSaleModelString ||
+      currentPurchaseModelString !== this.previousPurchaseModelString ||
+      currentCompanyPaymentTotal !== this.previousCompanyPaymentTotal
+    ) {
+      this.calculateSummary();
+      this.updatePreviousValues();
+    }
+  }
+
+  private updatePreviousValues(): void {
+    this.previousLocalSaleModelString = JSON.stringify(this.localSaleModel);
+    this.previousPurchaseModelString = JSON.stringify(this.purchaseModel);
+    this.previousCompanyPaymentTotal = this.companyPaymentTotal;
   }
 
   private calculateSummary(): void {
@@ -232,17 +259,18 @@ export class LocalSaleSummaryComponent implements OnChanges {
       return;
     }
 
-    const netGrandTotal = companyDetail.netGrandTotal || 0;
+    const netGrandTotal = Number(companyDetail.netGrandTotal) || 0;
+    const totalPaid = Number(this.companyPaymentTotal) || 0;
 
     if (netGrandTotal <= 0) {
       this.companyStatus = 'SIN PAGOS';
       return;
     }
 
-    // Check if payments cover the netGrandTotal
-    if (this.companyPaymentTotal >= netGrandTotal) {
+    // Check if payments cover the netGrandTotal (with small tolerance for rounding)
+    if (totalPaid >= netGrandTotal - 0.01) {
       this.companyStatus = 'PAGADO';
-    } else if (this.companyPaymentTotal > 0) {
+    } else if (totalPaid > 0) {
       this.companyStatus = 'PENDIENTE';
     } else {
       this.companyStatus = 'SIN PAGOS';

@@ -282,10 +282,11 @@
       [paymentMethods]="paymentMethods" (localSaleDetailChange)="handleLocalSaleTailDetailChange($event)" />
   </div>
 
-  <!-- COMPANY SALE DETAILS -->
+  <!-- LOCAL - COMPANY SALE DETAILS -->
   <div class="col-12">
     <app-local-company-sale-detail [localCompanySaleDetail]="localCompanySaleDetail"
-      (localCompanySaleDetailChange)="handleLocalCompanySaleDetailChange($event)" />
+      (localCompanySaleDetailChange)="handleLocalCompanySaleDetailChange($event)"
+      (paymentsUpdated)="refreshCompanyPaymentTotal()" />
   </div>
 </div>
 

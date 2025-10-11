@@ -24,6 +24,7 @@ export class LocalCompanySaleDetailComponent implements OnInit {
   @Input() localCompanySaleDetail: ILocalCompanySaleDetailModel | null = null;
   @Output() localCompanySaleDetailChange =
     new EventEmitter<ILocalCompanySaleDetailModel | null>();
+  @Output() paymentsUpdated = new EventEmitter<void>();
 
   @ViewChild('companyDetailsForm') companyDetailsForm!: NgForm;
 
@@ -267,10 +268,13 @@ export class LocalCompanySaleDetailComponent implements OnInit {
 
       // Listen for payment updates
       this.modalRef.componentInstance.reloadEvent.subscribe(() => {
-        this.emitChanges(); // Notify parent to refresh payment total
+        // Payment was added/updated/deleted - notify parent to refresh payment total
+        this.paymentsUpdated.emit();
       });
 
       const result = await this.modalRef.result;
+      // After modal closes, emit one more time to ensure parent recalculates
+      this.paymentsUpdated.emit();
       return result;
     } catch (error) {
       return null;
