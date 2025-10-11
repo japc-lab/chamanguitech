@@ -39,6 +39,7 @@ import { SaleStyleEnum } from '../../interfaces/sale.interface';
 import { SaleService } from '../../services/sale.service';
 import { IPaymentMethodModel } from '../../../shared/interfaces/payment-method.interface';
 import { PaymentMethodService } from '../../../shared/services/payment-method.service';
+import { LocalCompanySaleDetailPaymentService } from '../../services/local-company-sale-detail-payment.service';
 
 @Component({
   selector: 'app-new-local-sale',
@@ -76,8 +77,38 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
   localSaleId: string | undefined;
 
   paymentMethods: IPaymentMethodModel[] = [];
+  companyPaymentTotal: number = 0;
 
   private unsubscribe: Subscription[] = [];
+
+  /**
+   * Public method to refresh company payment total
+   * Can be called from payment components when payments are updated
+   */
+  public refreshCompanyPaymentTotal(): void {
+    this.calculateCompanyPaymentTotal();
+  }
+
+  private calculateCompanyPaymentTotal(): void {
+    if (this.localCompanySaleDetail?.id) {
+      const paymentSub = this.localCompanySaleDetailPaymentService
+        .getPaymentsByLocalCompanySaleDetailId(this.localCompanySaleDetail.id)
+        .subscribe({
+          next: (payments) => {
+            this.companyPaymentTotal = payments.reduce((sum, payment) => sum + (payment.amount || 0), 0);
+            this.cdr.detectChanges(); // Trigger change detection to update the summary
+          },
+          error: (error) => {
+            console.error('Error fetching company payments:', error);
+            this.companyPaymentTotal = 0;
+          }
+        });
+
+      this.unsubscribe.push(paymentSub);
+    } else {
+      this.companyPaymentTotal = 0;
+    }
+  }
 
   constructor(
     public activeModal: NgbActiveModal,
@@ -94,7 +125,8 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
     private location: Location,
     private router: Router,
     private cdr: ChangeDetectorRef,
-    private paymentMethodService: PaymentMethodService
+    private paymentMethodService: PaymentMethodService,
+    private localCompanySaleDetailPaymentService: LocalCompanySaleDetailPaymentService
   ) {}
 
   get saleDateFormatted(): string | null {
@@ -190,6 +222,10 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
 
           this.localCompanySaleDetail =
             this.localSaleModel.localCompanySaleDetail || null;
+
+          // Calculate company payment total
+          this.calculateCompanyPaymentTotal();
+
           this.updateGroupedDetails();
 
           this.controlNumber = localSale.purchase.controlNumber!;
@@ -497,6 +533,8 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
     detail: ILocalCompanySaleDetailModel | null
   ) {
     this.localCompanySaleDetail = detail;
+    // Refresh payment total when company detail changes
+    this.refreshCompanyPaymentTotal();
   }
 
   calculateWholeTotalPounds(): void {

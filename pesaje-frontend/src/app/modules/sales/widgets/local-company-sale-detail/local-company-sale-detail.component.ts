@@ -265,6 +265,11 @@ export class LocalCompanySaleDetailComponent implements OnInit {
       this.modalRef.componentInstance.localCompanySaleDetailId =
         this.localCompanySaleDetail.id;
 
+      // Listen for payment updates
+      this.modalRef.componentInstance.reloadEvent.subscribe(() => {
+        this.emitChanges(); // Notify parent to refresh payment total
+      });
+
       const result = await this.modalRef.result;
       return result;
     } catch (error) {

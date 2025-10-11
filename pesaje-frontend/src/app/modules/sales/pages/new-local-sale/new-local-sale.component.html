@@ -293,67 +293,13 @@
 
 <!-- Fifth Section: Summary -->
 <div class="card card-xl-stretch mb-xl-8 mt-2">
-
-  <div class="card-body py-3 text-end fw-bold fs-4">
-    <div class="table-responsive mb-6">
-      <table class="table table-bordered align-middle">
-        <thead class="bg-light text-muted fw-bold">
-          <tr>
-            <th class="text-start">Talla</th>
-            <th class="text-end">Total libras</th>
-            <th class="text-end">Total ($)</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Section: Con Cabeza -->
-          <ng-container *ngIf="groupedWhole.length > 0; else emptyWhole">
-            <tr *ngFor="let item of groupedWhole">
-              <td>{{ item.size }}</td>
-              <td class="text-end">{{ item.pounds | number: '1.2-2' }}</td>
-              <td class="text-end">{{ item.total | number: '1.2-2' }}</td>
-            </tr>
-          </ng-container>
-          <ng-template #emptyWhole>
-            <tr>
-              <td colspan="3" class="text-center text-muted">Sin registros Cabeza</td>
-            </tr>
-          </ng-template>
-          <tr class="fw-bold bg-light">
-            <td>Subtotal Cabeza</td>
-            <td class="text-end">{{ totalWholePounds | number: '1.2-2' }}</td>
-            <td class="text-end">{{ totalWholeAmount | number: '1.2-2' }}</td>
-          </tr>
-
-          <!-- Section: Sin Cabeza -->
-          <ng-container *ngIf="groupedTail.length > 0; else emptyTail">
-            <tr *ngFor="let item of groupedTail">
-              <td>{{ item.size }}</td>
-              <td class="text-end">{{ item.pounds | number: '1.2-2' }}</td>
-              <td class="text-end">{{ item.total | number: '1.2-2' }}</td>
-            </tr>
-          </ng-container>
-          <ng-template #emptyTail>
-            <tr>
-              <td colspan="3" class="text-center text-muted">Sin registros sin Cabeza</td>
-            </tr>
-          </ng-template>
-          <tr class="fw-bold bg-light">
-            <td>Subtotal sin Cabeza</td>
-            <td class="text-end">{{ totalTailPounds | number: '1.2-2' }}</td>
-            <td class="text-end">{{ totalTailAmount | number: '1.2-2' }}</td>
-          </tr>
-
-          <!-- Total General -->
-          <tr class="fw-bold bg-light">
-            <td>Total General</td>
-            <td class="text-end">{{ (totalWholePounds + totalTailPounds) | number: '1.2-2' }}</td>
-            <td class="text-end">{{ (totalWholeAmount + totalTailAmount) | number: '1.2-2' }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-  </div>
+  <!-- Summary Section -->
+  <app-local-sale-summary
+    [purchaseModel]="purchaseModel"
+    [localSaleModel]="localSaleModel"
+    [companyPaymentTotal]="companyPaymentTotal"
+    >
+  </app-local-sale-summary>
 
   <div class="card-footer d-flex justify-content-end py-6 px-9">
     <!-- Submit Button -->

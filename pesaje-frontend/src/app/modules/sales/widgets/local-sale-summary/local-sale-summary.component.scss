@@ -1,0 +1,185 @@
+// Custom styling for the local sale summary component
+
+.card {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.table {
+  margin-bottom: 0;
+
+  th {
+    border-top: none;
+    font-weight: 600;
+    font-size: 0.875rem;
+    padding: 0.75rem;
+  }
+
+  td {
+    padding: 0.75rem;
+    vertical-align: middle;
+    font-size: 0.875rem;
+  }
+}
+
+// Color coding for different shrimp categories
+.table-warning {
+  background-color: rgba(255, 193, 7, 0.1) !important;
+
+  th {
+    background-color: rgba(255, 193, 7, 0.2) !important;
+  }
+}
+
+.table-info {
+  background-color: rgba(13, 202, 240, 0.1) !important;
+
+  th {
+    background-color: rgba(13, 202, 240, 0.2) !important;
+  }
+}
+
+.table-success {
+  background-color: rgba(25, 135, 84, 0.1) !important;
+
+  th {
+    background-color: rgba(25, 135, 84, 0.2) !important;
+  }
+}
+
+.table-secondary {
+  background-color: rgba(108, 117, 125, 0.1) !important;
+
+  th {
+    background-color: rgba(108, 117, 125, 0.2) !important;
+  }
+}
+
+.table-light {
+  background-color: rgba(248, 249, 250, 0.8) !important;
+
+  th {
+    background-color: rgba(248, 249, 250, 1) !important;
+  }
+}
+
+.table-primary {
+  background-color: rgba(13, 110, 253, 0.1) !important;
+
+  th {
+    background-color: rgba(13, 110, 253, 0.2) !important;
+  }
+
+  td {
+    background-color: rgba(13, 110, 253, 0.05) !important;
+  }
+}
+
+// Badge styling
+.badge {
+  font-size: 0.75rem;
+  padding: 0.375rem 0.75rem;
+
+  &.badge-success {
+    background-color: #198754;
+    color: white;
+  }
+
+  &.badge-warning {
+    background-color: #ffc107;
+    color: #000;
+  }
+}
+
+// Text alignment and formatting
+.text-end {
+  text-align: right !important;
+}
+
+.text-center {
+  text-align: center !important;
+}
+
+.fw-bold {
+  font-weight: 700 !important;
+}
+
+.fw-semibold {
+  font-weight: 600 !important;
+}
+
+.fs-5 {
+  font-size: 1.25rem !important;
+}
+
+// Responsive table
+.table-responsive {
+  border-radius: 0.375rem;
+  overflow-x: auto;
+}
+
+// Card header styling
+.card-header {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+  background-color: rgba(248, 249, 250, 0.5);
+}
+
+.card-title {
+  margin-bottom: 0;
+
+  .card-label {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #181c32;
+  }
+}
+
+// Hover effects
+.table-hover tbody tr:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+// Special styling for financial summary header
+.table thead th.table-warning,
+.table thead th.table-info,
+.table thead th.table-success {
+  color: #000;
+  font-weight: 700;
+}
+
+// Net amount styling
+.text-success {
+  color: #198754 !important;
+  font-weight: 700;
+}
+
+// Color styles for category headers
+.orange-color {
+  background-color: rgba(255, 193, 7, 0.2) !important;
+  color: #856404 !important;
+}
+
+.blue-color {
+  background-color: rgba(13, 202, 240, 0.2) !important;
+  color: #055160 !important;
+}
+
+.green-color {
+  background-color: rgba(25, 135, 84, 0.2) !important;
+  color: #0f5132 !important;
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .table {
+    font-size: 0.8rem;
+
+    th, td {
+      padding: 0.5rem;
+    }
+  }
+
+  .card-title .card-label {
+    font-size: 1.1rem;
+  }
+}

@@ -1,0 +1,166 @@
+<!-- Combined Summary Table -->
+<div class="card card-xl-stretch mb-xl-8">
+  <div class="card-header border-0 pt-5">
+    <h4 class="card-title align-items-start flex-column">
+      <span class="card-label fw-bolder fs-3 mb-1">Resumen de Venta Local</span>
+    </h4>
+  </div>
+  <div class="card-body py-3">
+    <div class="table-responsive">
+      <table class="table table-bordered table-hover">
+        <tbody>
+          <!-- General Data Rows (Grey background) -->
+          <tr class="table-light">
+            <td colspan="2" class="fw-semibold">Libras de camaron compradas</td>
+            <td class="text-center">{{ purchaseModel?.totalPounds | number: '1.2-2' }}</td>
+            <td colspan="2" class="fw-semibold">Total libras camaron con cabeza calculadas</td>
+            <td class="text-center">{{ displayTotalWholePounds | number: '1.2-2' }}</td>
+          </tr>
+
+          <tr class="table-light">
+            <td colspan="2" class="fw-semibold">Libras de Basura</td>
+            <td class="text-center">{{ localSaleModel?.trashPounds | number: '1.2-2' }}</td>
+            <td colspan="2" class="fw-semibold">Rendimiento (%)</td>
+            <td class="text-center">{{ displayTotalYieldPercentage | number: '1.2-2' }}%</td>
+          </tr>
+
+          <tr class="table-light">
+            <td colspan="2" class="fw-semibold">Total libras camaron cola calculadas</td>
+            <td class="text-center">{{ displayTotalTailPounds | number: '1.2-2' }}</td>
+            <td colspan="2" class="fw-semibold">Estado</td>
+            <td class="text-center">
+              <span class="badge" [ngClass]="{
+                'badge-danger': localSaleStatus === 'SIN PAGOS',
+                'badge-success': localSaleStatus === 'PAGADO',
+                'badge-warning': localSaleStatus === 'PENDIENTE'
+              }">
+                {{ localSaleStatus }}
+              </span>
+            </td>
+          </tr>
+
+          <tr>
+            <td colspan="2" class="fw-semibold orange-color text-center">CAMARÓN CON CABEZA</td>
+            <td colspan="2" class="fw-semibold blue-color text-center">CAMARÓN SIN CABEZA</td>
+            <td colspan="2" class="fw-semibold green-color text-center">CAMARÓN SIN CABEZA LOCAL - COMPANÍA</td>
+          </tr>
+
+          <tr>
+            <td class="fw-semibold orange-color">Libras de camaron con cabeza calculadas</td>
+            <td class="text-center orange-color">{{ displayTotalWholePounds | number: '1.2-2' }}</td>
+            <td class="fw-semibold blue-color">Libras de camaron cola calculadas</td>
+            <td class="text-center blue-color">{{ displayTotalTailPoundsOnly | number: '1.2-2' }}</td>
+            <td class="fw-semibold green-color">Libras de camaron sin cabeza local - compañía calculadas</td>
+            <td class="text-center green-color">{{ displayTotalCompanyPounds | number: '1.2-2' }}</td>
+          </tr>
+
+          <tr>
+            <td class="fw-semibold orange-color">Rendimiento (%)</td>
+            <td class="text-center orange-color">{{ getWholeYieldPercentage() | number: '1.2-2' }}%</td>
+            <td class="fw-semibold blue-color">Rendimiento (%)</td>
+            <td class="text-center blue-color">{{ getTailYieldPercentage() | number: '1.2-2' }}%</td>
+            <td class="fw-semibold green-color">Rendimiento (%)</td>
+            <td class="text-center green-color">{{ getCompanyYieldPercentage() | number: '1.2-2' }}%</td>
+          </tr>
+
+          <!-- Financial Summary Section -->
+          <tr class="table-light">
+            <td colspan="6" class="text-center fw-bold fs-5">Tabla resumen financiero</td>
+          </tr>
+
+          <!-- Estado -->
+          <tr>
+            <td class="fw-semibold orange-color">Estado</td>
+            <td class="text-center orange-color">
+              <span class="badge" [ngClass]="{
+                'badge-danger': wholeStatus === 'SIN PAGOS',
+                'badge-success': wholeStatus === 'PAGADO',
+                'badge-warning': wholeStatus === 'PENDIENTE'
+              }">
+                {{ wholeStatus }}
+              </span>
+            </td>
+            <td class="fw-semibold blue-color">Estado</td>
+            <td class="text-center blue-color">
+              <span class="badge" [ngClass]="{
+                'badge-danger': tailStatus === 'SIN PAGOS',
+                'badge-success': tailStatus === 'PAGADO',
+                'badge-warning': tailStatus === 'PENDIENTE'
+              }">
+                {{ tailStatus }}
+              </span>
+            </td>
+            <td class="fw-semibold green-color">Estado</td>
+            <td class="text-center green-color">
+              <span class="badge" [ngClass]="{
+                'badge-danger': companyStatus === 'SIN PAGOS',
+                'badge-success': companyStatus === 'PAGADO',
+                'badge-warning': companyStatus === 'PENDIENTE'
+              }">
+                {{ companyStatus }}
+              </span>
+            </td>
+          </tr>
+
+          <!-- Subtotals -->
+          <tr>
+            <td class="fw-semibold orange-color">Subtotal camaron con cabeza ($)</td>
+            <td class="text-end orange-color">${{ wholeSubtotal | number: '1.2-2' }}</td>
+            <td class="fw-semibold blue-color">Subtotal camaron sin cabeza ($)</td>
+            <td class="text-end blue-color">${{ tailSubtotal | number: '1.2-2' }}</td>
+            <td class="fw-semibold green-color">Subtotal camaron sin cabeza local - compañía ($)</td>
+            <td class="text-end green-color">${{ companySubtotal | number: '1.2-2' }}</td>
+          </tr>
+
+          <!-- Retencion % -->
+          <tr>
+            <td class="fw-semibold orange-color">Retencion (%)</td>
+            <td class="text-end orange-color">{{ wholeRetentionPercentage | number: '1.2-2' }}%</td>
+            <td class="fw-semibold blue-color">Retencion (%)</td>
+            <td class="text-end blue-color">{{ tailRetentionPercentage | number: '1.2-2' }}%</td>
+            <td class="fw-semibold green-color">Retencion (%)</td>
+            <td class="text-end green-color">{{ companyRetentionPercentage | number: '1.2-2' }}%</td>
+          </tr>
+
+          <!-- Retencion $ -->
+          <tr>
+            <td class="fw-semibold orange-color">Retencion ($)</td>
+            <td class="text-end orange-color">${{ wholeRetentionAmount | number: '1.2-2' }}</td>
+            <td class="fw-semibold blue-color">Retencion ($)</td>
+            <td class="text-end blue-color">${{ tailRetentionAmount | number: '1.2-2' }}</td>
+            <td class="fw-semibold green-color">Retencion ($)</td>
+            <td class="text-end green-color">${{ companyRetentionAmount | number: '1.2-2' }}</td>
+          </tr>
+
+          <!-- Castigo o descuento adicional -->
+          <tr>
+            <td class="fw-semibold orange-color">Castigo o descuento adicional ($)</td>
+            <td class="text-end orange-color">${{ wholeAdditionalPenalty | number: '1.2-2' }}</td>
+            <td class="fw-semibold blue-color">Castigo o descuento adicional ($)</td>
+            <td class="text-end blue-color">${{ tailAdditionalPenalty | number: '1.2-2' }}</td>
+            <td class="fw-semibold green-color">Castigo o descuento adicional ($)</td>
+            <td class="text-end green-color">${{ companyAdditionalPenalty | number: '1.2-2' }}</td>
+          </tr>
+
+          <!-- Neto Final -->
+          <tr>
+            <td class="fw-semibold orange-color">Neto Final ($)</td>
+            <td class="text-end orange-color">${{ wholeFinalSubtotal | number: '1.2-2' }}</td>
+            <td class="fw-semibold blue-color">Neto Final ($)</td>
+            <td class="text-end blue-color">${{ tailFinalSubtotal | number: '1.2-2' }}</td>
+            <td class="fw-semibold green-color">Neto Final ($)</td>
+            <td class="text-end green-color">${{ companyFinalSubtotal | number: '1.2-2' }}</td>
+          </tr>
+
+          <!-- Valor neto a recibir -->
+          <tr class="table-primary">
+            <td colspan="2" class="fw-bold fs-5">Valor neto a recibir ($)</td>
+            <td colspan="4" class="text-center fw-bold fs-5 text-success">
+              ${{ netAmountToReceive | number: '1.2-2' }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
