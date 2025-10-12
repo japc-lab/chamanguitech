@@ -76,11 +76,12 @@
             <td>{{ purchaseStatus }}</td>
           </tr>
           <tr>
-            <td class="bg-light fw-bold">Número de hoja de peso</td>
-            <td>{{ weightSheetNumber }}</td>
+            <td class="bg-light fw-bold">Número de hoja de peso - Compra</td>
+            <td>{{ weightSheetNumberPurchase }}</td>
+            <td class="bg-light fw-bold">Número de hoja de peso - Venta</td>
+            <td>{{ weightSheetNumberSale }}</td>
             <td class="bg-light fw-bold">Número de hoja de logística</td>
             <td>{{ logisticsSheetNumber }}</td>
-            <td colspan="2"></td>
           </tr>
         </tbody>
       </table>
@@ -94,8 +95,8 @@
       <table class="table table-bordered align-middle mb-6" *ngIf="economicReportModel.isCompanySale; else localSale">
         <tbody>
           <tr>
-            <td class="bg-light fw-bold" style="width: 15%">Fecha de venta</td>
-            <td style="width: 18%">{{ economicReportModel.sale.saleDate | date: 'dd/MM/yyyy' }}</td>
+            <td class="bg-light fw-bold">Fecha de recepción</td>
+            <td>{{ economicReportModel.sale.receptionDate | date: 'dd/MM/yyyy' }}</td>
             <td class="bg-light fw-bold" style="width: 15%">Libras netas recibidas</td>
             <td style="width: 18%">{{ economicReportModel.sale.netPoundsReceived | number:'1.2-2' }}
             </td>
@@ -103,30 +104,25 @@
             <td class="text-end" style="width: 18%">{{ economicReportModel.sale.totalToReceive | number:'1.2-2' }}</td>
           </tr>
           <tr>
-            <td class="bg-light fw-bold">Fecha de recepción</td>
-            <td>{{ economicReportModel.sale.receptionDate | date: 'dd/MM/yyyy' }}</td>
             <td class="bg-light fw-bold">Libras recibidas cabeza</td>
             <td>{{ economicReportModel.sale.wholePoundsReceived | number:'1.2-2' }}</td>
-            <td colspan="2"></td>
-          </tr>
-          <tr>
-            <td class="bg-light fw-bold">Lote</td>
-            <td>{{ economicReportModel.sale.batch }}</td>
             <td class="bg-light fw-bold">Libras basura</td>
             <td>{{ economicReportModel.sale.trashPounds | number:'1.2-2' }}</td>
             <td colspan="2"></td>
           </tr>
           <tr>
-            <td class="bg-light fw-bold">Documento</td>
-            <td>{{ economicReportModel.sale.document }}</td>
             <td class="bg-light fw-bold">Rendimiento</td>
             <td>{{ economicReportModel.sale.performance | number:'1.2-2' }}%</td>
+            <td class="bg-light fw-bold">Gr. Promedio Lote</td>
+            <td>{{ economicReportModel.sale.averageBatchGrams | number:'1.2-2' }}</td>
             <td colspan="2"></td>
           </tr>
           <tr>
-            <td class="bg-light fw-bold">Gr. Promedio Lote</td>
-            <td>{{ economicReportModel.sale.averageBatchGrams | number:'1.2-2' }}</td>
-            <td colspan="4"></td>
+            <td class="bg-light fw-bold">Número de hoja de peso</td>
+            <td>{{ weightSheetNumberSale }}</td>
+            <td class="bg-light fw-bold">Lote</td>
+            <td>{{ economicReportModel.sale.batch }}</td>
+            <td colspan="2"></td>
           </tr>
         </tbody>
       </table>
@@ -203,7 +199,7 @@
           </tr>
           <tr>
             <td class="bg-light fw-bold" style="width: 15%;">Número de hoja de peso</td>
-            <td style="width: 18%;">{{ weightSheetNumber }}</td>
+            <td style="width: 18%;">{{ weightSheetNumberPurchase }}</td>
             <td colspan="4"></td>
           </tr>
         </tbody>

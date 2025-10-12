@@ -28,7 +28,8 @@ export class EconomicReportComponent implements OnInit, OnDestroy {
 
   purchaseStatus: string;
   logisticsType: string;
-  weightSheetNumber: string;
+  weightSheetNumberPurchase: string;
+  weightSheetNumberSale: string;
   logisticsSheetNumber: string;
 
   private unsubscribe: Subscription[] = [];
@@ -119,7 +120,10 @@ export class EconomicReportComponent implements OnInit, OnDestroy {
             statusMap[this.economicReportModel.purchase?.status] || '-';
 
           // Set sheet numbers
-          this.weightSheetNumber = this.economicReportModel.purchase?.weightSheetNumber || '-';
+          this.weightSheetNumberPurchase =
+            this.economicReportModel.purchase?.weightSheetNumber || '-';
+          this.weightSheetNumberSale =
+            this.economicReportModel.sale?.weightSheetNumber || '-';
           this.logisticsSheetNumber = this.getLogisticsSheetNumber();
 
           // Format sale dates
@@ -197,8 +201,8 @@ export class EconomicReportComponent implements OnInit, OnDestroy {
     if (Array.isArray(logistics)) {
       // For local sales, show all logistics sheet numbers
       const sheetNumbers = logistics
-        .map(log => log.logisticsSheetNumber)
-        .filter(sheet => sheet && sheet.trim() !== '');
+        .map((log) => log.logisticsSheetNumber)
+        .filter((sheet) => sheet && sheet.trim() !== '');
 
       return sheetNumbers.length > 0 ? sheetNumbers.join(', ') : '-';
     } else {
