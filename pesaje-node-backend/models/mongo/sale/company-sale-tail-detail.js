@@ -1,41 +1,42 @@
 const { Schema, model } = require('mongoose');
 
-const SaleStyleEnum = require('../../../enums/sale-style.enum');
-
-const CompanySaleItemSchema = Schema({
-  style: {
+const CompanySaleTailDetailSchema = Schema({
+  batch: {
     type: String,
-    enum: SaleStyleEnum,
-    required: true,
+    required: true
   },
-  class: {
-    type: String,
-    required: true,
-  },
-  size: {
-    type: String,
-    required: true,
-  },
-  unit: {
-    type: String,
-    required: true,
-  },
-  amount: {
+  performancePercentageTailPounts: {
     type: Number,
     required: true,
     min: 0
   },
-  price: {
+  settleDate: {
+    type: Date,
+    required: true,
+  },
+  predominantSize: {
+    type: String,
+    required: true,
+  },
+  receivedPoundsReported: {
+    type: Number,
+    required: true,
+  },
+  totalTailPoundsProcessed: {
+    type: Number,
+    required: true,
+  },
+  items: [{
+    type: Schema.Types.ObjectId,
+    ref: 'CompanySaleItem',
+    required: true
+  }],
+  poundsGrandTotal: {
     type: Number,
     required: true,
     min: 0
   },
-  total: {
-    type: Number,
-    required: true,
-    min: 0
-  },
-  percentage: {
+  grandTotal: {
     type: Number,
     required: true,
     min: 0
@@ -48,11 +49,10 @@ const CompanySaleItemSchema = Schema({
   { timestamps: true },
 );
 
-
-CompanySaleItemSchema.method('toJSON', function () {
+CompanySaleTailDetailSchema.method('toJSON', function () {
   const { __v, _id, createdAt, updatedAt, ...object } = this.toObject();
   object.id = _id;
   return object;
 });
 
-module.exports = model('CompanySaleItem', CompanySaleItemSchema);
+module.exports = model('CompanySaleTailDetail', CompanySaleTailDetailSchema);

@@ -48,11 +48,6 @@ const CompanySaleSchema = Schema({
     type: Number,
     required: true,
   },
-  items: [{
-    type: Schema.Types.ObjectId,
-    ref: 'CompanySaleItem',
-    required: true
-  }],
   poundsGrandTotal: {
     type: Number,
     required: true,
@@ -72,6 +67,14 @@ const CompanySaleSchema = Schema({
     type: String,
     enum: CompanySaleStatusEnum,
     required: true,
+  },
+  wholeDetail: {
+    type: Schema.Types.ObjectId,
+    ref: 'CompanySaleWholeDetail',
+  },
+  tailDetail: {
+    type: Schema.Types.ObjectId,
+    ref: 'CompanySaleTailDetail',
   },
   deletedAt: {
     type: Date,
