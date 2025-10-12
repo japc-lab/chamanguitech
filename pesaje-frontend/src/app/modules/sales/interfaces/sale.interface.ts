@@ -25,15 +25,12 @@ export interface ISaleModel {
 export interface ICreateUpdateCompanySaleModel {
   id?: string;
   purchase: string;
-  saleDate: string;
-  document: string;
+  saleDate?: string;
   batch: string;
   provider: string;
-  np?: string;
-  serialNumber: number;
-  receptionDateTime: string;
-  settleDateTime: string;
-  batchAverageGram: number;
+  receptionDate: string;
+  settleDate: string;
+  predominantSize: string;
   wholeReceivedPounds: number;
   trashPounds: number;
   netReceivedPounds: number;
@@ -42,6 +39,7 @@ export interface ICreateUpdateCompanySaleModel {
   poundsGrandTotal: number;
   grandTotal: number;
   percentageTotal: number;
+  weightSheetNumber?: string;
   status: CompanySaleStatusEnum;
   items: ICompanySaleItemModel[];
 }
@@ -50,15 +48,12 @@ export interface ICompanySaleModel {
   id: string;
   purchase: IReducedDetailedPurchaseModel;
   sale: string;
-  saleDate: string;
-  document: string;
+  saleDate?: string;
   batch: string;
   provider: string;
-  np: string;
-  serialNumber: number;
-  receptionDateTime: string;
-  settleDateTime: string;
-  batchAverageGram: number;
+  receptionDate: string;
+  settleDate: string;
+  predominantSize: string;
   wholeReceivedPounds: number;
   trashPounds: number;
   netReceivedPounds: number;
@@ -67,6 +62,7 @@ export interface ICompanySaleModel {
   poundsGrandTotal: number;
   grandTotal: number;
   percentageTotal: number;
+  weightSheetNumber?: string;
   status: CompanySaleStatusEnum;
   items: ICompanySaleItemModel[];
 }

@@ -8,7 +8,7 @@ const create = async (data) => {
     const transaction = await dbAdapter.saleAdapter.startTransaction();
 
     try {
-        const { purchase, saleDate, ...companySaleData } = data;
+        const { purchase, ...companySaleData } = data;
 
         // Validate referenced purchase exists
         const purchaseExists = await dbAdapter.purchaseAdapter.getById(purchase);
@@ -19,7 +19,7 @@ const create = async (data) => {
         // Create Sale document
         const sale = await dbAdapter.saleAdapter.create({
             purchase,
-            saleDate,
+            weightSheetNumber: companySaleData.weightSheetNumber,
             type: SaleTypeEnum.COMPANY
         }, { session: transaction.session });
 
@@ -74,6 +74,7 @@ const getById = async (id) => {
             referencePrice: item.referencePrice,
             total: item.total,
             percentage: item.percentage,
+            weightSheetNumber: companySale.sale.weightSheetNumber,
             deletedAt: item.deletedAt
         }))
     };
@@ -110,16 +111,13 @@ const getBySaleId = async (saleId) => {
     return {
         id: companySale.id,
         sale: companySale.sale,
-        saleDate: sale.saleDate,
+        weightSheetNumber: sale.weightSheetNumber,
         status: companySale.status,
-        document: companySale.document,
         batch: companySale.batch,
         provider: companySale.provider,
-        np: companySale.np,
-        serialNumber: companySale.serialNumber,
-        receptionDateTime: companySale.receptionDateTime,
-        settleDateTime: companySale.settleDateTime,
-        batchAverageGram: companySale.batchAverageGram,
+        receptionDate: companySale.receptionDate,
+        settleDate: companySale.settleDate,
+        predominantSize: companySale.predominantSize,
         wholeReceivedPounds: companySale.wholeReceivedPounds,
         trashPounds: companySale.trashPounds,
         netReceivedPounds: companySale.netReceivedPounds,
@@ -187,7 +185,7 @@ const update = async (id, data) => {
 
         // 🔸 Update the Sale's saleDate
         await dbAdapter.saleAdapter.update(saleId, {
-            saleDate: data.saleDate
+            weightSheetNumber: data.weightSheetNumber
         }, { session: transaction.session });
 
         // 🔥 Remove old CompanySaleItems
@@ -204,14 +202,12 @@ const update = async (id, data) => {
 
         // ✏️ Update the CompanySale record
         const updatedCompanySale = await dbAdapter.companySaleAdapter.update(id, {
-            document: data.document,
+            weightSheetNumber: data.weightSheetNumber,
             batch: data.batch,
             provider: data.provider,
-            np: data.np || null,
-            serialNumber: data.serialNumber,
-            receptionDateTime: data.receptionDateTime,
-            settleDateTime: data.settleDateTime,
-            batchAverageGram: data.batchAverageGram,
+            receptionDate: data.receptionDate,
+            settleDate: data.settleDate,
+            predominantSize: data.predominantSize,
             wholeReceivedPounds: data.wholeReceivedPounds,
             trashPounds: data.trashPounds,
             netReceivedPounds: data.netReceivedPounds,

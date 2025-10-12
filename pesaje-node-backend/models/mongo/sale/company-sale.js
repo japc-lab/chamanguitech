@@ -8,10 +8,6 @@ const CompanySaleSchema = Schema({
     ref: 'Sale',
     required: true
   },
-  document: {
-    type: String,
-    required: true
-  },
   batch: {
     type: String,
     required: true
@@ -20,23 +16,16 @@ const CompanySaleSchema = Schema({
     type: String,
     required: true
   },
-  np: {
+  receptionDate: {
+    type: Date,
+    required: true,
+  },
+  settleDate: {
+    type: Date,
+    required: true,
+  },
+  predominantSize: {
     type: String,
-  },
-  serialNumber: {
-    type: Number,
-    required: true
-  },
-  receptionDateTime: {
-    type: Date,
-    required: true,
-  },
-  settleDateTime: {
-    type: Date,
-    required: true,
-  },
-  batchAverageGram: {
-    type: Number,
     required: true,
   },
   wholeReceivedPounds: {

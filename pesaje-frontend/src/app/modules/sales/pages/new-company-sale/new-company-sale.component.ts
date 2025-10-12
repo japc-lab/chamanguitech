@@ -39,6 +39,7 @@ import { FormUtilsService } from 'src/app/utils/form-utils.service';
 import { IReducedPeriodModel } from 'src/app/modules/shared/interfaces/period.interface';
 import { CompanySalePaymentListingComponent } from '../../widgets/company-sale-payment-listing/company-sale-payment-listing.component';
 import { SaleService } from '../../services/sale.service';
+import { ICompany } from 'src/app/modules/settings/interfaces/company.interfaces';
 
 @Component({
   selector: 'app-new-company-sale',
@@ -89,10 +90,6 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef
   ) {}
 
-  get saleDateFormatted(): string | null {
-    return this.dateUtils.formatISOToDateInput(this.companySaleModel.saleDate);
-  }
-
   get purchaseDateFormatted(): string | null {
     return this.dateUtils.formatISOToDateInput(this.purchaseModel.purchaseDate);
   }
@@ -113,6 +110,7 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
     this.isOnlyBuyer = this.authService.isOnlyBuyer;
 
     this.initializeModels();
+    this.companySaleModel.predominantSize = 'P';
 
     if (this.saleId) {
       const companySaleSub = this.companySaleService
@@ -128,19 +126,13 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
             this.controlNumber = companySale.purchase.controlNumber!;
             this.purchaseModel = companySale.purchase;
 
-            const { date: fetchedReceptionDate, time: fetchedReceptionTime } =
-              this.dateUtils.parseISODateTime(
-                this.companySaleModel.receptionDateTime
-              );
-            this.receptionDate = fetchedReceptionDate;
-            this.receptionTime = fetchedReceptionTime;
+            this.receptionDate = this.dateUtils.formatISOToDateInput(
+              this.companySaleModel.receptionDate
+            );
 
-            const { date: fetchedSettleDate, time: fetchedSettleTime } =
-              this.dateUtils.parseISODateTime(
-                this.companySaleModel.settleDateTime
-              );
-            this.settleDate = fetchedSettleDate;
-            this.settleTime = fetchedSettleTime;
+            this.settleDate = this.dateUtils.formatISOToDateInput(
+              this.companySaleModel.settleDate
+            );
 
             this.companySaleItems = companySale.items;
 
@@ -165,6 +157,7 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
     this.purchaseModel.broker = {} as IReducedUserModel;
     this.purchaseModel.client = {} as IReducedUserModel;
     this.purchaseModel.shrimpFarm = {} as IReducedShrimpFarmModel;
+    this.purchaseModel.company = {} as ICompany;
   }
 
   confirmSave() {
@@ -196,14 +189,7 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
 
   submitCompanySaleForm() {
     this.companySaleModel.purchase = this.purchaseModel.id;
-    this.companySaleModel.receptionDateTime = this.dateUtils.toISODateTime(
-      this.receptionDate,
-      this.receptionTime
-    );
-    this.companySaleModel.settleDateTime = this.dateUtils.toISODateTime(
-      this.settleDate,
-      this.settleTime
-    );
+
     this.companySaleModel.items = this.companySaleItems.map(
       ({ id, ...rest }) => rest
     );
