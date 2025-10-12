@@ -225,7 +225,13 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
         .subscribe({
           next: (response) => {
             this.companySaleId = response.id; // ✅ Store the new ID for future updates
-            this.cdr.detectChanges();
+
+            // Navigate to edit URL with saleId to enable subsequent updates and payments
+            if (response.sale) {
+              this.saleId = response.sale;
+              this.router.navigate(['/sales/company', this.saleId]);
+            }
+
             this.alertService.showTranslatedAlert({ alertType: 'success' });
           },
           error: (error) => {
