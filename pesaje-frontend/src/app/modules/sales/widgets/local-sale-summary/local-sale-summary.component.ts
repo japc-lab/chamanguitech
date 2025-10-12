@@ -23,10 +23,6 @@ export class LocalSaleSummaryComponent implements OnChanges, DoCheck {
 
   // Quantity and Yield Calculations
   totalPurchasedPounds = 0;
-  totalTailPoundsCalculated = 0;
-  totalWholePoundsCalculated = 0;
-  totalTailCompanyPoundsCalculated = 0;
-  yieldPercentage = 0;
 
   // Display properties for template
   displayTotalWholePounds = 0;
@@ -96,17 +92,8 @@ export class LocalSaleSummaryComponent implements OnChanges, DoCheck {
     // Get data from purchase model
     this.totalPurchasedPounds = this.purchaseModel?.totalPounds || 0;
 
-    // Calculate total tail pounds (WHOLE + TAIL + COMPANY)
-    this.totalTailPoundsCalculated = this.getTotalTailPounds();
-
-    // Calculate total whole pounds (from WHOLE section)
-    this.totalWholePoundsCalculated = this.getTotalWholePounds();
-
-    // Calculate total company pounds (from COMPANY section)
-    this.totalTailCompanyPoundsCalculated = this.getTotalCompanyPounds();
-
     // Set display properties for template
-    this.displayTotalWholePounds = this.totalWholePoundsCalculated;
+    this.displayTotalWholePounds = this.getTotalWholePounds();
     this.displayTotalTailPounds = this.getTotalTailPoundsOnly();
     this.displayTotalTailPoundsOnly = this.getTailPoundsOnly(); // Only TAIL section
     this.displayTotalCompanyPounds = this.getTotalCompanyPounds();
@@ -119,16 +106,6 @@ export class LocalSaleSummaryComponent implements OnChanges, DoCheck {
         this.getCompanyYieldPercentage()
       ).toFixed(2)
     );
-
-    // Calculate yield percentage
-    if (this.totalPurchasedPounds > 0) {
-      this.yieldPercentage = Number(
-        (
-          (this.totalWholePoundsCalculated / this.totalPurchasedPounds) *
-          100
-        ).toFixed(2)
-      );
-    }
   }
 
   private calculateFinancialSummary(): void {
@@ -277,13 +254,6 @@ export class LocalSaleSummaryComponent implements OnChanges, DoCheck {
     }
   }
 
-  private getTotalTailPounds(): number {
-    const wholePounds = this.getTotalWholePounds();
-    const tailPounds = this.getTotalTailPoundsOnly();
-    const companyPounds = this.getTotalCompanyPounds();
-    return Number((wholePounds + tailPounds + companyPounds).toFixed(2));
-  }
-
   private getTotalWholePounds(): number {
     const wholeDetail = this.getWholeDetail();
     return wholeDetail?.poundsGrandTotal || 0;
@@ -328,7 +298,7 @@ export class LocalSaleSummaryComponent implements OnChanges, DoCheck {
     if (this.totalPurchasedPounds > 0) {
       return Number(
         (
-          (this.totalWholePoundsCalculated / this.totalPurchasedPounds) *
+          (this.getTotalWholePounds() / this.totalPurchasedPounds) *
           100
         ).toFixed(2)
       );
