@@ -97,6 +97,20 @@
         <input type="text" id="transportationMethod" name="transportationMethod" class="form-control form-control-sm"
           [(ngModel)]="transportationMethod" disabled />
       </div>
+
+      <!-- Company Name -->
+      <div class="col-md-6">
+        <label for="companyName" class="fw-semibold fs-6 mb-2">Nombre de la Compañía</label>
+        <input type="text" id="companyName" name="companyName" class="form-control form-control-sm"
+          [(ngModel)]="purchaseModel.company.name" disabled />
+      </div>
+
+      <!-- Weight Sheet Number -->
+      <div class="col-md-6">
+        <label for="weightSheetNumber" class="fw-semibold fs-6 mb-2">Número de hoja de peso</label>
+        <input type="text" id="weightSheetNumber" name="weightSheetNumber" class="form-control form-control-sm"
+          [(ngModel)]="purchaseModel.weightSheetNumber" disabled />
+      </div>
     </div>
   </div>
 </div>

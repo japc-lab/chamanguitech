@@ -97,6 +97,13 @@
         <input type="text" id="transportationMethod" name="transportationMethod" class="form-control form-control-sm"
           [value]="purchaseModel.totalPounds | number: '1.2-2'" disabled />
       </div>
+
+      <!-- Weight Sheet Number -->
+      <div class="col-md-6">
+        <label for="weightSheetNumber" class="fw-semibold fs-6 mb-2">Número de hoja de peso</label>
+        <input type="text" id="weightSheetNumber" name="weightSheetNumber" class="form-control form-control-sm"
+          [(ngModel)]="purchaseModel.weightSheetNumber" disabled />
+      </div>
     </div>
   </div>
 </div>
@@ -295,11 +302,8 @@
 <!-- Fifth Section: Summary -->
 <div class="card card-xl-stretch mb-xl-8 mt-2">
   <!-- Summary Section -->
-  <app-local-sale-summary
-    [purchaseModel]="purchaseModel"
-    [localSaleModel]="localSaleModel"
-    [companyPaymentTotal]="companyPaymentTotal"
-    >
+  <app-local-sale-summary [purchaseModel]="purchaseModel" [localSaleModel]="localSaleModel"
+    [companyPaymentTotal]="companyPaymentTotal">
   </app-local-sale-summary>
 
   <div class="card-footer d-flex justify-content-end py-6 px-9">
