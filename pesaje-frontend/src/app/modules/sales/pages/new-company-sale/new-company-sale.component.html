@@ -282,13 +282,19 @@
 </form>
 <!-- end::Sale Form -->
 
-<!-- Fourth Section: Company Sale Items -->
-<div>
-  <app-company-sale-items-listing *ngIf="!isAddingPayment" [periodId]="purchaseModel.period.id"
-    [companySaleItems]="companySaleItems" [canAddItems]="!!purchaseModel.period.id"
-    (companySaleItemsChange)="handleCompanySaleItemsChange($event)" />
+<!-- Fourth Section: Company Sale Details -->
+<!-- Whole Detail -->
+<app-company-sale-whole-detail *ngIf="purchaseModel?.period?.id" [wholeDetail]="wholeDetail"
+  [periodId]="purchaseModel.period.id" (wholeDetailChange)="handleWholeDetailChange($event)">
+</app-company-sale-whole-detail>
 
-  <!-- Submit Button inside card footer -->
+<!-- Tail Detail -->
+<app-company-sale-tail-detail *ngIf="purchaseModel?.period?.id" [tailDetail]="tailDetail"
+  [periodId]="purchaseModel.period.id" (tailDetailChange)="handleTailDetailChange($event)">
+</app-company-sale-tail-detail>
+
+<!-- Submit Button inside card footer -->
+<div class="card card-xl-stretch mb-xl-8 mt-2">
   <div class="card-footer d-flex justify-content-end py-6 px-9">
     <button *ngIf="canSaveCompanySale()" type="button" class="btn btn-primary" (click)="confirmSave()">
       Guardar
@@ -300,4 +306,4 @@
     </button>
   </div>
 </div>
-<!-- end::Fourth Section: Company Sale Items -->
+<!-- end::Fourth Section: Company Sale Details -->

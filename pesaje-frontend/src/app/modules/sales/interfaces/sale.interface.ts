@@ -4,6 +4,8 @@ import { IReducedUserModel } from '../../settings/interfaces/user.interface';
 import { ICompanySaleItemModel } from './company-sale-item.interface';
 import { ILocalCompanySaleDetailModel } from './local-company-sale-detail.interface';
 import { ILocalSaleDetailModel } from './local-sale-detail.interface';
+import { ICompanySaleWholeDetailModel } from './company-sale-whole-detail.interface';
+import { ICompanySaleTailDetailModel } from './company-sale-tail-detail.interface';
 
 export interface ISaleModel {
   id?: string;
@@ -41,7 +43,8 @@ export interface ICreateUpdateCompanySaleModel {
   percentageTotal: number;
   weightSheetNumber?: string;
   status: CompanySaleStatusEnum;
-  items: ICompanySaleItemModel[];
+  wholeDetail?: ICompanySaleWholeDetailModel;
+  tailDetail?: ICompanySaleTailDetailModel;
 }
 
 export interface ICompanySaleModel {
@@ -64,7 +67,8 @@ export interface ICompanySaleModel {
   percentageTotal: number;
   weightSheetNumber?: string;
   status: CompanySaleStatusEnum;
-  items: ICompanySaleItemModel[];
+  wholeDetail?: ICompanySaleWholeDetailModel;
+  tailDetail?: ICompanySaleTailDetailModel;
 }
 
 export interface ICreateUpdateLocalSaleModel {

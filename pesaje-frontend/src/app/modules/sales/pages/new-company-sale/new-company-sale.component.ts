@@ -5,6 +5,8 @@ import {
   ISaleModel,
   SaleTypeEnum,
 } from './../../interfaces/sale.interface';
+import { ICompanySaleWholeDetailModel } from '../../interfaces/company-sale-whole-detail.interface';
+import { ICompanySaleTailDetailModel } from '../../interfaces/company-sale-tail-detail.interface';
 import {
   ChangeDetectorRef,
   Component,
@@ -61,12 +63,8 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
   companySaleModel: ICreateUpdateCompanySaleModel;
   purchaseModel: IReducedDetailedPurchaseModel;
 
-  receptionDate: string = '';
-  receptionTime: string = '';
-  settleDate: string = '';
-  settleTime: string = '';
-
-  companySaleItems: ICompanySaleItemModel[] = [];
+  wholeDetail: ICompanySaleWholeDetailModel | null = null;
+  tailDetail: ICompanySaleTailDetailModel | null = null;
 
   saleId: string | undefined;
   companySaleId: string | undefined;
@@ -126,15 +124,9 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
             this.controlNumber = companySale.purchase.controlNumber!;
             this.purchaseModel = companySale.purchase;
 
-            this.receptionDate = this.dateUtils.formatISOToDateInput(
-              this.companySaleModel.receptionDate
-            );
-
-            this.settleDate = this.dateUtils.formatISOToDateInput(
-              this.companySaleModel.settleDate
-            );
-
-            this.companySaleItems = companySale.items;
+            // Load whole and tail details
+            this.wholeDetail = companySale.wholeDetail || null;
+            this.tailDetail = companySale.tailDetail || null;
 
             this.cdr.detectChanges();
           },
@@ -171,8 +163,17 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Check if both lists are empty
-    if (!this.companySaleItems || this.companySaleItems.length === 0) {
+    // Check if at least one detail has items
+    const hasWholeItems =
+      this.wholeDetail &&
+      this.wholeDetail.items &&
+      this.wholeDetail.items.length > 0;
+    const hasTailItems =
+      this.tailDetail &&
+      this.tailDetail.items &&
+      this.tailDetail.items.length > 0;
+
+    if (!hasWholeItems && !hasTailItems) {
       this.alertService.showTranslatedAlert({
         alertType: 'info',
         messageKey: 'MESSAGES.NO_SALE_DETAILS_ENTERED',
@@ -190,22 +191,52 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
   submitCompanySaleForm() {
     this.companySaleModel.purchase = this.purchaseModel.id;
 
-    this.companySaleModel.items = this.companySaleItems.map(
-      ({ id, ...rest }) => rest
-    );
-    this.companySaleModel.poundsGrandTotal = this.companySaleItems.reduce(
-      (sum, item) => sum + Number(item.pounds || 0),
-      0
-    );
-    this.companySaleModel.grandTotal = Number(
-      this.companySaleItems
-        .reduce((sum, item) => sum + Number(item.total || 0), 0)
-        .toFixed(2)
-    );
-    this.companySaleModel.percentageTotal = this.companySaleItems.reduce(
-      (sum, item) => sum + Number(item.percentage || 0),
-      0
-    );
+    // Prepare whole detail (strip IDs from items)
+    if (
+      this.wholeDetail &&
+      this.wholeDetail.items &&
+      this.wholeDetail.items.length > 0
+    ) {
+      this.companySaleModel.wholeDetail = {
+        ...this.wholeDetail,
+        items: this.wholeDetail.items.map(({ id, ...rest }) => rest),
+      };
+    } else {
+      this.companySaleModel.wholeDetail = undefined as any;
+    }
+
+    // Prepare tail detail (strip IDs from items)
+    if (
+      this.tailDetail &&
+      this.tailDetail.items &&
+      this.tailDetail.items.length > 0
+    ) {
+      this.companySaleModel.tailDetail = {
+        ...this.tailDetail,
+        items: this.tailDetail.items.map(({ id, ...rest }) => rest),
+      };
+    } else {
+      this.companySaleModel.tailDetail = undefined as any;
+    }
+
+    // Calculate grand totals
+    let totalPounds = 0;
+    let totalAmount = 0;
+    let totalPercentage = 0;
+
+    if (this.companySaleModel.wholeDetail) {
+      totalPounds += this.companySaleModel.wholeDetail.poundsGrandTotal || 0;
+      totalAmount += this.companySaleModel.wholeDetail.grandTotal || 0;
+    }
+
+    if (this.companySaleModel.tailDetail) {
+      totalPounds += this.companySaleModel.tailDetail.poundsGrandTotal || 0;
+      totalAmount += this.companySaleModel.tailDetail.grandTotal || 0;
+    }
+
+    this.companySaleModel.poundsGrandTotal = Number(totalPounds.toFixed(2));
+    this.companySaleModel.grandTotal = Number(totalAmount.toFixed(2));
+    this.companySaleModel.percentageTotal = 100; // Always 100% for combined details
 
     if (this.companySaleId) {
       this.companySaleService
@@ -357,8 +388,12 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
     this.router.navigate(['/sales/list']);
   }
 
-  handleCompanySaleItemsChange(items: ICompanySaleItemModel[]) {
-    this.companySaleItems = items;
+  handleWholeDetailChange(detail: ICompanySaleWholeDetailModel | null) {
+    this.wholeDetail = detail;
+  }
+
+  handleTailDetailChange(detail: ICompanySaleTailDetailModel | null) {
+    this.tailDetail = detail;
   }
 
   onDateChange(event: any): void {
