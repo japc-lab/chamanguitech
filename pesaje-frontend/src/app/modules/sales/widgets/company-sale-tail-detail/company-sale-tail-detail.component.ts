@@ -33,6 +33,12 @@ export class CompanySaleTailDetailComponent implements OnInit {
 
   @ViewChild('tailDetailsForm') tailDetailsForm!: NgForm;
 
+  isFormValid(): boolean {
+    if (!this.tailDetail) return true; // If no detail, it's valid (not required)
+    if (!this.tailDetailsForm) return true; // Form not yet initialized
+    return !!this.tailDetailsForm.valid && this.tailDetail.items.length > 0;
+  }
+
   tailSizes: IReadSizeModel[] = [];
   shrimpClassList: { type: string; label: string }[] = [];
   periodModel: IReadPeriodModel;
@@ -114,7 +120,8 @@ export class CompanySaleTailDetailComponent implements OnInit {
         style: SaleStyleEnum.TAIL,
         class: '',
         size: '',
-        pounds: 0,
+        unit: 'lb',
+        amount: 0,
         price: 0,
         referencePrice: 0,
         total: 0,
@@ -134,27 +141,27 @@ export class CompanySaleTailDetailComponent implements OnInit {
   recalculateTotals(): void {
     if (!this.tailDetail) return;
 
-    let totalPounds = 0;
     let totalAmount = 0;
+    let totalDollars = 0;
 
     this.tailDetail.items.forEach((item) => {
-      item.total = Number((item.pounds || 0) * (item.price || 0));
-      totalPounds += Number(item.pounds || 0);
-      totalAmount += item.total || 0;
+      item.total = Number((item.amount || 0) * (item.price || 0));
+      totalAmount += Number(item.amount || 0);
+      totalDollars += item.total || 0;
     });
 
     // Calculate percentages
     this.tailDetail.items.forEach((item) => {
-      item.percentage = totalAmount > 0 ? (item.total / totalAmount) * 100 : 0;
+      item.percentage = totalDollars > 0 ? (item.total / totalDollars) * 100 : 0;
     });
 
-    this.tailDetail.poundsGrandTotal = Number(totalPounds.toFixed(2));
-    this.tailDetail.grandTotal = Number(totalAmount.toFixed(2));
+    this.tailDetail.poundsGrandTotal = Number(totalAmount.toFixed(2));
+    this.tailDetail.grandTotal = Number(totalDollars.toFixed(2));
 
     // Calculate performance percentage
     if (this.tailDetail.receivedPoundsReported > 0) {
       this.tailDetail.performancePercentageTailPounts = Number(
-        ((totalPounds / this.tailDetail.receivedPoundsReported) * 100).toFixed(2)
+        ((totalAmount / this.tailDetail.receivedPoundsReported) * 100).toFixed(2)
       );
     } else {
       this.tailDetail.performancePercentageTailPounts = 0;

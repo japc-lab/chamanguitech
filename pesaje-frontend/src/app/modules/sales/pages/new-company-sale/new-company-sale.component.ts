@@ -42,6 +42,8 @@ import { IReducedPeriodModel } from 'src/app/modules/shared/interfaces/period.in
 import { CompanySalePaymentListingComponent } from '../../widgets/company-sale-payment-listing/company-sale-payment-listing.component';
 import { SaleService } from '../../services/sale.service';
 import { ICompany } from 'src/app/modules/settings/interfaces/company.interfaces';
+import { CompanySaleWholeDetailComponent } from '../../widgets/company-sale-whole-detail/company-sale-whole-detail.component';
+import { CompanySaleTailDetailComponent } from '../../widgets/company-sale-tail-detail/company-sale-tail-detail.component';
 
 @Component({
   selector: 'app-new-company-sale',
@@ -54,6 +56,8 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
   private modalRef: NgbModalRef | null = null;
 
   @ViewChild('saleForm') saleForm!: NgForm;
+  @ViewChild(CompanySaleWholeDetailComponent) wholeDetailComponent!: CompanySaleWholeDetailComponent;
+  @ViewChild(CompanySaleTailDetailComponent) tailDetailComponent!: CompanySaleTailDetailComponent;
 
   isOnlyBuyer = false;
   searchSubmitted = false;
@@ -124,6 +128,11 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
             this.controlNumber = companySale.purchase.controlNumber!;
             this.purchaseModel = companySale.purchase;
 
+            this.companySaleModel.settleDate =
+              this.dateUtils.formatISOToDateInput(companySale.settleDate);
+            this.companySaleModel.receptionDate =
+              this.dateUtils.formatISOToDateInput(companySale.receptionDate);
+
             // Load whole and tail details
             this.wholeDetail = companySale.wholeDetail || null;
             this.tailDetail = companySale.tailDetail || null;
@@ -177,6 +186,18 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
       this.alertService.showTranslatedAlert({
         alertType: 'info',
         messageKey: 'MESSAGES.NO_SALE_DETAILS_ENTERED',
+      });
+      return;
+    }
+
+    // Validate detail forms
+    const isWholeDetailValid = this.wholeDetailComponent ? this.wholeDetailComponent.isFormValid() : true;
+    const isTailDetailValid = this.tailDetailComponent ? this.tailDetailComponent.isFormValid() : true;
+
+    if (!isWholeDetailValid || !isTailDetailValid) {
+      this.alertService.showTranslatedAlert({
+        alertType: 'warning',
+        messageKey: 'MESSAGES.COMPANY_SALE_REQUIRED_FIELDS',
       });
       return;
     }

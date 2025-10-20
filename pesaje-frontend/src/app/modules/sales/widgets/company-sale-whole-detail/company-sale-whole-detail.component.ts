@@ -33,6 +33,12 @@ export class CompanySaleWholeDetailComponent implements OnInit {
 
   @ViewChild('wholeDetailsForm') wholeDetailsForm!: NgForm;
 
+  isFormValid(): boolean {
+    if (!this.wholeDetail) return true; // If no detail, it's valid (not required)
+    if (!this.wholeDetailsForm) return true; // Form not yet initialized
+    return !!this.wholeDetailsForm.valid && this.wholeDetail.items.length > 0;
+  }
+
   wholeSizes: IReadSizeModel[] = [];
   periodModel: IReadPeriodModel;
 
@@ -100,7 +106,8 @@ export class CompanySaleWholeDetailComponent implements OnInit {
         style: SaleStyleEnum.WHOLE,
         class: '',
         size: '',
-        pounds: 0,
+        unit: 'lb',
+        amount: 0,
         price: 0,
         referencePrice: 0,
         total: 0,
@@ -120,27 +127,27 @@ export class CompanySaleWholeDetailComponent implements OnInit {
   recalculateTotals(): void {
     if (!this.wholeDetail) return;
 
-    let totalPounds = 0;
     let totalAmount = 0;
+    let totalDollars = 0;
 
     this.wholeDetail.items.forEach((item) => {
-      item.total = Number((item.pounds || 0) * (item.price || 0));
-      totalPounds += Number(item.pounds || 0);
-      totalAmount += item.total || 0;
+      item.total = Number((item.amount || 0) * (item.price || 0));
+      totalAmount += Number(item.amount || 0);
+      totalDollars += item.total || 0;
     });
 
     // Calculate percentages
     this.wholeDetail.items.forEach((item) => {
-      item.percentage = totalAmount > 0 ? (item.total / totalAmount) * 100 : 0;
+      item.percentage = totalDollars > 0 ? (item.total / totalDollars) * 100 : 0;
     });
 
-    this.wholeDetail.poundsGrandTotal = Number(totalPounds.toFixed(2));
-    this.wholeDetail.grandTotal = Number(totalAmount.toFixed(2));
+    this.wholeDetail.poundsGrandTotal = Number(totalAmount.toFixed(2));
+    this.wholeDetail.grandTotal = Number(totalDollars.toFixed(2));
 
     // Calculate average price
-    if (totalPounds > 0) {
+    if (totalAmount > 0) {
       this.wholeDetail.averagePrice = Number(
-        (totalAmount / totalPounds).toFixed(2)
+        (totalDollars / totalAmount).toFixed(2)
       );
     } else {
       this.wholeDetail.averagePrice = 0;

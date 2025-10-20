@@ -41,8 +41,11 @@
 
             <div class="col-md-3">
               <label for="tailPredominantSize" class="required fw-semibold fs-6 mb-2">Talla Predominante</label>
-              <input type="text" id="tailPredominantSize" name="tailPredominantSize"
-                [(ngModel)]="tailDetail.predominantSize" class="form-control form-control-sm" required />
+              <select [(ngModel)]="tailDetail.predominantSize" name="tailPredominantSize" id="tailPredominantSize"
+                class="form-select form-select-sm" required>
+                <option value="" disabled selected>Seleccione</option>
+                <option *ngFor="let size of tailSizes" [value]="size.size">{{ size.size }}</option>
+              </select>
             </div>
 
             <div class="col-md-3">
@@ -88,10 +91,12 @@
         <table class="table table-bordered align-middle">
           <thead>
             <tr class="bg-light text-muted fw-bold">
+              <th class="text-start">Estilo</th>
               <th class="text-start">Clase</th>
               <th class="text-start">Talla</th>
               <th class="text-end">Precio Ref. ($)</th>
-              <th class="text-end">Libras (lb)</th>
+              <th class="text-center">Unidad</th>
+              <th class="text-end">Cantidad</th>
               <th class="text-end">Precio ($)</th>
               <th class="text-end">Total ($)</th>
               <th class="text-end">%</th>
@@ -100,12 +105,16 @@
           </thead>
           <tbody>
             <tr *ngIf="tailDetail.items.length === 0">
-              <td colspan="8" class="text-center text-muted py-4">
+              <td colspan="10" class="text-center text-muted py-4">
                 <i class="bi bi-inbox fs-1 d-block mb-2"></i>
                 <span>No hay items agregados. Haga clic en "Agregar Item" para comenzar.</span>
               </td>
             </tr>
             <tr *ngFor="let item of tailDetail.items; let itemIndex = index">
+              <td class="text-center">
+                <span class="badge badge-light-info">Cola</span>
+              </td>
+
               <td>
                 <select [(ngModel)]="item.class" name="tailClass{{ itemIndex }}" (ngModelChange)="onClassChange(item)"
                   class="form-select form-select-sm">
@@ -128,10 +137,17 @@
                 ${{ item.referencePrice | number: '1.2-2' }}
               </td>
 
+              <td class="text-center">
+                <select [(ngModel)]="item.unit" name="tailUnit{{ itemIndex }}" class="form-select form-select-sm">
+                  <option value="lb">lb</option>
+                  <option value="kg">kg</option>
+                </select>
+              </td>
+
               <td>
-                <input type="number" [(ngModel)]="item.pounds" name="tailPounds{{ itemIndex }}"
+                <input type="number" [(ngModel)]="item.amount" name="tailAmount{{ itemIndex }}"
                   (ngModelChange)="recalculateTotals()" (keypress)="validateNumber($event)"
-                  (blur)="formatDecimal('tailPounds' + itemIndex)"
+                  (blur)="formatDecimal('tailAmount' + itemIndex)"
                   class="form-control form-control-sm text-end no-spinner" step="0.01" />
               </td>
 
@@ -157,7 +173,7 @@
 
             <!-- Totals Row -->
             <tr class="fw-bold bg-light" *ngIf="tailDetail.items.length > 0">
-              <td colspan="3">Total General</td>
+              <td colspan="5">Total General</td>
               <td class="text-end">{{ tailDetail.poundsGrandTotal | number: '1.2-2' }}</td>
               <td></td>
               <td class="text-end">${{ tailDetail.grandTotal | number: '1.2-2' }}</td>

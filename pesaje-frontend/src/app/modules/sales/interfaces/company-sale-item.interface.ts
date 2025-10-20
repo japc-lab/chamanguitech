@@ -5,7 +5,8 @@ export interface ICompanySaleItemModel {
   style: SaleStyleEnum;
   class: string;
   size: string;
-  pounds: number;
+  unit: string;
+  amount: number;
   price: number;
   referencePrice?: number;
   total: number;

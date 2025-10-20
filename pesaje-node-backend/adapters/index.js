@@ -1,4 +1,4 @@
-const { User, Role, Broker, Merchant, Fisherman, PaymentInfo, Person, RolePermission, Option, Client, ShrimpFarm, Period, SizePrice, Company, Size, Purchase, PaymentMethod, PurchasePaymentMethod, Logistics, LogisticsItem, LogisticsPayment, Sale, CompanySale, CompanySaleItem, CompanySalePaymentMethod, LocalSale, LocalSaleDetail, LocalSaleDetailItem, LocalCompanySaleDetail, LocalCompanySaleDetailItem, LocalCompanySaleDetailPayment, TotalReport, Asset } = require('../models');
+const { User, Role, Broker, Merchant, Fisherman, PaymentInfo, Person, RolePermission, Option, Client, ShrimpFarm, Period, SizePrice, Company, Size, Purchase, PaymentMethod, PurchasePaymentMethod, Logistics, LogisticsItem, LogisticsPayment, Sale, CompanySale, CompanySaleItem, CompanySaleWholeDetail, CompanySaleTailDetail, CompanySalePaymentMethod, LocalSale, LocalSaleDetail, LocalSaleDetailItem, LocalCompanySaleDetail, LocalCompanySaleDetailItem, LocalCompanySaleDetailPayment, TotalReport, Asset } = require('../models');
 const MongooseGenericAdapter = require('./mongoose-generic-adapter');
 
 // If you have another adapter (e.g., PostgreSQL):
@@ -7,7 +7,7 @@ const MongooseGenericAdapter = require('./mongoose-generic-adapter');
 // Dynamically select the database
 const dbType = process.env.DB_TYPE || 'mongo';
 
-let userAdapter, personAdapter, brokerAdapter, merchantAdapter, fishermanAdapter, paymentInfoAdapter, roleAdapter, companyAdapter, sizeAdapter, rolePermissionAdapter, optionAdapter, clientAdapter, shrimpFarmAdapter, periodAdapter, sizePriceAdapter, purchaseAdapter, paymentMethodAdapter, purchasePaymentMethodAdapter, logisticsAdapter, logisticsItemAdapter, logisticsPaymentAdapter, saleAdapter, companySaleAdapter, companySaleItemAdapter, companySalePaymentMethodAdapter, localSaleAdapter, localSaleDetailAdapter, localSaleDetailItemAdapter, localCompanySaleDetailAdapter, localCompanySaleDetailItemAdapter, localCompanySaleDetailPaymentAdapter, totalReportAdapter, assetAdapter;
+let userAdapter, personAdapter, brokerAdapter, merchantAdapter, fishermanAdapter, paymentInfoAdapter, roleAdapter, companyAdapter, sizeAdapter, rolePermissionAdapter, optionAdapter, clientAdapter, shrimpFarmAdapter, periodAdapter, sizePriceAdapter, purchaseAdapter, paymentMethodAdapter, purchasePaymentMethodAdapter, logisticsAdapter, logisticsItemAdapter, logisticsPaymentAdapter, saleAdapter, companySaleAdapter, companySaleItemAdapter, companySaleWholeDetailAdapter, companySaleTailDetailAdapter, companySalePaymentMethodAdapter, localSaleAdapter, localSaleDetailAdapter, localSaleDetailItemAdapter, localCompanySaleDetailAdapter, localCompanySaleDetailItemAdapter, localCompanySaleDetailPaymentAdapter, totalReportAdapter, assetAdapter;
 
 if (dbType === 'mongo') {
     userAdapter = new MongooseGenericAdapter(User, ['person', 'roles']); // Populate person & roles
@@ -34,6 +34,8 @@ if (dbType === 'mongo') {
     saleAdapter = new MongooseGenericAdapter(Sale);
     companySaleAdapter = new MongooseGenericAdapter(CompanySale);
     companySaleItemAdapter = new MongooseGenericAdapter(CompanySaleItem);
+    companySaleWholeDetailAdapter = new MongooseGenericAdapter(CompanySaleWholeDetail);
+    companySaleTailDetailAdapter = new MongooseGenericAdapter(CompanySaleTailDetail);
     companySalePaymentMethodAdapter = new MongooseGenericAdapter(CompanySalePaymentMethod);
     localSaleAdapter = new MongooseGenericAdapter(LocalSale);
     localSaleDetailAdapter = new MongooseGenericAdapter(LocalSaleDetail);
@@ -51,4 +53,4 @@ if (dbType === 'mongo') {
 //     throw new Error(`Unsupported DB_TYPE: ${dbType}`);
 // }
 
-module.exports = { userAdapter, personAdapter, brokerAdapter, merchantAdapter, fishermanAdapter, paymentInfoAdapter, roleAdapter, companyAdapter, sizeAdapter, rolePermissionAdapter, optionAdapter, clientAdapter, shrimpFarmAdapter, periodAdapter, sizePriceAdapter, purchaseAdapter, paymentMethodAdapter, purchasePaymentMethodAdapter, logisticsAdapter, logisticsItemAdapter, logisticsPaymentAdapter, saleAdapter, companySaleAdapter, companySaleItemAdapter, companySalePaymentMethodAdapter, localSaleAdapter, localSaleDetailAdapter, localSaleDetailItemAdapter, localCompanySaleDetailAdapter, localCompanySaleDetailItemAdapter, localCompanySaleDetailPaymentAdapter, totalReportAdapter, assetAdapter };
+module.exports = { userAdapter, personAdapter, brokerAdapter, merchantAdapter, fishermanAdapter, paymentInfoAdapter, roleAdapter, companyAdapter, sizeAdapter, rolePermissionAdapter, optionAdapter, clientAdapter, shrimpFarmAdapter, periodAdapter, sizePriceAdapter, purchaseAdapter, paymentMethodAdapter, purchasePaymentMethodAdapter, logisticsAdapter, logisticsItemAdapter, logisticsPaymentAdapter, saleAdapter, companySaleAdapter, companySaleItemAdapter, companySaleWholeDetailAdapter, companySaleTailDetailAdapter, companySalePaymentMethodAdapter, localSaleAdapter, localSaleDetailAdapter, localSaleDetailItemAdapter, localCompanySaleDetailAdapter, localCompanySaleDetailItemAdapter, localCompanySaleDetailPaymentAdapter, totalReportAdapter, assetAdapter };

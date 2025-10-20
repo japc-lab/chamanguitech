@@ -108,7 +108,8 @@ const getById = async (id) => {
                 style: item.style,
                 class: item.class,
                 size: item.size,
-                pounds: item.pounds,
+                unit: item.unit,
+                amount: item.amount,
                 price: item.price,
                 referencePrice: item.referencePrice,
                 total: item.total,
@@ -127,7 +128,8 @@ const getById = async (id) => {
                 style: item.style,
                 class: item.class,
                 size: item.size,
-                pounds: item.pounds,
+                unit: item.unit,
+                amount: item.amount,
                 price: item.price,
                 referencePrice: item.referencePrice,
                 total: item.total,
@@ -207,7 +209,8 @@ const getBySaleId = async (saleId) => {
                 style: item.style,
                 class: item.class,
                 size: item.size,
-                pounds: item.pounds,
+                unit: item.unit,
+                amount: item.amount,
                 price: item.price,
                 referencePrice: item.referencePrice,
                 total: item.total,
@@ -226,7 +229,8 @@ const getBySaleId = async (saleId) => {
                 style: item.style,
                 class: item.class,
                 size: item.size,
-                pounds: item.pounds,
+                unit: item.unit,
+                amount: item.amount,
                 price: item.price,
                 referencePrice: item.referencePrice,
                 total: item.total,
@@ -298,8 +302,10 @@ const update = async (id, data) => {
             if (wholeDetailId) {
                 // Update existing whole detail - remove old items and create new ones
                 const existingWholeDetail = await dbAdapter.companySaleWholeDetailAdapter.getById(wholeDetailId);
-                for (const itemId of existingWholeDetail.items) {
-                    await dbAdapter.companySaleItemAdapter.removePermanently(itemId);
+                if (existingWholeDetail && existingWholeDetail.items) {
+                    for (const itemId of existingWholeDetail.items) {
+                        await dbAdapter.companySaleItemAdapter.removePermanently(itemId, { session: transaction.session });
+                    }
                 }
 
                 const wholeItemIds = [];
@@ -329,10 +335,12 @@ const update = async (id, data) => {
         } else if (wholeDetailId) {
             // Delete existing whole detail if no items provided
             const existingWholeDetail = await dbAdapter.companySaleWholeDetailAdapter.getById(wholeDetailId);
-            for (const itemId of existingWholeDetail.items) {
-                await dbAdapter.companySaleItemAdapter.removePermanently(itemId);
+            if (existingWholeDetail && existingWholeDetail.items) {
+                for (const itemId of existingWholeDetail.items) {
+                    await dbAdapter.companySaleItemAdapter.removePermanently(itemId, { session: transaction.session });
+                }
             }
-            await dbAdapter.companySaleWholeDetailAdapter.removePermanently(wholeDetailId);
+            await dbAdapter.companySaleWholeDetailAdapter.removePermanently(wholeDetailId, { session: transaction.session });
             wholeDetailId = null;
         }
 
@@ -341,8 +349,10 @@ const update = async (id, data) => {
             if (tailDetailId) {
                 // Update existing tail detail - remove old items and create new ones
                 const existingTailDetail = await dbAdapter.companySaleTailDetailAdapter.getById(tailDetailId);
-                for (const itemId of existingTailDetail.items) {
-                    await dbAdapter.companySaleItemAdapter.removePermanently(itemId);
+                if (existingTailDetail && existingTailDetail.items) {
+                    for (const itemId of existingTailDetail.items) {
+                        await dbAdapter.companySaleItemAdapter.removePermanently(itemId, { session: transaction.session });
+                    }
                 }
 
                 const tailItemIds = [];
@@ -372,10 +382,12 @@ const update = async (id, data) => {
         } else if (tailDetailId) {
             // Delete existing tail detail if no items provided
             const existingTailDetail = await dbAdapter.companySaleTailDetailAdapter.getById(tailDetailId);
-            for (const itemId of existingTailDetail.items) {
-                await dbAdapter.companySaleItemAdapter.removePermanently(itemId);
+            if (existingTailDetail && existingTailDetail.items) {
+                for (const itemId of existingTailDetail.items) {
+                    await dbAdapter.companySaleItemAdapter.removePermanently(itemId, { session: transaction.session });
+                }
             }
-            await dbAdapter.companySaleTailDetailAdapter.removePermanently(tailDetailId);
+            await dbAdapter.companySaleTailDetailAdapter.removePermanently(tailDetailId, { session: transaction.session });
             tailDetailId = null;
         }
 

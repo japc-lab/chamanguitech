@@ -284,13 +284,13 @@
 
 <!-- Fourth Section: Company Sale Details -->
 <!-- Whole Detail -->
-<app-company-sale-whole-detail *ngIf="purchaseModel?.period?.id" [wholeDetail]="wholeDetail"
-  [periodId]="purchaseModel.period.id" (wholeDetailChange)="handleWholeDetailChange($event)">
+<app-company-sale-whole-detail [wholeDetail]="wholeDetail" [periodId]="purchaseModel.period.id"
+  (wholeDetailChange)="handleWholeDetailChange($event)">
 </app-company-sale-whole-detail>
 
 <!-- Tail Detail -->
-<app-company-sale-tail-detail *ngIf="purchaseModel?.period?.id" [tailDetail]="tailDetail"
-  [periodId]="purchaseModel.period.id" (tailDetailChange)="handleTailDetailChange($event)">
+<app-company-sale-tail-detail [tailDetail]="tailDetail" [periodId]="purchaseModel.period.id"
+  (tailDetailChange)="handleTailDetailChange($event)">
 </app-company-sale-tail-detail>
 
 <!-- Submit Button inside card footer -->

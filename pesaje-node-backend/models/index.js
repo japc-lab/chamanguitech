@@ -51,6 +51,8 @@ const LogisticsPayment = require(`${logisticsModelsPath}/logistics-payment`);
 const Sale = require(`${saleModelsPath}/sale`);
 const CompanySale = require(`${saleModelsPath}/company-sale`);
 const CompanySaleItem = require(`${saleModelsPath}/company-sale-item`);
+const CompanySaleWholeDetail = require(`${saleModelsPath}/company-sale-whole-detail`);
+const CompanySaleTailDetail = require(`${saleModelsPath}/company-sale-tail-detail`);
 const CompanySalePaymentMethod = require(`${saleModelsPath}/company-sale-payment-method`);
 const LocalSale = require(`${saleModelsPath}/local-sale`);
 const LocalSaleDetail = require(`${saleModelsPath}/local-sale-detail`);
@@ -94,6 +96,8 @@ module.exports = {
     Sale,
     CompanySale,
     CompanySaleItem,
+    CompanySaleWholeDetail,
+    CompanySaleTailDetail,
     CompanySalePaymentMethod,
     LocalSale,
     LocalSaleDetail,

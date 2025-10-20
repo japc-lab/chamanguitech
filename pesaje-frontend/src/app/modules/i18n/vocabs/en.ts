@@ -120,6 +120,8 @@ export const locale = {
       SALE_LIMIT_REACHED: 'A sale has already been created for this purchase.',
       INCOMPLETE_TOTAL_REPORT_INFO:
         'The information for the report is incomplete. Please check the purchase, sale, or logistics information.',
+      COMPANY_SALE_REQUIRED_FIELDS:
+        'Please complete all required fields in the sale details.',
     },
     SUCCESS: {
       TITLE: 'Success!',
