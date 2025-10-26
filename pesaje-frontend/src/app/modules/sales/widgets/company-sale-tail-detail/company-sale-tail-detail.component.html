@@ -27,19 +27,19 @@
 
         <div class="card-body">
           <div class="row g-3">
-            <div class="col-md-3">
+            <div class="col-md-4">
               <label for="tailBatch" class="required fw-semibold fs-6 mb-2">Lote</label>
               <input type="text" id="tailBatch" name="tailBatch" [(ngModel)]="tailDetail.batch"
                 class="form-control form-control-sm" required />
             </div>
 
-            <div class="col-md-3">
+            <div class="col-md-4">
               <label for="tailSettleDate" class="required fw-semibold fs-6 mb-2">Fecha de Liquidación</label>
               <input type="date" id="tailSettleDate" name="tailSettleDate" [(ngModel)]="tailDetail.settleDate"
                 class="form-control form-control-sm" required />
             </div>
 
-            <div class="col-md-3">
+            <div class="col-md-4">
               <label for="tailPredominantSize" class="required fw-semibold fs-6 mb-2">Talla Predominante</label>
               <select [(ngModel)]="tailDetail.predominantSize" name="tailPredominantSize" id="tailPredominantSize"
                 class="form-select form-select-sm" required>
@@ -48,9 +48,10 @@
               </select>
             </div>
 
-            <div class="col-md-3">
-              <label for="receivedPoundsReported" class="required fw-semibold fs-6 mb-2">Libras Reportadas
-                Recibidas</label>
+            <div class="col-md-4">
+              <label for="receivedPoundsReported" class="required fw-semibold fs-6 mb-2">Lb recibidas con cabeza
+                reportadas por la compania
+              </label>
               <input type="number" id="receivedPoundsReported" name="receivedPoundsReported"
                 [(ngModel)]="tailDetail.receivedPoundsReported" (ngModelChange)="recalculateTotals()"
                 class="form-control form-control-sm" (keypress)="validateNumber($event)"
@@ -58,19 +59,21 @@
             </div>
 
             <div class="col-md-4">
-              <label for="totalTailPounds" class="required fw-semibold fs-6 mb-2">Total Libras Procesadas
-                S/Cabeza</label>
+              <label for="totalTailPounds" class="required fw-semibold fs-6 mb-2">Lb. Totales en cola procesadas
+              </label>
               <input type="number" id="totalTailPounds" name="totalTailPounds"
                 [(ngModel)]="tailDetail.totalTailPoundsProcessed" class="form-control form-control-sm"
                 (keypress)="validateNumber($event)" (blur)="formatDecimal('totalTailPounds')" required />
             </div>
 
             <div class="col-md-4">
-              <label for="performancePercentage" class="fw-semibold fs-6 mb-2">Rendimiento Libras Cola (%)</label>
+              <label for="performancePercentage" class="required fw-semibold fs-6 mb-2">Rendimiento Libras Cola (%)</label>
               <div class="input-group input-group-sm">
-                <input type="text" id="performancePercentage" name="performancePercentage"
-                  [value]="tailDetail.performancePercentageTailPounts | number: '1.2-2'"
-                  class="form-control form-control-sm text-end" disabled />
+                <input type="number" id="performancePercentage" name="performancePercentage"
+                  [(ngModel)]="tailDetail.performancePercentageTailPounts"
+                  class="form-control form-control-sm text-end"
+                  (keypress)="validateNumber($event)"
+                  (blur)="formatDecimal('performancePercentage')" required />
                 <span class="input-group-text">%</span>
               </div>
             </div>
@@ -171,9 +174,21 @@
               </td>
             </tr>
 
-            <!-- Totals Row -->
-            <tr class="fw-bold bg-light" *ngIf="tailDetail.items.length > 0">
-              <td colspan="5">Total General</td>
+            <!-- Subtotals by Class -->
+            <ng-container *ngFor="let className of getUniqueClasses()">
+              <tr class="fw-bold bg-light">
+                <td class="text-end" colspan="5">Subtotal Clase {{ getClassLabel(className) }}</td>
+                <td class="text-end">{{ getClassSubtotal(className).amount | number: '1.2-2' }}</td>
+                <td></td>
+                <td class="text-end">${{ getClassSubtotal(className).total | number: '1.2-2' }}</td>
+                <td class="text-end">{{ getClassSubtotal(className).percentage | number: '1.2-2' }}%</td>
+                <td></td>
+              </tr>
+            </ng-container>
+
+            <!-- Grand Total Row -->
+            <tr class="fw-bold bg-primary text-white" *ngIf="tailDetail.items.length > 0">
+              <td class="text-end" colspan="5">Total General</td>
               <td class="text-end">{{ tailDetail.poundsGrandTotal | number: '1.2-2' }}</td>
               <td></td>
               <td class="text-end">${{ tailDetail.grandTotal | number: '1.2-2' }}</td>

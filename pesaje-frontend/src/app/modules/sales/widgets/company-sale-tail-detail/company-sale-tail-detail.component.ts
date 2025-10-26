@@ -158,15 +158,6 @@ export class CompanySaleTailDetailComponent implements OnInit {
     this.tailDetail.poundsGrandTotal = Number(totalAmount.toFixed(2));
     this.tailDetail.grandTotal = Number(totalDollars.toFixed(2));
 
-    // Calculate performance percentage
-    if (this.tailDetail.receivedPoundsReported > 0) {
-      this.tailDetail.performancePercentageTailPounts = Number(
-        ((totalAmount / this.tailDetail.receivedPoundsReported) * 100).toFixed(2)
-      );
-    } else {
-      this.tailDetail.performancePercentageTailPounts = 0;
-    }
-
     this.emitChanges();
   }
 
@@ -205,6 +196,49 @@ export class CompanySaleTailDetailComponent implements OnInit {
 
   emitChanges(): void {
     this.tailDetailChange.emit(this.tailDetail);
+  }
+
+  // Get unique classes from items
+  getUniqueClasses(): string[] {
+    if (!this.tailDetail || !this.tailDetail.items) return [];
+    const classes = this.tailDetail.items
+      .map(item => item.class)
+      .filter(cls => cls && cls.trim() !== '');
+    return [...new Set(classes)];
+  }
+
+  // Get items by class
+  getItemsByClass(className: string): ICompanySaleItemModel[] {
+    if (!this.tailDetail || !this.tailDetail.items) return [];
+    return this.tailDetail.items.filter(item => item.class === className);
+  }
+
+  // Calculate subtotal for a specific class
+  getClassSubtotal(className: string): { amount: number, total: number, percentage: number } {
+    const classItems = this.getItemsByClass(className);
+    let totalAmount = 0;
+    let totalDollars = 0;
+
+    classItems.forEach(item => {
+      totalAmount += Number(item.amount || 0);
+      totalDollars += Number(item.total || 0);
+    });
+
+    const percentage = this.tailDetail && this.tailDetail.grandTotal > 0
+      ? (totalDollars / this.tailDetail.grandTotal) * 100
+      : 0;
+
+    return {
+      amount: Number(totalAmount.toFixed(2)),
+      total: Number(totalDollars.toFixed(2)),
+      percentage: Number(percentage.toFixed(2))
+    };
+  }
+
+  // Get the display label for a class type
+  getClassLabel(className: string): string {
+    const classItem = this.shrimpClassList.find(item => item.type === className);
+    return classItem ? classItem.label : className;
   }
 }
 
