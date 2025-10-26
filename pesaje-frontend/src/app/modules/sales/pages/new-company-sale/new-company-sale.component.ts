@@ -5,7 +5,10 @@ import {
   ISaleModel,
   SaleTypeEnum,
 } from './../../interfaces/sale.interface';
+import { ICompanySaleWholeDetailModel } from '../../interfaces/company-sale-whole-detail.interface';
+import { ICompanySaleTailDetailModel } from '../../interfaces/company-sale-tail-detail.interface';
 import {
+  AfterViewInit,
   ChangeDetectorRef,
   Component,
   OnDestroy,
@@ -39,18 +42,30 @@ import { FormUtilsService } from 'src/app/utils/form-utils.service';
 import { IReducedPeriodModel } from 'src/app/modules/shared/interfaces/period.interface';
 import { CompanySalePaymentListingComponent } from '../../widgets/company-sale-payment-listing/company-sale-payment-listing.component';
 import { SaleService } from '../../services/sale.service';
+import { ICompany } from 'src/app/modules/settings/interfaces/company.interfaces';
+import { CompanySaleWholeDetailComponent } from '../../widgets/company-sale-whole-detail/company-sale-whole-detail.component';
+import { CompanySaleTailDetailComponent } from '../../widgets/company-sale-tail-detail/company-sale-tail-detail.component';
+import { CompanySaleSummaryComponent } from '../../widgets/company-sale-summary/company-sale-summary.component';
 
 @Component({
   selector: 'app-new-company-sale',
   templateUrl: './new-company-sale.component.html',
   styleUrl: './new-company-sale.component.scss',
 })
-export class NewCompanySaleComponent implements OnInit, OnDestroy {
+export class NewCompanySaleComponent
+  implements OnInit, AfterViewInit, OnDestroy
+{
   PERMISSION_ROUTE = PERMISSION_ROUTES.SALES.COMPANY_SALE_FORM;
 
   private modalRef: NgbModalRef | null = null;
 
   @ViewChild('saleForm') saleForm!: NgForm;
+  @ViewChild(CompanySaleWholeDetailComponent)
+  wholeDetailComponent!: CompanySaleWholeDetailComponent;
+  @ViewChild(CompanySaleTailDetailComponent)
+  tailDetailComponent!: CompanySaleTailDetailComponent;
+  @ViewChild(CompanySaleSummaryComponent, { static: false })
+  summaryComponent!: CompanySaleSummaryComponent;
 
   isOnlyBuyer = false;
   searchSubmitted = false;
@@ -60,12 +75,8 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
   companySaleModel: ICreateUpdateCompanySaleModel;
   purchaseModel: IReducedDetailedPurchaseModel;
 
-  receptionDate: string = '';
-  receptionTime: string = '';
-  settleDate: string = '';
-  settleTime: string = '';
-
-  companySaleItems: ICompanySaleItemModel[] = [];
+  wholeDetail: ICompanySaleWholeDetailModel | null = null;
+  tailDetail: ICompanySaleTailDetailModel | null = null;
 
   saleId: string | undefined;
   companySaleId: string | undefined;
@@ -89,10 +100,6 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef
   ) {}
 
-  get saleDateFormatted(): string | null {
-    return this.dateUtils.formatISOToDateInput(this.companySaleModel.saleDate);
-  }
-
   get purchaseDateFormatted(): string | null {
     return this.dateUtils.formatISOToDateInput(this.purchaseModel.purchaseDate);
   }
@@ -113,6 +120,7 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
     this.isOnlyBuyer = this.authService.isOnlyBuyer;
 
     this.initializeModels();
+    this.companySaleModel.predominantSize = 'P';
 
     if (this.saleId) {
       const companySaleSub = this.companySaleService
@@ -128,21 +136,17 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
             this.controlNumber = companySale.purchase.controlNumber!;
             this.purchaseModel = companySale.purchase;
 
-            const { date: fetchedReceptionDate, time: fetchedReceptionTime } =
-              this.dateUtils.parseISODateTime(
-                this.companySaleModel.receptionDateTime
-              );
-            this.receptionDate = fetchedReceptionDate;
-            this.receptionTime = fetchedReceptionTime;
+            this.companySaleModel.settleDate =
+              this.dateUtils.formatISOToDateInput(companySale.settleDate);
+            this.companySaleModel.receptionDate =
+              this.dateUtils.formatISOToDateInput(companySale.receptionDate);
 
-            const { date: fetchedSettleDate, time: fetchedSettleTime } =
-              this.dateUtils.parseISODateTime(
-                this.companySaleModel.settleDateTime
-              );
-            this.settleDate = fetchedSettleDate;
-            this.settleTime = fetchedSettleTime;
+            // Load whole and tail details
+            this.wholeDetail = companySale.wholeDetail || null;
+            this.tailDetail = companySale.tailDetail || null;
 
-            this.companySaleItems = companySale.items;
+            // Initialize summary values if they exist
+            this.initializeSummary();
 
             this.cdr.detectChanges();
           },
@@ -165,6 +169,7 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
     this.purchaseModel.broker = {} as IReducedUserModel;
     this.purchaseModel.client = {} as IReducedUserModel;
     this.purchaseModel.shrimpFarm = {} as IReducedShrimpFarmModel;
+    this.purchaseModel.company = {} as ICompany;
   }
 
   confirmSave() {
@@ -178,11 +183,36 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Check if both lists are empty
-    if (!this.companySaleItems || this.companySaleItems.length === 0) {
+    // Check if at least one detail has items
+    const hasWholeItems =
+      this.wholeDetail &&
+      this.wholeDetail.items &&
+      this.wholeDetail.items.length > 0;
+    const hasTailItems =
+      this.tailDetail &&
+      this.tailDetail.items &&
+      this.tailDetail.items.length > 0;
+
+    if (!hasWholeItems && !hasTailItems) {
       this.alertService.showTranslatedAlert({
         alertType: 'info',
         messageKey: 'MESSAGES.NO_SALE_DETAILS_ENTERED',
+      });
+      return;
+    }
+
+    // Validate detail forms
+    const isWholeDetailValid = this.wholeDetailComponent
+      ? this.wholeDetailComponent.isFormValid()
+      : true;
+    const isTailDetailValid = this.tailDetailComponent
+      ? this.tailDetailComponent.isFormValid()
+      : true;
+
+    if (!isWholeDetailValid || !isTailDetailValid) {
+      this.alertService.showTranslatedAlert({
+        alertType: 'warning',
+        messageKey: 'MESSAGES.COMPANY_SALE_REQUIRED_FIELDS',
       });
       return;
     }
@@ -196,30 +226,80 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
 
   submitCompanySaleForm() {
     this.companySaleModel.purchase = this.purchaseModel.id;
-    this.companySaleModel.receptionDateTime = this.dateUtils.toISODateTime(
-      this.receptionDate,
-      this.receptionTime
-    );
-    this.companySaleModel.settleDateTime = this.dateUtils.toISODateTime(
-      this.settleDate,
-      this.settleTime
-    );
-    this.companySaleModel.items = this.companySaleItems.map(
-      ({ id, ...rest }) => rest
-    );
-    this.companySaleModel.poundsGrandTotal = this.companySaleItems.reduce(
-      (sum, item) => sum + Number(item.pounds || 0),
-      0
-    );
-    this.companySaleModel.grandTotal = Number(
-      this.companySaleItems
-        .reduce((sum, item) => sum + Number(item.total || 0), 0)
-        .toFixed(2)
-    );
-    this.companySaleModel.percentageTotal = this.companySaleItems.reduce(
-      (sum, item) => sum + Number(item.percentage || 0),
-      0
-    );
+
+    // Ensure form values are synced before capturing
+    this.cdr.detectChanges();
+
+    // Capture process summary values
+    if (this.summaryComponent) {
+      // Ensure the component form values are up to date
+      if (this.summaryComponent.summaryForm) {
+        Object.keys(this.summaryComponent.summaryForm.controls).forEach(
+          (key) => {
+            this.summaryComponent.summaryForm.controls[
+              key
+            ].updateValueAndValidity();
+          }
+        );
+      }
+
+      this.companySaleModel.summaryPoundsReceived =
+        Number(this.summaryComponent.poundsReceivedInput) || 0;
+      this.companySaleModel.summaryPerformancePercentage =
+        Number(this.summaryComponent.performancePercentageInput) || 0;
+      this.companySaleModel.summaryRetentionPercentage =
+        Number(this.summaryComponent.retentionPercentage) || 0;
+      this.companySaleModel.summaryAdditionalPenalty =
+        Number(this.summaryComponent.additionalPenalty) || 0;
+    }
+
+    // Prepare whole detail (strip IDs from items)
+    if (
+      this.wholeDetail &&
+      this.wholeDetail.items &&
+      this.wholeDetail.items.length > 0
+    ) {
+      this.companySaleModel.wholeDetail = {
+        ...this.wholeDetail,
+        items: this.wholeDetail.items.map(({ id, ...rest }) => rest),
+      };
+    } else {
+      this.companySaleModel.wholeDetail = undefined as any;
+    }
+
+    // Prepare tail detail (strip IDs from items)
+    if (
+      this.tailDetail &&
+      this.tailDetail.items &&
+      this.tailDetail.items.length > 0
+    ) {
+      this.companySaleModel.tailDetail = {
+        ...this.tailDetail,
+        items: this.tailDetail.items.map(({ id, ...rest }) => rest),
+      };
+    } else {
+      this.companySaleModel.tailDetail = undefined as any;
+    }
+
+    // Calculate grand totals
+    let totalPounds = 0;
+
+    if (this.companySaleModel.wholeDetail) {
+      totalPounds += this.companySaleModel.wholeDetail.poundsGrandTotal || 0;
+    }
+
+    if (this.companySaleModel.tailDetail) {
+      totalPounds += this.companySaleModel.tailDetail.poundsGrandTotal || 0;
+    }
+
+    this.companySaleModel.poundsGrandTotal = Number(totalPounds.toFixed(2));
+
+    // Use netAmountToReceive as grandTotal if available, otherwise use calculated total
+    const netAmountToReceive = this.summaryComponent
+      ? this.summaryComponent.netAmountToReceive
+      : 0;
+    this.companySaleModel.grandTotal = netAmountToReceive;
+    this.companySaleModel.percentageTotal = 100; // Always 100% for combined details
 
     if (this.companySaleId) {
       this.companySaleService
@@ -239,7 +319,13 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
         .subscribe({
           next: (response) => {
             this.companySaleId = response.id; // ✅ Store the new ID for future updates
-            this.cdr.detectChanges();
+
+            // Navigate to edit URL with saleId to enable subsequent updates and payments
+            if (response.sale) {
+              this.saleId = response.sale;
+              this.router.navigate(['/sales/company', this.saleId]);
+            }
+
             this.alertService.showTranslatedAlert({ alertType: 'success' });
           },
           error: (error) => {
@@ -365,8 +451,12 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
     this.router.navigate(['/sales/list']);
   }
 
-  handleCompanySaleItemsChange(items: ICompanySaleItemModel[]) {
-    this.companySaleItems = items;
+  handleWholeDetailChange(detail: ICompanySaleWholeDetailModel | null) {
+    this.wholeDetail = detail;
+  }
+
+  handleTailDetailChange(detail: ICompanySaleTailDetailModel | null) {
+    this.tailDetail = detail;
   }
 
   onDateChange(event: any): void {
@@ -422,6 +512,27 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
 
   validateWholeNumber(event: KeyboardEvent) {
     this.inputUtils.validateWholeNumber(event);
+  }
+
+  initializeSummary(): void {
+    // Initialize summary values from summary-specific properties only
+    if (this.companySaleModel && this.summaryComponent) {
+      // Only initialize from saved summary values, not from other model properties
+      this.summaryComponent.poundsReceivedInput =
+        this.companySaleModel.summaryPoundsReceived || 0;
+      this.summaryComponent.performancePercentageInput =
+        this.companySaleModel.summaryPerformancePercentage || 0;
+      this.summaryComponent.retentionPercentage =
+        this.companySaleModel.summaryRetentionPercentage || 0;
+      this.summaryComponent.additionalPenalty =
+        this.companySaleModel.summaryAdditionalPenalty || 0;
+      this.summaryComponent.calculateSummary();
+    }
+  }
+
+  ngAfterViewInit(): void {
+    // Initialize the summary component with existing company sale data if available
+    this.initializeSummary();
   }
 
   ngOnDestroy(): void {

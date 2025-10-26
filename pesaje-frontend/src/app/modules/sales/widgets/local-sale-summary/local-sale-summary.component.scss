@@ -22,39 +22,6 @@
   }
 }
 
-// Color coding for different shrimp categories
-.table-warning {
-  background-color: rgba(255, 193, 7, 0.1) !important;
-
-  th {
-    background-color: rgba(255, 193, 7, 0.2) !important;
-  }
-}
-
-.table-info {
-  background-color: rgba(13, 202, 240, 0.1) !important;
-
-  th {
-    background-color: rgba(13, 202, 240, 0.2) !important;
-  }
-}
-
-.table-success {
-  background-color: rgba(25, 135, 84, 0.1) !important;
-
-  th {
-    background-color: rgba(25, 135, 84, 0.2) !important;
-  }
-}
-
-.table-secondary {
-  background-color: rgba(108, 117, 125, 0.1) !important;
-
-  th {
-    background-color: rgba(108, 117, 125, 0.2) !important;
-  }
-}
-
 .table-light {
   background-color: rgba(248, 249, 250, 0.8) !important;
 
@@ -89,27 +56,11 @@
     background-color: #ffc107;
     color: #000;
   }
-}
 
-// Text alignment and formatting
-.text-end {
-  text-align: right !important;
-}
-
-.text-center {
-  text-align: center !important;
-}
-
-.fw-bold {
-  font-weight: 700 !important;
-}
-
-.fw-semibold {
-  font-weight: 600 !important;
-}
-
-.fs-5 {
-  font-size: 1.25rem !important;
+  &.badge-danger {
+    background-color: #dc3545;
+    color: white;
+  }
 }
 
 // Responsive table
@@ -137,20 +88,6 @@
 // Hover effects
 .table-hover tbody tr:hover {
   background-color: rgba(0, 0, 0, 0.05);
-}
-
-// Special styling for financial summary header
-.table thead th.table-warning,
-.table thead th.table-info,
-.table thead th.table-success {
-  color: #000;
-  font-weight: 700;
-}
-
-// Net amount styling
-.text-success {
-  color: #198754 !important;
-  font-weight: 700;
 }
 
 // Color styles for category headers

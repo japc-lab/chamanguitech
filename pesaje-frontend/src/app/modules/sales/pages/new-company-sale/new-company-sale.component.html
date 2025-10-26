@@ -97,6 +97,20 @@
         <input type="text" id="transportationMethod" name="transportationMethod" class="form-control form-control-sm"
           [(ngModel)]="transportationMethod" disabled />
       </div>
+
+      <!-- Company Name -->
+      <div class="col-md-6">
+        <label for="companyName" class="fw-semibold fs-6 mb-2">Nombre de la Compañía</label>
+        <input type="text" id="companyName" name="companyName" class="form-control form-control-sm"
+          [(ngModel)]="purchaseModel.company.name" disabled />
+      </div>
+
+      <!-- Weight Sheet Number -->
+      <div class="col-md-6">
+        <label for="weightSheetNumber" class="fw-semibold fs-6 mb-2">Número de hoja de peso</label>
+        <input type="text" id="weightSheetNumber" name="weightSheetNumber" class="form-control form-control-sm"
+          [(ngModel)]="purchaseModel.weightSheetNumber" disabled />
+      </div>
     </div>
   </div>
 </div>
@@ -120,28 +134,6 @@
       <!-- begin::Row -->
       <div class="row g-5 g-xl-8">
 
-        <!-- Sale Date -->
-        <div class="col-md-4">
-          <label for="saleDate" class="required fw-semibold fs-6 mb-2">Fecha de venta</label>
-          <input type="date" class="form-control form-control-sm" id="saleDate" name="saleDate"
-            [ngModel]="saleDateFormatted" (ngModelChange)="onDateChange($event)" required #saleDate="ngModel">
-          <div *ngIf="(saleForm.submitted || saleDate.dirty || saleDate.touched) && saleDate.errors?.['required']"
-            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-            <div>La fecha de venta es obligatoria.</div>
-          </div>
-        </div>
-
-        <!-- Document -->
-        <div class="col-md-4">
-          <label for="document" class="required fw-semibold fs-6 mb-2">Documento</label>
-          <input type="text" id="document" name="document" [(ngModel)]="companySaleModel.document" #document="ngModel"
-            class="form-control form-control-sm" required />
-          <div *ngIf="(saleForm.submitted || document.dirty || document.touched) && document.errors?.['required']"
-            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-            El documento es obligatorio.
-          </div>
-        </div>
-
         <!-- Batch -->
         <div class="col-md-4">
           <label for="batch" class="required fw-semibold fs-6 mb-2">Lote</label>
@@ -154,7 +146,7 @@
         </div>
 
         <!-- Provider -->
-        <div class="col-md-4">
+        <div class="col-md-8">
           <label for="provider" class="required fw-semibold fs-6 mb-2">Proveedor</label>
           <input type="text" id="provider" name="provider" [(ngModel)]="companySaleModel.provider" #provider="ngModel"
             class="form-control form-control-sm" required />
@@ -164,31 +156,11 @@
           </div>
         </div>
 
-        <!-- NP -->
-        <div class="col-md-4">
-          <label for="np" class="fw-semibold fs-6 mb-2">NP</label>
-          <input type="text" id="np" name="np" [(ngModel)]="companySaleModel.np" #np="ngModel"
-            class="form-control form-control-sm" />
-        </div>
-
-        <!-- Serial Number -->
-        <div class="col-md-4">
-          <label for="serialNumber" class="required fw-semibold fs-6 mb-2">Serie</label>
-          <input type="text" id="serialNumber" name="serialNumber" [(ngModel)]="companySaleModel.serialNumber"
-            #serialNumber="ngModel" class="form-control form-control-sm" required
-            (keypress)="validateWholeNumber($event)" />
-          <div
-            *ngIf="(saleForm.submitted || serialNumber.dirty || serialNumber.touched) && serialNumber.errors?.['required']"
-            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-            El número de serie es obligatorio.
-          </div>
-        </div>
-
         <!-- Reception Date -->
         <div class="col-md-6">
           <label for="receptionDate" class="required fw-semibold fs-6 mb-2">Fecha de recepción</label>
           <input type="date" class="form-control form-control-sm" id="receptionDate" name="receptionDate"
-            [(ngModel)]="receptionDate" #receptionDateField="ngModel" required>
+            [(ngModel)]="companySaleModel.receptionDate" #receptionDateField="ngModel" required>
           <div
             *ngIf="(saleForm.submitted || receptionDateField.dirty || receptionDateField.touched) && receptionDateField.errors?.['required']"
             class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
@@ -196,27 +168,38 @@
           </div>
         </div>
 
-        <!-- Reception Time -->
+        <!-- Settle Date -->
         <div class="col-md-6">
-          <label for="receptionTime" class="required fw-semibold fs-6 mb-2">Hora de recepción</label>
-          <input type="time" class="form-control form-control-sm" [(ngModel)]="receptionTime" id="receptionTime"
-            name="receptionTime" #receptionTimeField="ngModel" required>
+          <label for="settleDate" class="required fw-semibold fs-6 mb-2">Fecha de liquidación</label>
+          <input type="date" class="form-control form-control-sm" id="settleDate" name="settleDate"
+            [(ngModel)]="companySaleModel.settleDate" #settleDateField="ngModel" required>
           <div
-            *ngIf="(saleForm.submitted || receptionTimeField.dirty || receptionTimeField.touched) && receptionTimeField.errors?.['required']"
+            *ngIf="(saleForm.submitted || settleDateField.dirty || settleDateField.touched) && settleDateField.errors?.['required']"
             class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-            La hora de recepción es obligatoria.
+            La fecha de liquidación es obligatoria.
           </div>
         </div>
 
-        <!-- Batch Average Gram -->
-        <div class="col-md-4">
-          <label for="batchAverageGram" class="required fw-semibold fs-6 mb-2">Gr. Promedio Lote</label>
-          <input type="text" id="batchAverageGram" name="batchAverageGram"
-            [(ngModel)]="companySaleModel.batchAverageGram" #batchAverageGram="ngModel"
-            class="form-control form-control-sm" required (keypress)="validateNumber($event)"
-            (blur)="formatDecimal('batchAverageGram')" />
+        <!-- Weight Sheet Number -->
+        <div class="col-md-6">
+          <label for="weightSheetNumber" class="required fw-semibold fs-6 mb-2">Número de hoja de peso</label>
+          <input type="text" id="weightSheetNumber" name="weightSheetNumber"
+            [(ngModel)]="companySaleModel.weightSheetNumber" #weightSheetNumber="ngModel"
+            class="form-control form-control-sm" required>
           <div
-            *ngIf="(saleForm.submitted || batchAverageGram.dirty || batchAverageGram.touched) && batchAverageGram.errors?.['required']"
+            *ngIf="(saleForm.submitted || weightSheetNumber.dirty || weightSheetNumber.touched) && weightSheetNumber.errors?.['required']"
+            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+            El campo es obligatorio.
+          </div>
+        </div>
+
+        <!-- Predominant Size -->
+        <div class="col-md-6">
+          <label for="predominantSize" class="required fw-semibold fs-6 mb-2">Talla Predominante</label>
+          <input type="text" id="predominantSize" name="predominantSize" [(ngModel)]="companySaleModel.predominantSize"
+            #predominantSize="ngModel" class="form-control form-control-sm" required disabled />
+          <div
+            *ngIf="(saleForm.submitted || predominantSize.dirty || predominantSize.touched) && predominantSize.errors?.['required']"
             class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
             El campo es obligatorio.
           </div>
@@ -230,7 +213,7 @@
             class="form-control form-control-sm" required (keypress)="validateNumber($event)"
             (blur)="formatDecimal('wholeReceivedPounds')" />
           <div
-            *ngIf="(saleForm.submitted || batchAverageGram.dirty || batchAverageGram.touched) && batchAverageGram.errors?.['required']"
+            *ngIf="(saleForm.submitted || wholeReceivedPounds.dirty || wholeReceivedPounds.touched) && wholeReceivedPounds.errors?.['required']"
             class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
             El campo es obligatorio.
           </div>
@@ -264,7 +247,7 @@
         </div>
 
         <!-- Processed Pounds -->
-        <div class="col-md-4">
+        <div class="col-md-6">
           <label for="processedPounds" class="required fw-semibold fs-6 mb-2">Libras Procesadas</label>
           <input type="text" id="processedPounds" name="processedPounds" [(ngModel)]="companySaleModel.processedPounds"
             #processedPounds="ngModel" class="form-control form-control-sm" required (keypress)="validateNumber($event)"
@@ -277,7 +260,7 @@
         </div>
 
         <!-- Performance -->
-        <div class="col-md-4">
+        <div class="col-md-6">
           <label for="performance" class="required fw-semibold fs-6 mb-2">Rendimiento</label>
           <div class="input-group input-group-sm">
             <input type="text" id="performance" name="performance" [(ngModel)]="companySaleModel.performance"
@@ -292,30 +275,6 @@
           </div>
         </div>
 
-        <!-- Settle Date -->
-        <div class="col-md-6">
-          <label for="settleDate" class="required fw-semibold fs-6 mb-2">Fecha de liquidación</label>
-          <input type="date" class="form-control form-control-sm" id="settleDate" name="settleDate"
-            [(ngModel)]="settleDate" #settleDateField="ngModel" required>
-          <div
-            *ngIf="(saleForm.submitted || settleDateField.dirty || settleDateField.touched) && settleDateField.errors?.['required']"
-            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-            La fecha de liquidación es obligatoria.
-          </div>
-        </div>
-
-        <!-- Settle Time -->
-        <div class="col-md-6">
-          <label for="settleTime" class="required fw-semibold fs-6 mb-2">Hora de liquidación</label>
-          <input type="time" class="form-control form-control-sm" [(ngModel)]="settleTime" id="settleTime"
-            name="settleTime" #settleTimeField="ngModel" required>
-          <div
-            *ngIf="(saleForm.submitted || settleTimeField.dirty || settleTimeField.touched) && settleTimeField.errors?.['required']"
-            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-            La hora de liquidación es obligatoria.
-          </div>
-        </div>
-
       </div>
     </div>
   </div>
@@ -323,13 +282,24 @@
 </form>
 <!-- end::Sale Form -->
 
-<!-- Fourth Section: Company Sale Items -->
-<div>
-  <app-company-sale-items-listing *ngIf="!isAddingPayment" [periodId]="purchaseModel.period.id"
-    [companySaleItems]="companySaleItems" [canAddItems]="!!purchaseModel.period.id"
-    (companySaleItemsChange)="handleCompanySaleItemsChange($event)" />
+<!-- Fourth Section: Company Sale Details -->
+<!-- Whole Detail -->
+<app-company-sale-whole-detail [wholeDetail]="wholeDetail" [periodId]="purchaseModel.period.id"
+  (wholeDetailChange)="handleWholeDetailChange($event)">
+</app-company-sale-whole-detail>
 
-  <!-- Submit Button inside card footer -->
+<!-- Tail Detail -->
+<app-company-sale-tail-detail [tailDetail]="tailDetail" [periodId]="purchaseModel.period.id"
+  (tailDetailChange)="handleTailDetailChange($event)">
+</app-company-sale-tail-detail>
+
+<!-- Summary -->
+<app-company-sale-summary [purchaseModel]="purchaseModel" [companySaleModel]="companySaleModel"
+  [wholeDetail]="wholeDetail" [tailDetail]="tailDetail">
+</app-company-sale-summary>
+
+<!-- Submit Button inside card footer -->
+<div class="card card-xl-stretch mb-xl-8 mt-2">
   <div class="card-footer d-flex justify-content-end py-6 px-9">
     <button *ngIf="canSaveCompanySale()" type="button" class="btn btn-primary" (click)="confirmSave()">
       Guardar
@@ -341,4 +311,4 @@
     </button>
   </div>
 </div>
-<!-- end::Fourth Section: Company Sale Items -->
+<!-- end::Fourth Section: Company Sale Details -->

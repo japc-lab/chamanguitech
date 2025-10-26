@@ -1,0 +1,130 @@
+<!-- Company Sale Process Summary Table -->
+<div class="card card-xl-stretch mb-xl-8">
+  <div class="card-header border-0 pt-5">
+    <h4 class="card-title align-items-start flex-column">
+      <span class="card-label fw-bolder fs-3 mb-1">Resumen de Venta Compañía</span>
+    </h4>
+  </div>
+  <div class="card-body py-3">
+    <form #processSummaryForm="ngForm">
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+        <tbody>
+          <!-- Header Row -->
+          <tr>
+            <td colspan="2" class="fw-semibold orange-color text-center">CAMARÓN ENTERO</td>
+            <td colspan="2" class="fw-semibold blue-color text-center">CAMARÓN EN COLA</td>
+          </tr>
+
+          <!-- Process Data Rows -->
+          <tr>
+            <td class="fw-semibold orange-color">Libras de camarón compradas</td>
+            <td class="text-center orange-color">{{ poundsBought | number: '1.2-2' }}</td>
+            <td class="fw-semibold blue-color">Libras de cola calculadas</td>
+            <td class="text-center blue-color">{{ tailReceivedPoundsReported | number: '1.2-2' }}</td>
+          </tr>
+
+          <tr>
+            <td class="fw-semibold orange-color">Libras de camarón recibidas</td>
+            <td class="orange-color">
+              <input type="number" [(ngModel)]="poundsReceivedInput" name="poundsReceivedInput"
+                class="form-control form-control-sm"
+                (ngModelChange)="calculateSummary()"
+                (keypress)="validateNumber($event)"
+                (blur)="formatDecimal('poundsReceivedInput')" />
+            </td>
+            <td class="fw-semibold blue-color">Libras de camarón cola procesadas</td>
+            <td class="text-center blue-color">{{ tailTotalPoundsProcessed | number: '1.2-2' }}</td>
+          </tr>
+
+          <tr>
+            <td class="fw-semibold orange-color">Diferencia</td>
+            <td class="text-center orange-color">{{ difference | number: '1.2-2' }}</td>
+            <td class="fw-semibold blue-color">Rendimiento (%)</td>
+            <td class="text-center blue-color">{{ tailPerformancePercentage | number: '1.2-2' }}%</td>
+          </tr>
+
+          <tr>
+            <td class="fw-semibold orange-color">Libras de Basura</td>
+            <td class="text-center orange-color">{{ trashPounds | number: '1.2-2' }}</td>
+            <td class="fw-semibold blue-color">Libras de camarón entero a cola</td>
+            <td class="text-center blue-color">{{ tailReceivedPoundsReported | number: '1.2-2' }}</td>
+          </tr>
+
+          <tr>
+            <td class="fw-semibold orange-color">Libras para proceso de entero</td>
+            <td class="text-center orange-color">{{ poundsForWholeProcess | number: '1.2-2' }}</td>
+            <td colspan="2" class="blue-color"></td>
+          </tr>
+
+          <tr>
+            <td class="fw-semibold orange-color">Rendimiento (%)</td>
+            <td class="orange-color">
+              <input type="number" [(ngModel)]="performancePercentageInput" name="performancePercentageInput"
+                class="form-control form-control-sm"
+                (ngModelChange)="calculateSummary()"
+                (keypress)="validateNumber($event)"
+                (blur)="formatDecimal('performancePercentageInput')" />
+            </td>
+            <td colspan="2" class="blue-color"></td>
+          </tr>
+
+          <!-- Financial Summary Section -->
+          <tr class="table-light">
+            <td colspan="4" class="text-center fw-bold fs-5">Tabla resumen financiero</td>
+          </tr>
+
+          <!-- Subtotals -->
+          <tr>
+            <td class="fw-semibold orange-color">Subtotal camarón entero ($)</td>
+            <td class="text-end orange-color">${{ wholeSubtotal | number: '1.2-2' }}</td>
+            <td class="fw-semibold blue-color">Precio promedio de compra ($)</td>
+            <td class="text-end blue-color">${{ averagePurchasePrice | number: '1.2-2' }}</td>
+          </tr>
+
+          <tr>
+            <td class="fw-semibold orange-color">Subtotal camarón en cola ($)</td>
+            <td class="text-end orange-color">${{ tailSubtotal | number: '1.2-2' }}</td>
+            <td class="fw-semibold blue-color">Precio promedio de empacadora ($)</td>
+            <td class="text-end blue-color">${{ averagePackingPrice | number: '1.2-2' }}</td>
+          </tr>
+
+          <tr>
+            <td class="fw-semibold orange-color">Total general ($)</td>
+            <td class="text-end orange-color">${{ grandTotal | number: '1.2-2' }}</td>
+            <td class="fw-semibold blue-color">Retención (%)</td>
+            <td class="blue-color">
+              <input type="number" [(ngModel)]="retentionPercentage" name="retentionPercentage"
+                class="form-control form-control-sm"
+                (ngModelChange)="calculateSummary()"
+                (keypress)="validateNumber($event)"
+                (blur)="formatDecimal('retentionPercentage')" />
+            </td>
+          </tr>
+
+          <tr>
+            <td class="fw-semibold orange-color">Retención ($)</td>
+            <td class="text-end orange-color">${{ retentionAmount | number: '1.2-2' }}</td>
+            <td class="fw-semibold blue-color">Castigo o descuento adicional ($)</td>
+            <td class="blue-color">
+              <input type="number" [(ngModel)]="additionalPenalty" name="additionalPenalty"
+                class="form-control form-control-sm"
+                (ngModelChange)="calculateSummary()"
+                (keypress)="validateNumber($event)"
+                (blur)="formatDecimal('additionalPenalty')" />
+            </td>
+          </tr>
+
+          <!-- Net Amount Row -->
+          <tr class="table-primary">
+            <td class="fw-bold fs-5">Valor neto a recibir ($)</td>
+            <td colspan="3" class="text-center fw-bold fs-5 text-success">
+              ${{ netAmountToReceive | number: '1.2-2' }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    </form>
+  </div>
+</div>

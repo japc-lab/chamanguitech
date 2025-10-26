@@ -8,10 +8,6 @@ const CompanySaleSchema = Schema({
     ref: 'Sale',
     required: true
   },
-  document: {
-    type: String,
-    required: true
-  },
   batch: {
     type: String,
     required: true
@@ -20,23 +16,16 @@ const CompanySaleSchema = Schema({
     type: String,
     required: true
   },
-  np: {
+  receptionDate: {
+    type: Date,
+    required: true,
+  },
+  settleDate: {
+    type: Date,
+    required: true,
+  },
+  predominantSize: {
     type: String,
-  },
-  serialNumber: {
-    type: Number,
-    required: true
-  },
-  receptionDateTime: {
-    type: Date,
-    required: true,
-  },
-  settleDateTime: {
-    type: Date,
-    required: true,
-  },
-  batchAverageGram: {
-    type: Number,
     required: true,
   },
   wholeReceivedPounds: {
@@ -59,11 +48,6 @@ const CompanySaleSchema = Schema({
     type: Number,
     required: true,
   },
-  items: [{
-    type: Schema.Types.ObjectId,
-    ref: 'CompanySaleItem',
-    required: true
-  }],
   poundsGrandTotal: {
     type: Number,
     required: true,
@@ -83,6 +67,33 @@ const CompanySaleSchema = Schema({
     type: String,
     enum: CompanySaleStatusEnum,
     required: true,
+  },
+  wholeDetail: {
+    type: Schema.Types.ObjectId,
+    ref: 'CompanySaleWholeDetail',
+  },
+  tailDetail: {
+    type: Schema.Types.ObjectId,
+    ref: 'CompanySaleTailDetail',
+  },
+  summaryPoundsReceived: {
+    type: Number,
+    required: true,
+    min: 0
+  },
+  summaryPerformancePercentage: {
+    type: Number,
+    required: true,
+  },
+  summaryRetentionPercentage: {
+    type: Number,
+    required: true,
+    min: 0
+  },
+  summaryAdditionalPenalty: {
+    type: Number,
+    required: true,
+    min: 0
   },
   deletedAt: {
     type: Date,

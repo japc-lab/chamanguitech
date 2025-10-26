@@ -14,15 +14,12 @@ router.post(
     [
         validateJWT,
         check('purchase', 'Purchase ID is required').isMongoId(),
-        check('saleDate', 'Sale date is required').isISO8601(),
-        check('document', 'Document is required').notEmpty(),
+        check('weightSheetNumber').optional().notEmpty().withMessage('Weight sheet number cannot be empty'),
         check('batch', 'Batch is required').notEmpty(),
         check('provider', 'Provider is required').notEmpty(),
-        check('np').optional().notEmpty().withMessage('NP cannot be empty if provided'),
-        check('serialNumber', 'Serial number is required').isNumeric(),
-        check('receptionDateTime', 'Reception date is required').isISO8601(),
-        check('settleDateTime', 'Settle date is required').isISO8601(),
-        check('batchAverageGram', 'Batch average gram is required').isNumeric(),
+        check('receptionDate', 'Reception date is required').isISO8601(),
+        check('settleDate', 'Settle date is required').isISO8601(),
+        check('predominantSize', 'Predominant size is required').notEmpty(),
         check('wholeReceivedPounds', 'Whole received pounds is required').isNumeric(),
         check('trashPounds', 'Trash pounds is required').isNumeric(),
         check('netReceivedPounds', 'Net received pounds is required').isNumeric(),
@@ -32,19 +29,38 @@ router.post(
         check('grandTotal', 'Price grand total is required').isNumeric(),
         check('percentageTotal', 'Percentage total is required').isNumeric(),
 
-        // 🔹 Items array and subfields
-        check('items', 'Items must be a non-empty array').isArray({ min: 1 }),
-        check('items.*.style')
-            .notEmpty()
-            .withMessage('Style is required')
+        // WholeDetail validation (optional)
+        check('wholeDetail').optional().isObject().withMessage('WholeDetail must be an object'),
+        check('wholeDetail.items').optional().isArray().withMessage('WholeDetail items must be an array'),
+        check('wholeDetail.items.*.style')
+            .optional()
             .isIn(Object.values(SaleStyleEnum))
             .withMessage(`Style must be one of: ${Object.values(SaleStyleEnum).join(', ')}`),
-        check('items.*.class', 'Class is required').notEmpty(),
-        check('items.*.size', 'Size is required').notEmpty(),
-        check('items.*.pounds', 'Pounds must be a number').isNumeric(),
-        check('items.*.price', 'Price must be a number').isNumeric(),
-        check('items.*.total', 'Total must be a number').isNumeric(),
-        check('items.*.percentage', 'Percentage must be a number').isNumeric(),
+        check('wholeDetail.items.*.class').optional().notEmpty().withMessage('Class is required'),
+        check('wholeDetail.items.*.size').optional().notEmpty().withMessage('Size is required'),
+        check('wholeDetail.items.*.pounds').optional().isNumeric().withMessage('Pounds must be a number'),
+        check('wholeDetail.items.*.price').optional().isNumeric().withMessage('Price must be a number'),
+        check('wholeDetail.items.*.total').optional().isNumeric().withMessage('Total must be a number'),
+        check('wholeDetail.items.*.percentage').optional().isNumeric().withMessage('Percentage must be a number'),
+
+        // TailDetail validation (optional)
+        check('tailDetail').optional().isObject().withMessage('TailDetail must be an object'),
+        check('tailDetail.items').optional().isArray().withMessage('TailDetail items must be an array'),
+        check('tailDetail.items.*.style')
+            .optional()
+            .isIn(Object.values(SaleStyleEnum))
+            .withMessage(`Style must be one of: ${Object.values(SaleStyleEnum).join(', ')}`),
+        check('tailDetail.items.*.class').optional().notEmpty().withMessage('Class is required'),
+        check('tailDetail.items.*.size').optional().notEmpty().withMessage('Size is required'),
+        check('tailDetail.items.*.pounds').optional().isNumeric().withMessage('Pounds must be a number'),
+        check('tailDetail.items.*.price').optional().isNumeric().withMessage('Price must be a number'),
+        check('tailDetail.items.*.total').optional().isNumeric().withMessage('Total must be a number'),
+        check('tailDetail.items.*.percentage').optional().isNumeric().withMessage('Percentage must be a number'),
+
+        check('summaryPoundsReceived', 'Summary pounds received is required').isNumeric(),
+        check('summaryPerformancePercentage', 'Summary performance percentage is required').isNumeric(),
+        check('summaryRetentionPercentage', 'Summary retention percentage is required').isNumeric(),
+        check('summaryAdditionalPenalty', 'Summary additional penalty is required').isNumeric(),
 
         validateFields,
     ],
@@ -76,14 +92,12 @@ router.put(
     [
         validateJWT,
         check('id', 'Invalid ID').isMongoId(),
-        check('saleDate', 'Sale date is required').isISO8601(),
-        check('document', 'Document is required').notEmpty(),
+        check('weightSheetNumber').optional().notEmpty().withMessage('Weight sheet number cannot be empty'),
         check('batch', 'Batch is required').notEmpty(),
         check('provider', 'Provider is required').notEmpty(),
-        check('serialNumber', 'Serial number is required').isNumeric(),
-        check('receptionDateTime', 'Reception date is required').isISO8601(),
-        check('settleDateTime', 'Settle date is required').isISO8601(),
-        check('batchAverageGram', 'Batch average gram is required').isNumeric(),
+        check('receptionDate', 'Reception date is required').isISO8601(),
+        check('settleDate', 'Settle date is required').isISO8601(),
+        check('predominantSize', 'Predominant size is required').notEmpty(),
         check('wholeReceivedPounds', 'Whole received pounds is required').isNumeric(),
         check('trashPounds', 'Trash pounds is required').isNumeric(),
         check('netReceivedPounds', 'Net received pounds is required').isNumeric(),
@@ -92,15 +106,42 @@ router.put(
         check('poundsGrandTotal', 'Pounds grand total is required').isNumeric(),
         check('grandTotal', 'Grand total is required').isNumeric(),
         check('percentageTotal', 'Percentage total is required').isNumeric(),
-        check('items', 'Items must be a non-empty array').isArray({ min: 1 }),
-        check('items.*.style', 'Style is required').notEmpty(),
-        check('items.*.class', 'Class is required').notEmpty(),
-        check('items.*.size', 'Size is required').notEmpty(),
-        check('items.*.pounds', 'Pounds must be a number').isNumeric(),
-        check('items.*.price', 'Price must be a number').isNumeric(),
-        check('items.*.referencePrice', 'Reference price must be a number').isNumeric(),
-        check('items.*.total', 'Total must be a number').isNumeric(),
-        check('items.*.percentage', 'Percentage must be a number').isNumeric(),
+
+        // WholeDetail validation (optional)
+        check('wholeDetail').optional().isObject().withMessage('WholeDetail must be an object'),
+        check('wholeDetail.items').optional().isArray().withMessage('WholeDetail items must be an array'),
+        check('wholeDetail.items.*.style')
+            .optional()
+            .isIn(Object.values(SaleStyleEnum))
+            .withMessage(`Style must be one of: ${Object.values(SaleStyleEnum).join(', ')}`),
+        check('wholeDetail.items.*.class').optional().notEmpty().withMessage('Class is required'),
+        check('wholeDetail.items.*.size').optional().notEmpty().withMessage('Size is required'),
+        check('wholeDetail.items.*.pounds').optional().isNumeric().withMessage('Pounds must be a number'),
+        check('wholeDetail.items.*.price').optional().isNumeric().withMessage('Price must be a number'),
+        check('wholeDetail.items.*.referencePrice').optional().isNumeric().withMessage('Reference price must be a number'),
+        check('wholeDetail.items.*.total').optional().isNumeric().withMessage('Total must be a number'),
+        check('wholeDetail.items.*.percentage').optional().isNumeric().withMessage('Percentage must be a number'),
+
+        // TailDetail validation (optional)
+        check('tailDetail').optional().isObject().withMessage('TailDetail must be an object'),
+        check('tailDetail.items').optional().isArray().withMessage('TailDetail items must be an array'),
+        check('tailDetail.items.*.style')
+            .optional()
+            .isIn(Object.values(SaleStyleEnum))
+            .withMessage(`Style must be one of: ${Object.values(SaleStyleEnum).join(', ')}`),
+        check('tailDetail.items.*.class').optional().notEmpty().withMessage('Class is required'),
+        check('tailDetail.items.*.size').optional().notEmpty().withMessage('Size is required'),
+        check('tailDetail.items.*.pounds').optional().isNumeric().withMessage('Pounds must be a number'),
+        check('tailDetail.items.*.price').optional().isNumeric().withMessage('Price must be a number'),
+        check('tailDetail.items.*.referencePrice').optional().isNumeric().withMessage('Reference price must be a number'),
+        check('tailDetail.items.*.total').optional().isNumeric().withMessage('Total must be a number'),
+        check('tailDetail.items.*.percentage').optional().isNumeric().withMessage('Percentage must be a number'),
+
+        check('summaryPoundsReceived', 'Summary pounds received is required').isNumeric(),
+        check('summaryPerformancePercentage', 'Summary performance percentage is required').isNumeric(),
+        check('summaryRetentionPercentage', 'Summary retention percentage is required').isNumeric(),
+        check('summaryAdditionalPenalty', 'Summary additional penalty is required').isNumeric(),
+
         validateFields
     ],
     updateCompanySale

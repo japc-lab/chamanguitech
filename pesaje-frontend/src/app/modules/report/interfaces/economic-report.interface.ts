@@ -48,6 +48,7 @@ export interface ISaleDetailsModel {
   tailTotalPounds: number;
   totalProcessedPounds: number;
   wholeRejectedPounds: number;
+  weightSheetNumber: string;
 }
 
 export interface ILogisticsDetailsModel {

@@ -1,41 +1,40 @@
 const { Schema, model } = require('mongoose');
 
-const SaleStyleEnum = require('../../../enums/sale-style.enum');
-
-const CompanySaleItemSchema = Schema({
-  style: {
+const CompanySaleWholeDetailSchema = Schema({
+  batch: {
     type: String,
-    enum: SaleStyleEnum,
+    required: true
+  },
+  averagePrice: {
+    type: Number,
+  },
+  settleDate: {
+    type: Date,
     required: true,
   },
-  class: {
-    type: String,
-    required: true,
-  },
-  size: {
-    type: String,
-    required: true,
-  },
-  unit: {
+  predominantSize: {
     type: String,
     required: true,
   },
-  amount: {
+  totalWholePoundsProcessed: {
+    type: Number,
+    required: true,
+  },
+  totalTrashPounds: {
+    type: Number,
+    required: true,
+  },
+  items: [{
+    type: Schema.Types.ObjectId,
+    ref: 'CompanySaleItem',
+    required: true
+  }],
+  poundsGrandTotal: {
     type: Number,
     required: true,
     min: 0
   },
-  price: {
-    type: Number,
-    required: true,
-    min: 0
-  },
-  total: {
-    type: Number,
-    required: true,
-    min: 0
-  },
-  percentage: {
+  grandTotal: {
     type: Number,
     required: true,
     min: 0
@@ -48,11 +47,10 @@ const CompanySaleItemSchema = Schema({
   { timestamps: true },
 );
 
-
-CompanySaleItemSchema.method('toJSON', function () {
+CompanySaleWholeDetailSchema.method('toJSON', function () {
   const { __v, _id, createdAt, updatedAt, ...object } = this.toObject();
   object.id = _id;
   return object;
 });
 
-module.exports = model('CompanySaleItem', CompanySaleItemSchema);
+module.exports = model('CompanySaleWholeDetail', CompanySaleWholeDetailSchema);

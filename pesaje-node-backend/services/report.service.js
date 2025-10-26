@@ -103,16 +103,16 @@ const getEconomicReportByParams = async ({ includeDeleted = false, clientId, use
             weightSheetNumber: purchase.weightSheetNumber || ''
         },
         sale: isCompany ? {
-            saleDate: sale?.saleDate || '',
-            receptionDate: companySale?.receptionDateTime || '',
+            receptionDate: companySale?.receptionDate || '',
             batch: companySale?.batch || '',
-            document: companySale?.document || '',
+            predominantSize: companySale?.predominantSize || '',
             averageBatchGrams: companySale?.batchAverageGram || 0,
             netPoundsReceived: companySale?.netReceivedPounds || 0,
             wholePoundsReceived: companySale?.wholeReceivedPounds || 0,
             trashPounds: companySale?.trashPounds || 0,
             performance: companySale?.performance || 0,
-            totalToReceive: companySale?.grandTotal || 0
+            totalToReceive: companySale?.grandTotal || 0,
+            weightSheetNumber: sale?.weightSheetNumber || ''
         } : {
             saleDate: sale?.saleDate || '',
             wholeTotalPounds: localSale?.wholeTotalPounds || 0,

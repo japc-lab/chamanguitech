@@ -8,7 +8,7 @@ const create = async (data) => {
     const transaction = await dbAdapter.saleAdapter.startTransaction();
 
     try {
-        const { purchase, saleDate, ...companySaleData } = data;
+        const { purchase, wholeDetail, tailDetail, ...companySaleData } = data;
 
         // Validate referenced purchase exists
         const purchaseExists = await dbAdapter.purchaseAdapter.getById(purchase);
@@ -19,25 +19,52 @@ const create = async (data) => {
         // Create Sale document
         const sale = await dbAdapter.saleAdapter.create({
             purchase,
-            saleDate,
+            weightSheetNumber: companySaleData.weightSheetNumber,
             type: SaleTypeEnum.COMPANY
         }, { session: transaction.session });
 
-        // Create CompanySaleItems
-        const itemIds = [];
-        for (const item of data.items) {
-            const createdItem = await dbAdapter.companySaleItemAdapter.create(item, { session: transaction.session });
-            itemIds.push(createdItem.id);
+        let wholeDetailId = null;
+        let tailDetailId = null;
+
+        // Create WholeDetail if provided
+        if (wholeDetail && wholeDetail.items && wholeDetail.items.length > 0) {
+            const wholeItemIds = [];
+            for (const item of wholeDetail.items) {
+                const createdItem = await dbAdapter.companySaleItemAdapter.create(item, { session: transaction.session });
+                wholeItemIds.push(createdItem.id);
+            }
+
+            const createdWholeDetail = await dbAdapter.companySaleWholeDetailAdapter.create({
+                ...wholeDetail,
+                items: wholeItemIds
+            }, { session: transaction.session });
+            wholeDetailId = createdWholeDetail.id;
+        }
+
+        // Create TailDetail if provided
+        if (tailDetail && tailDetail.items && tailDetail.items.length > 0) {
+            const tailItemIds = [];
+            for (const item of tailDetail.items) {
+                const createdItem = await dbAdapter.companySaleItemAdapter.create(item, { session: transaction.session });
+                tailItemIds.push(createdItem.id);
+            }
+
+            const createdTailDetail = await dbAdapter.companySaleTailDetailAdapter.create({
+                ...tailDetail,
+                items: tailItemIds
+            }, { session: transaction.session });
+            tailDetailId = createdTailDetail.id;
         }
 
         // Set initial status
-        companySaleData.status = CompanySaleStatusEnum.DRAFT;
+        companySaleData.status = CompanySaleStatusEnum.CREATED;
 
         // Create CompanySale
         const companySale = await dbAdapter.companySaleAdapter.create({
             ...companySaleData,
             sale: sale.id,
-            items: itemIds
+            wholeDetail: wholeDetailId,
+            tailDetail: tailDetailId
         }, { session: transaction.session });
 
         await transaction.commit();
@@ -53,7 +80,12 @@ const create = async (data) => {
 const getById = async (id) => {
     const companySale = await dbAdapter.companySaleAdapter.getByIdWithRelations(id, [
         {
-            path: 'items'
+            path: 'wholeDetail',
+            populate: 'items'
+        },
+        {
+            path: 'tailDetail',
+            populate: 'items'
         },
         {
             path: 'sale'
@@ -62,27 +94,67 @@ const getById = async (id) => {
 
     if (!companySale) throw new Error('Company sale not found');
 
-    return {
+    const result = {
         ...companySale,
-        items: companySale.items.map(item => ({
-            id: item.id,
-            style: item.style,
-            class: item.class,
-            size: item.size,
-            pounds: item.pounds,
-            price: item.price,
-            referencePrice: item.referencePrice,
-            total: item.total,
-            percentage: item.percentage,
-            deletedAt: item.deletedAt
-        }))
+        weightSheetNumber: companySale.sale?.weightSheetNumber
     };
+
+    // Map wholeDetail items
+    if (companySale.wholeDetail) {
+        result.wholeDetail = {
+            ...companySale.wholeDetail,
+            items: companySale.wholeDetail.items?.map(item => ({
+                id: item.id,
+                style: item.style,
+                class: item.class,
+                size: item.size,
+                unit: item.unit,
+                amount: item.amount,
+                price: item.price,
+                referencePrice: item.referencePrice,
+                total: item.total,
+                percentage: item.percentage,
+                deletedAt: item.deletedAt
+            })) || []
+        };
+    }
+
+    // Map tailDetail items
+    if (companySale.tailDetail) {
+        result.tailDetail = {
+            ...companySale.tailDetail,
+            items: companySale.tailDetail.items?.map(item => ({
+                id: item.id,
+                style: item.style,
+                class: item.class,
+                size: item.size,
+                unit: item.unit,
+                amount: item.amount,
+                price: item.price,
+                referencePrice: item.referencePrice,
+                total: item.total,
+                percentage: item.percentage,
+                deletedAt: item.deletedAt
+            })) || []
+        };
+    }
+
+    return result;
 };
 
 const getBySaleId = async (saleId) => {
     const companySaleList = await dbAdapter.companySaleAdapter.getAllWithRelations(
         { sale: saleId, deletedAt: null },
-        ['items']
+        [
+            {
+                path: 'wholeDetail',
+                populate: 'items'
+            },
+            {
+                path: 'tailDetail',
+                populate: 'items'
+            }
+        ]
     );
 
     const companySale = companySaleList[0];
@@ -107,19 +179,16 @@ const getBySaleId = async (saleId) => {
         return map;
     }, {});
 
-    return {
+    const result = {
         id: companySale.id,
         sale: companySale.sale,
-        saleDate: sale.saleDate,
+        weightSheetNumber: sale.weightSheetNumber,
         status: companySale.status,
-        document: companySale.document,
         batch: companySale.batch,
         provider: companySale.provider,
-        np: companySale.np,
-        serialNumber: companySale.serialNumber,
-        receptionDateTime: companySale.receptionDateTime,
-        settleDateTime: companySale.settleDateTime,
-        batchAverageGram: companySale.batchAverageGram,
+        receptionDate: companySale.receptionDate,
+        settleDate: companySale.settleDate,
+        predominantSize: companySale.predominantSize,
         wholeReceivedPounds: companySale.wholeReceivedPounds,
         trashPounds: companySale.trashPounds,
         netReceivedPounds: companySale.netReceivedPounds,
@@ -128,99 +197,226 @@ const getBySaleId = async (saleId) => {
         poundsGrandTotal: companySale.poundsGrandTotal,
         grandTotal: companySale.grandTotal,
         percentageTotal: companySale.percentageTotal,
+        summaryPoundsReceived: companySale.summaryPoundsReceived,
+        summaryPerformancePercentage: companySale.summaryPerformancePercentage,
+        summaryRetentionPercentage: companySale.summaryRetentionPercentage,
+        summaryAdditionalPenalty: companySale.summaryAdditionalPenalty,
         deletedAt: companySale.deletedAt,
-        items: companySale.items.map(item => ({
-            id: item.id,
-            style: item.style,
-            class: item.class,
-            size: item.size,
-            pounds: item.pounds,
-            price: item.price,
-            referencePrice: item.referencePrice,
-            total: item.total,
-            percentage: item.percentage,
-            deletedAt: item.deletedAt
-        })),
-        purchase: {
-            id: purchase.id,
-            controlNumber: purchase.controlNumber,
-            purchaseDate: purchase.purchaseDate,
-            buyer: purchase.buyer ? {
-                id: purchase.buyer._id,
-                fullName: personMap[purchase.buyer.person] || 'Unknown'
-            } : null,
-            broker: purchase.broker ? {
-                id: purchase.broker._id,
-                fullName: personMap[purchase.broker.person] || 'Unknown'
-            } : null,
-            client: purchase.client ? {
-                id: purchase.client._id,
-                fullName: personMap[purchase.client.person] || 'Unknown'
-            } : null,
-            company: purchase.company ? {
-                id: purchase.company._id,
-                name: purchase.company.name
-            } : null,
-            shrimpFarm: purchase.shrimpFarm ? {
-                id: purchase.shrimpFarm._id,
-                identifier: purchase.shrimpFarm.identifier,
-                place: purchase.shrimpFarm.place
-            } : null,
-            period: purchase.period ? {
-                id: purchase.period._id,
-                name: purchase.period.name
-            } : null
-        }
     };
+
+    // Map wholeDetail items
+    if (companySale.wholeDetail) {
+        result.wholeDetail = {
+            ...companySale.wholeDetail,
+            items: companySale.wholeDetail.items?.map(item => ({
+                id: item.id,
+                style: item.style,
+                class: item.class,
+                size: item.size,
+                unit: item.unit,
+                amount: item.amount,
+                price: item.price,
+                referencePrice: item.referencePrice,
+                total: item.total,
+                percentage: item.percentage,
+                deletedAt: item.deletedAt
+            })) || []
+        };
+    }
+
+    // Map tailDetail items
+    if (companySale.tailDetail) {
+        result.tailDetail = {
+            ...companySale.tailDetail,
+            items: companySale.tailDetail.items?.map(item => ({
+                id: item.id,
+                style: item.style,
+                class: item.class,
+                size: item.size,
+                unit: item.unit,
+                amount: item.amount,
+                price: item.price,
+                referencePrice: item.referencePrice,
+                total: item.total,
+                percentage: item.percentage,
+                deletedAt: item.deletedAt
+            })) || []
+        };
+    }
+
+    result.purchase = {
+        id: purchase.id,
+        controlNumber: purchase.controlNumber,
+        purchaseDate: purchase.purchaseDate,
+        buyer: purchase.buyer ? {
+            id: purchase.buyer._id,
+            fullName: personMap[purchase.buyer.person] || 'Unknown'
+        } : null,
+        broker: purchase.broker ? {
+            id: purchase.broker._id,
+            fullName: personMap[purchase.broker.person] || 'Unknown'
+        } : null,
+        client: purchase.client ? {
+            id: purchase.client._id,
+            fullName: personMap[purchase.client.person] || 'Unknown'
+        } : null,
+        company: purchase.company ? {
+            id: purchase.company._id,
+            name: purchase.company.name
+        } : null,
+        shrimpFarm: purchase.shrimpFarm ? {
+            id: purchase.shrimpFarm._id,
+            identifier: purchase.shrimpFarm.identifier,
+            place: purchase.shrimpFarm.place
+        } : null,
+        period: purchase.period ? {
+            id: purchase.period._id,
+            name: purchase.period.name
+        } : null,
+        totalPounds: purchase.totalPounds
+    };
+
+    return result;
 };
 
 const update = async (id, data) => {
     const transaction = await dbAdapter.companySaleAdapter.startTransaction();
 
     try {
-        const existingCompanySale = await dbAdapter.companySaleAdapter.getById(id);
+        const existingCompanySale = await dbAdapter.companySaleAdapter.getByIdWithRelations(id, [
+            'wholeDetail',
+            'tailDetail'
+        ]);
         if (!existingCompanySale) {
             throw new Error('Company sale not found');
         }
 
         const saleId = existingCompanySale.sale;
 
-        // 🔸 Update the Sale's saleDate
+        // 🔸 Update the Sale's weightSheetNumber
         await dbAdapter.saleAdapter.update(saleId, {
-            saleDate: data.saleDate
+            weightSheetNumber: data.weightSheetNumber
         }, { session: transaction.session });
 
-        // 🔥 Remove old CompanySaleItems
-        for (const itemId of existingCompanySale.items) {
-            await dbAdapter.companySaleItemAdapter.removePermanently(itemId);
+        const { wholeDetail, tailDetail, ...companySaleData } = data;
+        let wholeDetailId = existingCompanySale.wholeDetail?._id || null;
+        let tailDetailId = existingCompanySale.tailDetail?._id || null;
+
+        // Handle WholeDetail update/create/delete
+        if (wholeDetail && wholeDetail.items && wholeDetail.items.length > 0) {
+            if (wholeDetailId) {
+                // Update existing whole detail - remove old items and create new ones
+                const existingWholeDetail = await dbAdapter.companySaleWholeDetailAdapter.getById(wholeDetailId);
+                if (existingWholeDetail && existingWholeDetail.items) {
+                    for (const itemId of existingWholeDetail.items) {
+                        await dbAdapter.companySaleItemAdapter.removePermanently(itemId, { session: transaction.session });
+                    }
+                }
+
+                const wholeItemIds = [];
+                for (const item of wholeDetail.items) {
+                    const createdItem = await dbAdapter.companySaleItemAdapter.create(item, { session: transaction.session });
+                    wholeItemIds.push(createdItem.id);
+                }
+
+                await dbAdapter.companySaleWholeDetailAdapter.update(wholeDetailId, {
+                    ...wholeDetail,
+                    items: wholeItemIds
+                }, { session: transaction.session });
+            } else {
+                // Create new whole detail
+                const wholeItemIds = [];
+                for (const item of wholeDetail.items) {
+                    const createdItem = await dbAdapter.companySaleItemAdapter.create(item, { session: transaction.session });
+                    wholeItemIds.push(createdItem.id);
+                }
+
+                const createdWholeDetail = await dbAdapter.companySaleWholeDetailAdapter.create({
+                    ...wholeDetail,
+                    items: wholeItemIds
+                }, { session: transaction.session });
+                wholeDetailId = createdWholeDetail.id;
+            }
+        } else if (wholeDetailId) {
+            // Delete existing whole detail if no items provided
+            const existingWholeDetail = await dbAdapter.companySaleWholeDetailAdapter.getById(wholeDetailId);
+            if (existingWholeDetail && existingWholeDetail.items) {
+                for (const itemId of existingWholeDetail.items) {
+                    await dbAdapter.companySaleItemAdapter.removePermanently(itemId, { session: transaction.session });
+                }
+            }
+            await dbAdapter.companySaleWholeDetailAdapter.removePermanently(wholeDetailId, { session: transaction.session });
+            wholeDetailId = null;
         }
 
-        // 🆕 Create new CompanySaleItems
-        const newItemIds = [];
-        for (const item of data.items) {
-            const newItem = await dbAdapter.companySaleItemAdapter.create(item, { session: transaction.session });
-            newItemIds.push(newItem.id);
+        // Handle TailDetail update/create/delete
+        if (tailDetail && tailDetail.items && tailDetail.items.length > 0) {
+            if (tailDetailId) {
+                // Update existing tail detail - remove old items and create new ones
+                const existingTailDetail = await dbAdapter.companySaleTailDetailAdapter.getById(tailDetailId);
+                if (existingTailDetail && existingTailDetail.items) {
+                    for (const itemId of existingTailDetail.items) {
+                        await dbAdapter.companySaleItemAdapter.removePermanently(itemId, { session: transaction.session });
+                    }
+                }
+
+                const tailItemIds = [];
+                for (const item of tailDetail.items) {
+                    const createdItem = await dbAdapter.companySaleItemAdapter.create(item, { session: transaction.session });
+                    tailItemIds.push(createdItem.id);
+                }
+
+                await dbAdapter.companySaleTailDetailAdapter.update(tailDetailId, {
+                    ...tailDetail,
+                    items: tailItemIds
+                }, { session: transaction.session });
+            } else {
+                // Create new tail detail
+                const tailItemIds = [];
+                for (const item of tailDetail.items) {
+                    const createdItem = await dbAdapter.companySaleItemAdapter.create(item, { session: transaction.session });
+                    tailItemIds.push(createdItem.id);
+                }
+
+                const createdTailDetail = await dbAdapter.companySaleTailDetailAdapter.create({
+                    ...tailDetail,
+                    items: tailItemIds
+                }, { session: transaction.session });
+                tailDetailId = createdTailDetail.id;
+            }
+        } else if (tailDetailId) {
+            // Delete existing tail detail if no items provided
+            const existingTailDetail = await dbAdapter.companySaleTailDetailAdapter.getById(tailDetailId);
+            if (existingTailDetail && existingTailDetail.items) {
+                for (const itemId of existingTailDetail.items) {
+                    await dbAdapter.companySaleItemAdapter.removePermanently(itemId, { session: transaction.session });
+                }
+            }
+            await dbAdapter.companySaleTailDetailAdapter.removePermanently(tailDetailId, { session: transaction.session });
+            tailDetailId = null;
         }
 
         // ✏️ Update the CompanySale record
         const updatedCompanySale = await dbAdapter.companySaleAdapter.update(id, {
-            document: data.document,
-            batch: data.batch,
-            provider: data.provider,
-            np: data.np || null,
-            serialNumber: data.serialNumber,
-            receptionDateTime: data.receptionDateTime,
-            settleDateTime: data.settleDateTime,
-            batchAverageGram: data.batchAverageGram,
-            wholeReceivedPounds: data.wholeReceivedPounds,
-            trashPounds: data.trashPounds,
-            netReceivedPounds: data.netReceivedPounds,
-            processedPounds: data.processedPounds,
-            performance: data.performance,
-            poundsGrandTotal: data.poundsGrandTotal,
-            grandTotal: data.grandTotal,
-            percentageTotal: data.percentageTotal,
-            items: newItemIds
+            batch: companySaleData.batch,
+            provider: companySaleData.provider,
+            receptionDate: companySaleData.receptionDate,
+            settleDate: companySaleData.settleDate,
+            predominantSize: companySaleData.predominantSize,
+            wholeReceivedPounds: companySaleData.wholeReceivedPounds,
+            trashPounds: companySaleData.trashPounds,
+            netReceivedPounds: companySaleData.netReceivedPounds,
+            processedPounds: companySaleData.processedPounds,
+            performance: companySaleData.performance,
+            poundsGrandTotal: companySaleData.poundsGrandTotal,
+            grandTotal: companySaleData.grandTotal,
+            percentageTotal: companySaleData.percentageTotal,
+            summaryPoundsReceived: companySaleData.summaryPoundsReceived,
+            summaryPerformancePercentage: companySaleData.summaryPerformancePercentage,
+            summaryRetentionPercentage: companySaleData.summaryRetentionPercentage,
+            summaryAdditionalPenalty: companySaleData.summaryAdditionalPenalty,
+            wholeDetail: wholeDetailId,
+            tailDetail: tailDetailId
         }, { session: transaction.session });
 
         await transaction.commit();

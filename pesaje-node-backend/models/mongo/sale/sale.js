@@ -10,7 +10,6 @@ const SaleSchema = Schema({
   },
   saleDate: {
     type: Date,
-    required: true,
   },
   type: {
     type: String,

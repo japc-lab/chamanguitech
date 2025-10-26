@@ -120,6 +120,8 @@ export const locale = {
       SALE_LIMIT_REACHED: 'Ya existe una venta creada para esta compra.',
       INCOMPLETE_TOTAL_REPORT_INFO:
         'La información para el reporte está incompleta. Verifique la información de compra, venta o logística.',
+      COMPANY_SALE_REQUIRED_FIELDS:
+        'Por favor complete todos los campos requeridos en los detalles de venta.',
     },
     SUCCESS: {
       TITLE: '¡Éxito!',

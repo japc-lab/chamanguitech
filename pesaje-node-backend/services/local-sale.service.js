@@ -36,7 +36,7 @@ const determineLocalSaleStatus = async (localSaleDetails, localCompanySaleDetail
     if (localCompanySaleDetailId && companyDetailNetGrandTotal > 0) {
         // Company detail exists and has items (netGrandTotal > 0)
         hasAnyItems = true;
-        
+
         const companyPayments = await dbAdapter.localCompanySaleDetailPaymentAdapter.getAll({
             localCompanySaleDetail: localCompanySaleDetailId,
             deletedAt: null
@@ -44,7 +44,7 @@ const determineLocalSaleStatus = async (localSaleDetails, localCompanySaleDetail
 
         if (companyPayments && companyPayments.length > 0) {
             hasAnyPayment = true;
-            
+
             // Check if company detail is fully paid
             const totalCompanyPaid = normalize(companyPayments.reduce((sum, pm) => sum + Number(pm.amount), 0));
             if (totalCompanyPaid < companyDetailNetGrandTotal) {
@@ -61,11 +61,11 @@ const determineLocalSaleStatus = async (localSaleDetails, localCompanySaleDetail
     if (!hasAnyPayment) {
         return LocalSaleStatusEnum.CREATED;
     }
-    
+
     if (allPaid && hasAnyItems) {
         return LocalSaleStatusEnum.COMPLETED;
     }
-    
+
     return LocalSaleStatusEnum.IN_PROGRESS;
 };
 
@@ -193,7 +193,7 @@ const create = async (data) => {
 
         // Handle local company detail (single object)
         let createdCompanySaleDetailId = null;
-        
+
         if (localCompanySaleDetail) {
             const companyItemIds = [];
 
@@ -401,6 +401,7 @@ const getBySaleId = async (saleId) => {
             controlNumber: purchase.controlNumber,
             purchaseDate: purchase.purchaseDate,
             totalPounds: purchase.totalPounds,
+            weightSheetNumber: purchase.weightSheetNumber,
             buyer: purchase.buyer ? {
                 id: purchase.buyer._id,
                 fullName: personMap[purchase.buyer.person] || 'Unknown'
@@ -605,7 +606,7 @@ const update = async (id, data) => {
                 for (const payment of existingPayments) {
                     await dbAdapter.localCompanySaleDetailPaymentAdapter.removePermanently(payment.id, { session: transaction.session });
                 }
-                
+
                 // Then delete the company detail
                 await dbAdapter.localCompanySaleDetailAdapter.removePermanently(existingCompanyDetail.id, { session: transaction.session });
             }
