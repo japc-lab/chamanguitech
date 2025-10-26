@@ -182,4 +182,42 @@ export class CompanySaleWholeDetailComponent implements OnInit {
   emitChanges(): void {
     this.wholeDetailChange.emit(this.wholeDetail);
   }
+
+  // Get unique classes from items
+  getUniqueClasses(): string[] {
+    if (!this.wholeDetail || !this.wholeDetail.items) return [];
+    const classes = this.wholeDetail.items
+      .map(item => item.class)
+      .filter(cls => cls && cls.trim() !== '');
+    return [...new Set(classes)];
+  }
+
+  // Get items by class
+  getItemsByClass(className: string): ICompanySaleItemModel[] {
+    if (!this.wholeDetail || !this.wholeDetail.items) return [];
+    return this.wholeDetail.items.filter(item => item.class === className);
+  }
+
+  // Calculate subtotal for a specific class
+  getClassSubtotal(className: string): { amount: number, total: number, percentage: number } {
+    const classItems = this.getItemsByClass(className);
+    let totalAmount = 0;
+    let totalDollars = 0;
+
+    classItems.forEach(item => {
+      totalAmount += Number(item.amount || 0);
+      totalDollars += Number(item.total || 0);
+    });
+
+    const percentage = this.wholeDetail && this.wholeDetail.grandTotal > 0
+      ? (totalDollars / this.wholeDetail.grandTotal) * 100
+      : 0;
+
+    return {
+      amount: Number(totalAmount.toFixed(2)),
+      total: Number(totalDollars.toFixed(2)),
+      percentage: Number(percentage.toFixed(2))
+    };
+  }
+
 }

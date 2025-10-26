@@ -15,6 +15,7 @@ import { LocalCompanySaleDetailPaymentListingComponent } from './widgets/local-c
 import { LocalSaleSummaryComponent } from './widgets/local-sale-summary/local-sale-summary.component';
 import { CompanySaleWholeDetailComponent } from './widgets/company-sale-whole-detail/company-sale-whole-detail.component';
 import { CompanySaleTailDetailComponent } from './widgets/company-sale-tail-detail/company-sale-tail-detail.component';
+import { CompanySaleSummaryComponent } from './widgets/company-sale-summary/company-sale-summary.component';
 
 @NgModule({
   declarations: [
@@ -28,6 +29,7 @@ import { CompanySaleTailDetailComponent } from './widgets/company-sale-tail-deta
     LocalSaleSummaryComponent,
     CompanySaleWholeDetailComponent,
     CompanySaleTailDetailComponent,
+    CompanySaleSummaryComponent,
   ],
   imports: [
     CommonModule,

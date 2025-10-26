@@ -164,9 +164,21 @@
               </td>
             </tr>
 
-            <!-- Totals Row -->
-            <tr class="fw-bold bg-light" *ngIf="wholeDetail.items.length > 0">
-              <td colspan="5">Total General</td>
+            <!-- Subtotals by Class -->
+            <ng-container *ngFor="let className of getUniqueClasses()">
+              <tr class="fw-bold bg-light">
+                <td class="text-end" colspan="5">Subtotal Clase {{ className }}</td>
+                <td class="text-end">{{ getClassSubtotal(className).amount | number: '1.2-2' }}</td>
+                <td></td>
+                <td class="text-end">${{ getClassSubtotal(className).total | number: '1.2-2' }}</td>
+                <td class="text-end">{{ getClassSubtotal(className).percentage | number: '1.2-2' }}%</td>
+                <td></td>
+              </tr>
+            </ng-container>
+
+            <!-- Grand Total Row -->
+            <tr class="fw-bold bg-primary text-white" *ngIf="wholeDetail.items.length > 0">
+              <td class="text-end" colspan="5">Total General</td>
               <td class="text-end">{{ wholeDetail.poundsGrandTotal | number: '1.2-2' }}</td>
               <td></td>
               <td class="text-end">${{ wholeDetail.grandTotal | number: '1.2-2' }}</td>
@@ -177,5 +189,8 @@
         </table>
       </div>
     </form>
+
+    <!-- Company Sale Summary Component -->
+    <app-company-sale-summary [wholeDetail]="wholeDetail"></app-company-sale-summary>
   </div>
 </div>
