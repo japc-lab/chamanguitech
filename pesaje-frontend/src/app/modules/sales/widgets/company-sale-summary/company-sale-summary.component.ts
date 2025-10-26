@@ -1,79 +1,138 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnChanges,
+  SimpleChanges,
+  ViewChild,
+} from '@angular/core';
+import { NgForm } from '@angular/forms';
+import { IReducedDetailedPurchaseModel } from '../../../purchases/interfaces/purchase.interface';
+import { ICreateUpdateCompanySaleModel } from '../../interfaces/sale.interface';
 import { ICompanySaleWholeDetailModel } from '../../interfaces/company-sale-whole-detail.interface';
+import { ICompanySaleTailDetailModel } from '../../interfaces/company-sale-tail-detail.interface';
+import { InputUtilsService } from 'src/app/utils/input-utils.service';
+import { FormUtilsService } from 'src/app/utils/form-utils.service';
 
 @Component({
   selector: 'app-company-sale-summary',
   templateUrl: './company-sale-summary.component.html',
-  styleUrls: ['./company-sale-summary.component.scss']
+  styleUrls: ['./company-sale-summary.component.scss'],
 })
 export class CompanySaleSummaryComponent implements OnChanges {
+  @Input() purchaseModel: IReducedDetailedPurchaseModel | null = null;
+  @Input() companySaleModel: ICreateUpdateCompanySaleModel | null = null;
   @Input() wholeDetail: ICompanySaleWholeDetailModel | null = null;
+  @Input() tailDetail: ICompanySaleTailDetailModel | null = null;
 
-  summaryData: { class: string, size: string, quantityKg: number, quantityLb: number }[] = [];
-  totalSummary: { quantityKg: number, quantityLb: number } = { quantityKg: 0, quantityLb: 0 };
+  @ViewChild('summaryForm') summaryForm!: NgForm;
 
-  // Conversion factor: 1 kg = 2.20462 lbs
-  private readonly KG_TO_LB_FACTOR = 2.20462;
-  private readonly LB_TO_KG_FACTOR = 1 / 2.20462;
+  // User input fields (editable)
+  poundsReceivedInput = 0;
+  performancePercentageInput = 0;
+  retentionPercentage = 0;
+  additionalPenalty = 0;
+
+  // Computed values (will be calculated)
+  grandTotal = 0;
+  averagePurchasePrice = 0;
+  averagePackingPrice = 0;
+  netAmountToReceive = 0;
+
+  constructor(
+    private inputUtils: InputUtilsService,
+    private formUtils: FormUtilsService
+  ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['wholeDetail']) {
-      this.calculateSummaryData();
+    if (
+      changes['purchaseModel'] ||
+      changes['companySaleModel'] ||
+      changes['wholeDetail'] ||
+      changes['tailDetail']
+    ) {
+      this.calculateSummary();
     }
   }
 
-  private calculateSummaryData(): void {
-    if (!this.wholeDetail || !this.wholeDetail.items) {
-      this.summaryData = [];
-      this.totalSummary = { quantityKg: 0, quantityLb: 0 };
-      return;
+  calculateSummary(): void {
+    // Financial summary calculations
+    const wholeSubtotal = this.wholeDetail?.grandTotal || 0;
+    const tailSubtotal = this.tailDetail?.grandTotal || 0;
+    this.grandTotal = wholeSubtotal + tailSubtotal;
+
+    // Calculate average purchase price
+    const poundsBought = this.purchaseModel?.totalPounds || 0;
+    if (poundsBought > 0) {
+      this.averagePurchasePrice =
+        (this.purchaseModel?.grandTotal || 0) / poundsBought;
     }
 
-    const summaryMap = new Map<string, { quantityKg: number, quantityLb: number }>();
+    // Placeholder for packing price - needs business logic
+    this.averagePackingPrice = 0;
 
-    this.wholeDetail.items.forEach(item => {
-      if (!item.class || !item.size) return;
+    // Calculate net amount
+    const retentionAmount = (this.grandTotal * this.retentionPercentage) / 100;
+    this.netAmountToReceive =
+      this.grandTotal - retentionAmount - this.additionalPenalty;
+  }
 
-      const key = `${item.class}-${item.size}`;
-      const amount = Number(item.amount || 0);
+  // Getter methods for template access to model properties
+  get poundsBought(): number {
+    return this.purchaseModel?.totalPounds || 0;
+  }
 
-      if (!summaryMap.has(key)) {
-        summaryMap.set(key, { quantityKg: 0, quantityLb: 0 });
-      }
+  get poundsReceived(): number {
+    return this.poundsReceivedInput;
+  }
 
-      const summary = summaryMap.get(key)!;
+  get difference(): number {
+    return this.poundsReceived - this.poundsBought;
+  }
 
-      if (item.unit === 'kg') {
-        summary.quantityKg += amount;
-        summary.quantityLb += amount * this.KG_TO_LB_FACTOR;
-      } else if (item.unit === 'lb') {
-        summary.quantityLb += amount;
-        summary.quantityKg += amount * this.LB_TO_KG_FACTOR;
-      }
-    });
+  get trashPounds(): number {
+    return this.companySaleModel?.trashPounds || 0;
+  }
 
-    this.summaryData = Array.from(summaryMap.entries()).map(([key, data]) => {
-      const [className, size] = key.split('-');
-      return {
-        class: className,
-        size: size,
-        quantityKg: Number(data.quantityKg.toFixed(2)),
-        quantityLb: Number(data.quantityLb.toFixed(2))
-      };
-    });
+  get poundsForWholeProcess(): number {
+    return this.poundsReceived - this.trashPounds;
+  }
 
-    // Calculate totals
-    let totalKg = 0;
-    let totalLb = 0;
+  get performancePercentage(): number {
+    return this.performancePercentageInput;
+  }
 
-    this.summaryData.forEach(item => {
-      totalKg += item.quantityKg;
-      totalLb += item.quantityLb;
-    });
+  get wholeSubtotal(): number {
+    return this.wholeDetail?.grandTotal || 0;
+  }
 
-    this.totalSummary = {
-      quantityKg: Number(totalKg.toFixed(2)),
-      quantityLb: Number(totalLb.toFixed(2))
-    };
+  get tailReceivedPoundsReported(): number {
+    return this.tailDetail?.receivedPoundsReported || 0;
+  }
+
+  get tailTotalPoundsProcessed(): number {
+    return this.tailDetail?.totalTailPoundsProcessed || 0;
+  }
+
+  get tailPerformancePercentage(): number {
+    return this.tailDetail?.performancePercentageTailPounts || 0;
+  }
+
+  get tailSubtotal(): number {
+    return this.tailDetail?.grandTotal || 0;
+  }
+
+  get retentionAmount(): number {
+    return (this.grandTotal * this.retentionPercentage) / 100;
+  }
+
+  validateNumber(event: KeyboardEvent) {
+    this.inputUtils.validateNumber(event);
+  }
+
+  formatDecimal(controlName: string) {
+    const control = this.summaryForm?.form?.get(controlName);
+    if (control) {
+      this.formUtils.formatControlToDecimal(control);
+    }
   }
 }

@@ -1,0 +1,84 @@
+.card {
+  border-radius: 12px;
+  overflow: hidden;
+
+  .card-header {
+    border-bottom: none;
+    border-radius: 12px 12px 0 0 !important;
+
+    .bi-bar-chart-fill {
+      font-size: 1.1rem;
+    }
+  }
+
+  .card-body {
+    border-radius: 0 0 12px 12px;
+  }
+}
+
+.table {
+  border-collapse: separate;
+  border-spacing: 0;
+
+  th, td {
+    border-left: none;
+    border-right: none;
+    border-top: none;
+
+    &:first-child {
+      border-left: none;
+    }
+
+    &:last-child {
+      border-right: none;
+    }
+  }
+
+  thead tr th {
+    border-bottom: 2px solid #dee2e6;
+    background-color: #f8f9fa;
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+  }
+
+  tbody tr {
+    transition: background-color 0.15s ease-in-out;
+
+    &:hover:not(:last-child) {
+      background-color: #f8f9fa;
+    }
+
+    &:last-child {
+      &:hover {
+        background-color: #198754 !important;
+      }
+
+      td {
+        border-bottom: none;
+        font-size: 0.9rem;
+        letter-spacing: 0.025em;
+      }
+    }
+  }
+
+  .border-bottom {
+    border-bottom: 1px solid #e9ecef !important;
+  }
+}
+
+.badge {
+  font-size: 0.75rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 6px;
+}
+
+// Success color variations
+.bg-success {
+  background-color: #198754 !important;
+}
+
+// Custom shadow
+.shadow-sm {
+  box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.075) !important;
+}

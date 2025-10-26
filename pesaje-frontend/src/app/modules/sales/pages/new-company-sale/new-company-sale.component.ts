@@ -8,6 +8,7 @@ import {
 import { ICompanySaleWholeDetailModel } from '../../interfaces/company-sale-whole-detail.interface';
 import { ICompanySaleTailDetailModel } from '../../interfaces/company-sale-tail-detail.interface';
 import {
+  AfterViewInit,
   ChangeDetectorRef,
   Component,
   OnDestroy,
@@ -44,20 +45,27 @@ import { SaleService } from '../../services/sale.service';
 import { ICompany } from 'src/app/modules/settings/interfaces/company.interfaces';
 import { CompanySaleWholeDetailComponent } from '../../widgets/company-sale-whole-detail/company-sale-whole-detail.component';
 import { CompanySaleTailDetailComponent } from '../../widgets/company-sale-tail-detail/company-sale-tail-detail.component';
+import { CompanySaleSummaryComponent } from '../../widgets/company-sale-summary/company-sale-summary.component';
 
 @Component({
   selector: 'app-new-company-sale',
   templateUrl: './new-company-sale.component.html',
   styleUrl: './new-company-sale.component.scss',
 })
-export class NewCompanySaleComponent implements OnInit, OnDestroy {
+export class NewCompanySaleComponent
+  implements OnInit, AfterViewInit, OnDestroy
+{
   PERMISSION_ROUTE = PERMISSION_ROUTES.SALES.COMPANY_SALE_FORM;
 
   private modalRef: NgbModalRef | null = null;
 
   @ViewChild('saleForm') saleForm!: NgForm;
-  @ViewChild(CompanySaleWholeDetailComponent) wholeDetailComponent!: CompanySaleWholeDetailComponent;
-  @ViewChild(CompanySaleTailDetailComponent) tailDetailComponent!: CompanySaleTailDetailComponent;
+  @ViewChild(CompanySaleWholeDetailComponent)
+  wholeDetailComponent!: CompanySaleWholeDetailComponent;
+  @ViewChild(CompanySaleTailDetailComponent)
+  tailDetailComponent!: CompanySaleTailDetailComponent;
+  @ViewChild(CompanySaleSummaryComponent, { static: false })
+  summaryComponent!: CompanySaleSummaryComponent;
 
   isOnlyBuyer = false;
   searchSubmitted = false;
@@ -137,6 +145,9 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
             this.wholeDetail = companySale.wholeDetail || null;
             this.tailDetail = companySale.tailDetail || null;
 
+            // Initialize summary values if they exist
+            this.initializeSummary();
+
             this.cdr.detectChanges();
           },
           error: (error) => {
@@ -191,8 +202,12 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
     }
 
     // Validate detail forms
-    const isWholeDetailValid = this.wholeDetailComponent ? this.wholeDetailComponent.isFormValid() : true;
-    const isTailDetailValid = this.tailDetailComponent ? this.tailDetailComponent.isFormValid() : true;
+    const isWholeDetailValid = this.wholeDetailComponent
+      ? this.wholeDetailComponent.isFormValid()
+      : true;
+    const isTailDetailValid = this.tailDetailComponent
+      ? this.tailDetailComponent.isFormValid()
+      : true;
 
     if (!isWholeDetailValid || !isTailDetailValid) {
       this.alertService.showTranslatedAlert({
@@ -211,6 +226,32 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
 
   submitCompanySaleForm() {
     this.companySaleModel.purchase = this.purchaseModel.id;
+
+    // Ensure form values are synced before capturing
+    this.cdr.detectChanges();
+
+    // Capture process summary values
+    if (this.summaryComponent) {
+      // Ensure the component form values are up to date
+      if (this.summaryComponent.summaryForm) {
+        Object.keys(this.summaryComponent.summaryForm.controls).forEach(
+          (key) => {
+            this.summaryComponent.summaryForm.controls[
+              key
+            ].updateValueAndValidity();
+          }
+        );
+      }
+
+      this.companySaleModel.summaryPoundsReceived =
+        Number(this.summaryComponent.poundsReceivedInput) || 0;
+      this.companySaleModel.summaryPerformancePercentage =
+        Number(this.summaryComponent.performancePercentageInput) || 0;
+      this.companySaleModel.summaryRetentionPercentage =
+        Number(this.summaryComponent.retentionPercentage) || 0;
+      this.companySaleModel.summaryAdditionalPenalty =
+        Number(this.summaryComponent.additionalPenalty) || 0;
+    }
 
     // Prepare whole detail (strip IDs from items)
     if (
@@ -242,21 +283,22 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
 
     // Calculate grand totals
     let totalPounds = 0;
-    let totalAmount = 0;
-    let totalPercentage = 0;
 
     if (this.companySaleModel.wholeDetail) {
       totalPounds += this.companySaleModel.wholeDetail.poundsGrandTotal || 0;
-      totalAmount += this.companySaleModel.wholeDetail.grandTotal || 0;
     }
 
     if (this.companySaleModel.tailDetail) {
       totalPounds += this.companySaleModel.tailDetail.poundsGrandTotal || 0;
-      totalAmount += this.companySaleModel.tailDetail.grandTotal || 0;
     }
 
     this.companySaleModel.poundsGrandTotal = Number(totalPounds.toFixed(2));
-    this.companySaleModel.grandTotal = Number(totalAmount.toFixed(2));
+
+    // Use netAmountToReceive as grandTotal if available, otherwise use calculated total
+    const netAmountToReceive = this.summaryComponent
+      ? this.summaryComponent.netAmountToReceive
+      : 0;
+    this.companySaleModel.grandTotal = netAmountToReceive;
     this.companySaleModel.percentageTotal = 100; // Always 100% for combined details
 
     if (this.companySaleId) {
@@ -470,6 +512,27 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
 
   validateWholeNumber(event: KeyboardEvent) {
     this.inputUtils.validateWholeNumber(event);
+  }
+
+  initializeSummary(): void {
+    // Initialize summary values from summary-specific properties only
+    if (this.companySaleModel && this.summaryComponent) {
+      // Only initialize from saved summary values, not from other model properties
+      this.summaryComponent.poundsReceivedInput =
+        this.companySaleModel.summaryPoundsReceived || 0;
+      this.summaryComponent.performancePercentageInput =
+        this.companySaleModel.summaryPerformancePercentage || 0;
+      this.summaryComponent.retentionPercentage =
+        this.companySaleModel.summaryRetentionPercentage || 0;
+      this.summaryComponent.additionalPenalty =
+        this.companySaleModel.summaryAdditionalPenalty || 0;
+      this.summaryComponent.calculateSummary();
+    }
+  }
+
+  ngAfterViewInit(): void {
+    // Initialize the summary component with existing company sale data if available
+    this.initializeSummary();
   }
 
   ngOnDestroy(): void {

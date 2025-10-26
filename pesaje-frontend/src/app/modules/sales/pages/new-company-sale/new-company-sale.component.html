@@ -293,6 +293,11 @@
   (tailDetailChange)="handleTailDetailChange($event)">
 </app-company-sale-tail-detail>
 
+<!-- Summary -->
+<app-company-sale-summary [purchaseModel]="purchaseModel" [companySaleModel]="companySaleModel"
+  [wholeDetail]="wholeDetail" [tailDetail]="tailDetail">
+</app-company-sale-summary>
+
 <!-- Submit Button inside card footer -->
 <div class="card card-xl-stretch mb-xl-8 mt-2">
   <div class="card-footer d-flex justify-content-end py-6 px-9">

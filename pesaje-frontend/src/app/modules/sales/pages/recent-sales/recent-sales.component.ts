@@ -74,20 +74,20 @@ export class RecentSalesComponent implements OnInit {
           data: 'status',
           render: function (data, type: any, full: any) {
             if (type === 'sort') {
-              if (data === CompanySaleStatusEnum.DRAFT) return 1; // Sin pagos
+              if (data === CompanySaleStatusEnum.CREATED) return 1; // Sin pagos
               if (data === null) return 2; // Empty / No status
-              if (data === CompanySaleStatusEnum.IN_PROGRESS) return 3; // En progreso
-              if (data === CompanySaleStatusEnum.COMPLETED) return 4; // Completado
-              if (data === CompanySaleStatusEnum.CLOSED) return 5; // Completado
+              if (data === CompanySaleStatusEnum.IN_PROGRESS) return 3; // Pendiente
+              if (data === CompanySaleStatusEnum.COMPLETED) return 4; // Pagado
+              if (data === CompanySaleStatusEnum.CLOSED) return 5; // Cerrado
               return 6; // Desconocido
             } else {
               switch (data) {
-                case CompanySaleStatusEnum.DRAFT:
+                case CompanySaleStatusEnum.CREATED:
                   return `<span class="badge bg-secondary">Sin pagos</span>`;
                 case CompanySaleStatusEnum.IN_PROGRESS:
-                  return `<span class="badge bg-warning text-dark">En progreso</span>`;
+                  return `<span class="badge bg-warning text-dark">Pendiente</span>`;
                 case CompanySaleStatusEnum.COMPLETED:
-                  return `<span class="badge bg-success">Completado</span>`;
+                  return `<span class="badge bg-success">Pagado</span>`;
                 case CompanySaleStatusEnum.CLOSED:
                   return `<span class="badge bg-danger">Cerrado</span>`;
                 default:

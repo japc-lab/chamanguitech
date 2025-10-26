@@ -57,6 +57,11 @@ router.post(
         check('tailDetail.items.*.total').optional().isNumeric().withMessage('Total must be a number'),
         check('tailDetail.items.*.percentage').optional().isNumeric().withMessage('Percentage must be a number'),
 
+        check('summaryPoundsReceived', 'Summary pounds received is required').isNumeric(),
+        check('summaryPerformancePercentage', 'Summary performance percentage is required').isNumeric(),
+        check('summaryRetentionPercentage', 'Summary retention percentage is required').isNumeric(),
+        check('summaryAdditionalPenalty', 'Summary additional penalty is required').isNumeric(),
+
         validateFields,
     ],
     createCompanySale
@@ -131,6 +136,11 @@ router.put(
         check('tailDetail.items.*.referencePrice').optional().isNumeric().withMessage('Reference price must be a number'),
         check('tailDetail.items.*.total').optional().isNumeric().withMessage('Total must be a number'),
         check('tailDetail.items.*.percentage').optional().isNumeric().withMessage('Percentage must be a number'),
+
+        check('summaryPoundsReceived', 'Summary pounds received is required').isNumeric(),
+        check('summaryPerformancePercentage', 'Summary performance percentage is required').isNumeric(),
+        check('summaryRetentionPercentage', 'Summary retention percentage is required').isNumeric(),
+        check('summaryAdditionalPenalty', 'Summary additional penalty is required').isNumeric(),
 
         validateFields
     ],

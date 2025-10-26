@@ -57,7 +57,7 @@ const create = async (data) => {
         }
 
         // Set initial status
-        companySaleData.status = CompanySaleStatusEnum.DRAFT;
+        companySaleData.status = CompanySaleStatusEnum.CREATED;
 
         // Create CompanySale
         const companySale = await dbAdapter.companySaleAdapter.create({
@@ -197,6 +197,10 @@ const getBySaleId = async (saleId) => {
         poundsGrandTotal: companySale.poundsGrandTotal,
         grandTotal: companySale.grandTotal,
         percentageTotal: companySale.percentageTotal,
+        summaryPoundsReceived: companySale.summaryPoundsReceived,
+        summaryPerformancePercentage: companySale.summaryPerformancePercentage,
+        summaryRetentionPercentage: companySale.summaryRetentionPercentage,
+        summaryAdditionalPenalty: companySale.summaryAdditionalPenalty,
         deletedAt: companySale.deletedAt,
     };
 
@@ -268,7 +272,8 @@ const getBySaleId = async (saleId) => {
         period: purchase.period ? {
             id: purchase.period._id,
             name: purchase.period.name
-        } : null
+        } : null,
+        totalPounds: purchase.totalPounds
     };
 
     return result;
@@ -406,6 +411,10 @@ const update = async (id, data) => {
             poundsGrandTotal: companySaleData.poundsGrandTotal,
             grandTotal: companySaleData.grandTotal,
             percentageTotal: companySaleData.percentageTotal,
+            summaryPoundsReceived: companySaleData.summaryPoundsReceived,
+            summaryPerformancePercentage: companySaleData.summaryPerformancePercentage,
+            summaryRetentionPercentage: companySaleData.summaryRetentionPercentage,
+            summaryAdditionalPenalty: companySaleData.summaryAdditionalPenalty,
             wholeDetail: wholeDetailId,
             tailDetail: tailDetailId
         }, { session: transaction.session });

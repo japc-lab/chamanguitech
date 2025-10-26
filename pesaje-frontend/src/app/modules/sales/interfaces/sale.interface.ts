@@ -41,6 +41,10 @@ export interface ICreateUpdateCompanySaleModel {
   poundsGrandTotal: number;
   grandTotal: number;
   percentageTotal: number;
+  summaryPoundsReceived?: number;
+  summaryPerformancePercentage?: number;
+  summaryRetentionPercentage?: number;
+  summaryAdditionalPenalty?: number;
   weightSheetNumber?: string;
   status: CompanySaleStatusEnum;
   wholeDetail?: ICompanySaleWholeDetailModel;
@@ -65,6 +69,10 @@ export interface ICompanySaleModel {
   poundsGrandTotal: number;
   grandTotal: number;
   percentageTotal: number;
+  summaryPoundsReceived?: number;
+  summaryPerformancePercentage?: number;
+  summaryRetentionPercentage?: number;
+  summaryAdditionalPenalty?: number;
   weightSheetNumber?: string;
   status: CompanySaleStatusEnum;
   wholeDetail?: ICompanySaleWholeDetailModel;
@@ -121,7 +129,7 @@ export enum SaleStyleEnum {
 }
 
 export enum CompanySaleStatusEnum {
-  DRAFT = 'DRAFT',
+  CREATED = 'CREATED',
   IN_PROGRESS = 'IN_PROGRESS',
   COMPLETED = 'COMPLETED',
   CLOSED = 'CLOSED',

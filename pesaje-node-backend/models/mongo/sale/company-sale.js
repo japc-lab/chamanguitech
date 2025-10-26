@@ -76,6 +76,25 @@ const CompanySaleSchema = Schema({
     type: Schema.Types.ObjectId,
     ref: 'CompanySaleTailDetail',
   },
+  summaryPoundsReceived: {
+    type: Number,
+    required: true,
+    min: 0
+  },
+  summaryPerformancePercentage: {
+    type: Number,
+    required: true,
+  },
+  summaryRetentionPercentage: {
+    type: Number,
+    required: true,
+    min: 0
+  },
+  summaryAdditionalPenalty: {
+    type: Number,
+    required: true,
+    min: 0
+  },
   deletedAt: {
     type: Date,
     default: null

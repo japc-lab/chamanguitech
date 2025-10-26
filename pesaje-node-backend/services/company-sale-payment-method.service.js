@@ -4,8 +4,12 @@ const CompanySaleStatusEnum = require('../enums/company-sale-status.enum');
 const normalize = (num) => Math.round((Number(num) + Number.EPSILON) * 100) / 100;
 
 const determineStatus = (totalPaid, totalToReceive) => {
-    if (totalPaid === 0) return CompanySaleStatusEnum.DRAFT;
-    if (totalPaid >= totalToReceive) return CompanySaleStatusEnum.COMPLETED;
+    // Normalize both values to handle floating point precision
+    const normalizedPaid = normalize(totalPaid);
+    const normalizedToReceive = normalize(totalToReceive);
+
+    if (normalizedPaid === 0) return CompanySaleStatusEnum.CREATED;
+    if (normalizedPaid >= normalizedToReceive) return CompanySaleStatusEnum.COMPLETED;
     return CompanySaleStatusEnum.IN_PROGRESS;
 };
 
@@ -18,11 +22,24 @@ const createPaymentMethod = async (data) => {
         const paymentMethod = await dbAdapter.paymentMethodAdapter.getById(data.paymentMethod);
         if (!paymentMethod) throw new Error('Payment Method does not exist');
 
-        const existingPayments = await dbAdapter.companySalePaymentMethodAdapter.getAll({ companySale: data.companySale });
+        // Validate payment amount
+        if (!data.amount || Number(data.amount) <= 0) {
+            throw new Error('Payment amount must be greater than 0');
+        }
+
+        const existingPayments = await dbAdapter.companySalePaymentMethodAdapter.getAll({
+            companySale: data.companySale,
+            deletedAt: null
+        });
         const totalPaid = normalize(existingPayments.reduce((sum, pm) => sum + Number(pm.amount), 0) + Number(data.amount));
 
+        // Validate grand total is valid
+        if (!companySale.grandTotal || companySale.grandTotal <= 0) {
+            throw new Error('Company sale grand total must be greater than 0 to accept payments');
+        }
+
         if (totalPaid > companySale.grandTotal) {
-            throw new Error(`Total payments cannot exceed the expected amount of ${companySale.grandTotal}`);
+            throw new Error(`Total payments (${totalPaid}) cannot exceed the expected amount of ${companySale.grandTotal}`);
         }
 
         const newPayment = await dbAdapter.companySalePaymentMethodAdapter.create(data, { session: transaction.session });
@@ -56,15 +73,26 @@ const updatePaymentMethod = async (id, data) => {
             if (!paymentMethod) throw new Error('New payment method does not exist');
         }
 
+        // Validate payment amount if being updated
+        if (data.amount !== undefined && Number(data.amount) <= 0) {
+            throw new Error('Payment amount must be greater than 0');
+        }
+
         const existingPayments = await dbAdapter.companySalePaymentMethodAdapter.getAll({
             companySale: payment.companySale,
-            _id: { $ne: id }
+            _id: { $ne: id },
+            deletedAt: null
         });
 
         const totalPaid = normalize(existingPayments.reduce((sum, pm) => sum + Number(pm.amount), 0) + (data.amount ? Number(data.amount) : Number(payment.amount)));
 
+        // Validate grand total is valid
+        if (!companySale.grandTotal || companySale.grandTotal <= 0) {
+            throw new Error('Company sale grand total must be greater than 0 to accept payments');
+        }
+
         if (totalPaid > companySale.grandTotal) {
-            throw new Error(`Total payments cannot exceed the expected amount of ${companySale.grandTotal}`);
+            throw new Error(`Total payments (${totalPaid}) cannot exceed the expected amount of ${companySale.grandTotal}`);
         }
 
         await dbAdapter.companySalePaymentMethodAdapter.update(id, data, { session: transaction.session });

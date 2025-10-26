@@ -15,6 +15,8 @@ import { LocalCompanySaleDetailPaymentListingComponent } from './widgets/local-c
 import { LocalSaleSummaryComponent } from './widgets/local-sale-summary/local-sale-summary.component';
 import { CompanySaleWholeDetailComponent } from './widgets/company-sale-whole-detail/company-sale-whole-detail.component';
 import { CompanySaleTailDetailComponent } from './widgets/company-sale-tail-detail/company-sale-tail-detail.component';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { CompanySaleUnitsConversionComponent } from './widgets/company-sale-units-conversion/company-sale-units-conversion.component';
 import { CompanySaleSummaryComponent } from './widgets/company-sale-summary/company-sale-summary.component';
 
 @NgModule({
@@ -29,6 +31,7 @@ import { CompanySaleSummaryComponent } from './widgets/company-sale-summary/comp
     LocalSaleSummaryComponent,
     CompanySaleWholeDetailComponent,
     CompanySaleTailDetailComponent,
+    CompanySaleUnitsConversionComponent,
     CompanySaleSummaryComponent,
   ],
   imports: [
@@ -39,6 +42,7 @@ import { CompanySaleSummaryComponent } from './widgets/company-sale-summary/comp
     CrudModule,
     SharedModule,
     NgbModule,
+    MatDatepickerModule,
   ],
   providers: [NgbActiveModal],
 })
