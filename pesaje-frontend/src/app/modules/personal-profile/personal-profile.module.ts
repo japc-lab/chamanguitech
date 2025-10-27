@@ -22,6 +22,7 @@ import {
   NgbTooltipModule,
 } from '@ng-bootstrap/ng-bootstrap';
 import { SharedModule } from '../shared/shared.module';
+import { TranslationModule } from '../i18n/translation.module';
 
 @NgModule({
   declarations: [
@@ -46,6 +47,7 @@ import { SharedModule } from '../shared/shared.module';
     NgbDropdownModule,
     NgbCollapseModule,
     NgbTooltipModule,
+    TranslationModule,
   ],
 })
 export class PersonalProfileModule {}

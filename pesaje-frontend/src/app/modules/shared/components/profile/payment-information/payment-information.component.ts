@@ -19,6 +19,7 @@ import { PERMISSION_ROUTES } from 'src/app/constants/routes.constants';
 import { IPaymentInfoModel } from '../../../interfaces/payment-info.interface';
 import { PaymentInfoService } from '../../../services/payment-info.service';
 import { ActivatedRoute, ROUTES } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-payment-information',
@@ -40,46 +41,25 @@ export class PaymentInformationComponent
   @ViewChild('noticeSwal') noticeSwal!: SwalComponent;
   swalOptions: SweetAlertOptions = {};
 
-  datatableConfig: Config = {
-    serverSide: false,
-    paging: true,
-    pageLength: 10,
-    data: [], // ✅ Ensure default is an empty array
-    columns: [
-      {
-        title: 'ID',
-        data: 'id',
-        visible: false,
-      },
-      {
-        title: '# Cuenta',
-        data: 'accountNumber',
-        render: (data, type, full) =>
-          `${full?.bankName} - ${data?.toUpperCase()}`,
-      },
-      {
-        title: 'Nombre',
-        data: 'accountName',
-        render: (data) => `${data?.toUpperCase()}`,
-      },
-      {
-        title: 'Identificación',
-        data: 'identification',
-        render: (data) => `${data?.toUpperCase()}`,
-      },
-    ],
-    language: {
-      url: 'https://cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json',
-    },
-  };
+  datatableConfig: Config = {} as Config;
 
   constructor(
     private paymentInfoService: PaymentInfoService,
     private route: ActivatedRoute,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {
+    this.initializeDatatableConfig();
+
+    // Subscribe to language changes and reinitialize datatable config with new translations
+    const langSub = this.translate.onLangChange.subscribe(() => {
+      this.initializeDatatableConfig();
+      this.cdr.detectChanges();
+    });
+    this.unsubscribe.push(langSub);
+
     if (!this.permissionRoute) {
       this.permissionRoute = PERMISSION_ROUTES.PERSONAL_PROFILE.MY_PROFILE;
     }
@@ -95,6 +75,46 @@ export class PaymentInformationComponent
     } else {
       this.loadPaymentInfos(); // ✅ Load if personId is provided as input
     }
+  }
+
+  // 🔹 Initialize DataTable Configuration with Translations
+  initializeDatatableConfig(): void {
+    // Preserve existing data when reinitializing (e.g., during language change)
+    const currentData = this.datatableConfig?.data || [];
+
+    this.datatableConfig = {
+      serverSide: false,
+      paging: true,
+      pageLength: 10,
+      data: currentData,
+      columns: [
+        {
+          title: 'ID',
+          data: 'id',
+          visible: false,
+        },
+        {
+          title: this.translate.instant(
+            'PROFILE.PAYMENT_INFO.TABLE.ACCOUNT_NUMBER'
+          ),
+          data: 'accountNumber',
+          render: (data, type, full) =>
+            `${full?.bankName} - ${data?.toUpperCase()}`,
+        },
+        {
+          title: this.translate.instant('PROFILE.PAYMENT_INFO.TABLE.NAME'),
+          data: 'accountName',
+          render: (data) => `${data?.toUpperCase()}`,
+        },
+        {
+          title: this.translate.instant(
+            'PROFILE.PAYMENT_INFO.TABLE.IDENTIFICATION'
+          ),
+          data: 'identification',
+          render: (data) => `${data?.toUpperCase()}`,
+        },
+      ],
+    };
   }
 
   ngAfterViewInit(): void {}
@@ -125,8 +145,10 @@ export class PaymentInformationComponent
         error: () => {
           this.showAlert({
             icon: 'error',
-            title: 'Error',
-            text: 'No se pudo cargar la información de pago.',
+            title: this.translate.instant('ERROR.TITLE'),
+            text: this.translate.instant(
+              'PROFILE.PAYMENT_INFO.MESSAGES.LOAD_ERROR'
+            ),
           });
         },
       });
@@ -149,8 +171,10 @@ export class PaymentInformationComponent
       error: () => {
         this.showAlert({
           icon: 'error',
-          title: 'Error',
-          text: 'No se pudo eliminar la información de pago.',
+          title: this.translate.instant('ERROR.TITLE'),
+          text: this.translate.instant(
+            'PROFILE.PAYMENT_INFO.MESSAGES.DELETE_ERROR'
+          ),
         });
       },
     });
@@ -174,7 +198,14 @@ export class PaymentInformationComponent
       return;
     }
 
-    if (!this.personId) return;
+    if (!this.personId) {
+      this.showAlert({
+        icon: 'error',
+        title: this.translate.instant('ERROR.TITLE'),
+        text: this.translate.instant('PROFILE.PAYMENT_INFO.MESSAGES.PERSON_ID_ERROR'),
+      });
+      return;
+    }
 
     this.paymentInfo.personId = this.personId;
 
@@ -182,15 +213,17 @@ export class PaymentInformationComponent
 
     const successAlert: SweetAlertOptions = {
       icon: 'success',
-      title: '¡Éxito!',
+      title: this.translate.instant('SUCCESS.TITLE'),
       text: this.paymentInfo.id
-        ? 'Información de pago actualizada correctamente.'
-        : 'Información de pago creada correctamente.',
+        ? this.translate.instant('PROFILE.PAYMENT_INFO.MESSAGES.UPDATE_SUCCESS')
+        : this.translate.instant(
+            'PROFILE.PAYMENT_INFO.MESSAGES.CREATE_SUCCESS'
+          ),
     };
 
     const errorAlert: SweetAlertOptions = {
       icon: 'error',
-      title: 'Error',
+      title: this.translate.instant('ERROR.TITLE'),
       text: '',
     };
 
@@ -219,7 +252,9 @@ export class PaymentInformationComponent
             this.reloadEvent.emit(true);
           },
           error: (error) => {
-            errorAlert.text = 'No se pudo actualizar la información de pago.';
+            errorAlert.text = this.translate.instant(
+              'PROFILE.PAYMENT_INFO.MESSAGES.UPDATE_ERROR'
+            );
             this.showAlert(errorAlert);
             this.isLoading = false;
           },
@@ -234,7 +269,9 @@ export class PaymentInformationComponent
           this.loadPaymentInfos(); // ✅ Reload the list after creation
         },
         error: (error) => {
-          errorAlert.text = 'No se pudo crear la información de pago.';
+          errorAlert.text = this.translate.instant(
+            'PROFILE.PAYMENT_INFO.MESSAGES.CREATE_ERROR'
+          );
           this.showAlert(errorAlert);
           this.isLoading = false;
         },
@@ -253,7 +290,7 @@ export class PaymentInformationComponent
   showAlert(swalOptions: SweetAlertOptions): void {
     this.swalOptions = {
       buttonsStyling: false,
-      confirmButtonText: 'Ok, entendido!',
+      confirmButtonText: this.translate.instant('BUTTONS.OK'),
       customClass: {
         confirmButton:
           'btn btn-' + (swalOptions.icon === 'error' ? 'danger' : 'primary'),

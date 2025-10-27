@@ -3,7 +3,7 @@
     <form novalidate class="form" #profileForm="ngForm">
       <div class="card-body border-top p-9">
         <div class="row mb-6">
-          <label class="col-lg-4 col-form-label fw-bold fs-6">Avatar</label>
+          <label class="col-lg-4 col-form-label fw-bold fs-6" translate="PROFILE.PERSONAL_INFO.FIELDS.AVATAR"></label>
           <div class="col-lg-8">
             <div class="image-input image-input-outline" data-kt-image-input="true">
               <div class="image-input-wrapper w-125px h-125px" [style.background-image]="user!.person.photo
@@ -14,91 +14,97 @@
           </div>
         </div>
         <div class="row mb-6">
-          <label class="col-lg-4 col-form-label required fw-bold fs-6">Nombre Completo</label>
+          <label class="col-lg-4 col-form-label required fw-bold fs-6" translate="PROFILE.PERSONAL_INFO.FIELDS.FULL_NAME"></label>
           <div class="col-lg-8">
             <div class="row">
               <div class="col-lg-6 fv-row">
                 <input type="text" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
-                  placeholder="Nombres" name="names" [(ngModel)]="user!.person.names">
+                  [placeholder]="'PROFILE.PERSONAL_INFO.PLACEHOLDERS.FIRST_NAME' | translate" name="names" [(ngModel)]="user!.person.names">
               </div>
               <div class="col-lg-6 fv-row">
-                <input type="text" class="form-control form-control-lg form-control-solid" placeholder="Apellidos"
+                <input type="text" class="form-control form-control-lg form-control-solid"
+                  [placeholder]="'PROFILE.PERSONAL_INFO.PLACEHOLDERS.LAST_NAME' | translate"
                   name="lastNames" [(ngModel)]="user!.person.lastNames">
               </div>
             </div>
           </div>
         </div>
         <div class="row mb-6">
-          <label class="col-lg-4 col-form-label required fw-bold fs-6">Identificación</label>
+          <label class="col-lg-4 col-form-label required fw-bold fs-6" translate="PROFILE.PERSONAL_INFO.FIELDS.IDENTIFICATION"></label>
           <div class="col-lg-8 fv-row">
-            <input type="text" class="form-control form-control-lg form-control-solid" placeholder="Identificación"
+            <input type="text" class="form-control form-control-lg form-control-solid"
+              [placeholder]="'PROFILE.PERSONAL_INFO.PLACEHOLDERS.IDENTIFICATION' | translate"
               name="identification" [(ngModel)]="user!.person.identification">
           </div>
         </div>
         <div class="row mb-6">
-          <label class="col-lg-4 col-form-label required fw-bold fs-6">Fecha de Nacimiento</label>
+          <label class="col-lg-4 col-form-label required fw-bold fs-6" translate="PROFILE.PERSONAL_INFO.FIELDS.BIRTH_DATE"></label>
           <div class="col-lg-8 fv-row">
             <input type="date" class="form-control form-control-lg form-control-solid" name="birthDate"
               [ngModel]="user!.person.birthDate | date:'yyyy-MM-dd'" (ngModelChange)="user!.person.birthDate = $event">
           </div>
         </div>
         <div class="row mb-6">
-          <label class="col-lg-4 col-form-label required fw-bold fs-6">Dirección</label>
+          <label class="col-lg-4 col-form-label required fw-bold fs-6" translate="PROFILE.PERSONAL_INFO.FIELDS.ADDRESS"></label>
           <div class="col-lg-8 fv-row">
-            <input type="text" class="form-control form-control-lg form-control-solid" placeholder="Dirección"
+            <input type="text" class="form-control form-control-lg form-control-solid"
+              [placeholder]="'PROFILE.PERSONAL_INFO.PLACEHOLDERS.ADDRESS' | translate"
               name="address" [(ngModel)]="user!.person.address">
           </div>
         </div>
         <div class="row mb-6">
-          <label class="col-lg-4 col-form-label required fw-bold fs-6">Teléfonos</label>
+          <label class="col-lg-4 col-form-label required fw-bold fs-6" translate="PROFILE.PERSONAL_INFO.FIELDS.PHONES"></label>
           <div class="col-lg-8">
             <div class="row">
               <div class="col-lg-4 fv-row">
                 <input type="tel" class="form-control form-control-lg form-control-solid mb-3"
-                  placeholder="Teléfono fijo" name="phone" [(ngModel)]="user!.person.phone">
+                  [placeholder]="'PROFILE.PERSONAL_INFO.PLACEHOLDERS.LANDLINE' | translate" name="phone" [(ngModel)]="user!.person.phone">
               </div>
               <div class="col-lg-4 fv-row">
-                <input type="tel" class="form-control form-control-lg form-control-solid mb-3" placeholder="Celular 1"
+                <input type="tel" class="form-control form-control-lg form-control-solid mb-3"
+                  [placeholder]="'PROFILE.PERSONAL_INFO.PLACEHOLDERS.MOBILE_1' | translate"
                   name="mobilePhone" [(ngModel)]="user!.person.mobilePhone">
               </div>
               <div class="col-lg-4 fv-row">
-                <input type="tel" class="form-control form-control-lg form-control-solid" placeholder="Celular 2"
+                <input type="tel" class="form-control form-control-lg form-control-solid"
+                  [placeholder]="'PROFILE.PERSONAL_INFO.PLACEHOLDERS.MOBILE_2' | translate"
                   name="mobilePhone2" [(ngModel)]="user!.person.mobilePhone2">
               </div>
             </div>
           </div>
         </div>
         <div class="row mb-6">
-          <label class="col-lg-4 col-form-label fw-bold fs-6">Correo Electrónico</label>
+          <label class="col-lg-4 col-form-label fw-bold fs-6" translate="PROFILE.PERSONAL_INFO.FIELDS.EMAIL"></label>
           <div class="col-lg-8 fv-row">
-            <input type="email" class="form-control form-control-lg form-control-solid" placeholder="Correo electrónico"
+            <input type="email" class="form-control form-control-lg form-control-solid"
+              [placeholder]="'PROFILE.PERSONAL_INFO.PLACEHOLDERS.EMAIL' | translate"
               name="email" [(ngModel)]="user!.person.email">
           </div>
         </div>
         <div class="row mb-6">
-          <label class="col-lg-4 col-form-label required fw-bold fs-6">Contacto de Emergencia</label>
+          <label class="col-lg-4 col-form-label required fw-bold fs-6" translate="PROFILE.PERSONAL_INFO.FIELDS.EMERGENCY_CONTACT"></label>
           <div class="col-lg-8">
             <div class="row">
               <div class="col-lg-6 fv-row">
                 <input type="text" class="form-control form-control-lg form-control-solid mb-3"
-                  placeholder="Nombre contacto" name="emergencyContactName"
+                  [placeholder]="'PROFILE.PERSONAL_INFO.PLACEHOLDERS.EMERGENCY_NAME' | translate" name="emergencyContactName"
                   [(ngModel)]="user!.person.emergencyContactName">
               </div>
               <div class="col-lg-6 fv-row">
                 <input type="tel" class="form-control form-control-lg form-control-solid"
-                  placeholder="Teléfono contacto" name="emergencyContactPhone"
+                  [placeholder]="'PROFILE.PERSONAL_INFO.PLACEHOLDERS.EMERGENCY_PHONE' | translate" name="emergencyContactPhone"
                   [(ngModel)]="user!.person.emergencyContactPhone">
               </div>
             </div>
           </div>
         </div>
         <div class="row mb-6">
-          <label class="col-lg-4 col-form-label required fw-bold fs-6">Contraseña</label>
+          <label class="col-lg-4 col-form-label required fw-bold fs-6" translate="PROFILE.PERSONAL_INFO.FIELDS.PASSWORD"></label>
           <div class="col-lg-8">
             <div class="row">
               <div class="col-lg-6 fv-row">
                 <input type="password" class="form-control form-control-lg form-control-solid mb-3"
-                  placeholder="••••••••" name="password" [(ngModel)]="user!.password" autocomplete="new-password">
+                  [placeholder]="'PROFILE.PERSONAL_INFO.PLACEHOLDERS.PASSWORD' | translate" name="password" [(ngModel)]="user!.password" autocomplete="new-password">
               </div>
             </div>
           </div>
@@ -107,9 +113,9 @@
 
       <div class="card-footer d-flex justify-content-end py-6 px-9">
         <button type="button" class="btn btn-primary" [disabled]="isLoading" (click)="saveSettings()">
-          <span *ngIf="!isLoading">Guardar Cambios</span>
+          <span *ngIf="!isLoading" translate="BUTTONS.SAVE"></span>
           <span *ngIf="isLoading" class="indicator-progress">
-            Por favor, espere...
+            <span translate="BUTTONS.PLEASE_WAIT"></span>
             <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
           </span>
         </button>
