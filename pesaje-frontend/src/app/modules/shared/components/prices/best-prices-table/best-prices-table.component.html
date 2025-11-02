@@ -11,7 +11,7 @@
       <table class="table table-bordered align-middle">
         <thead>
           <tr>
-            <th class="sticky-column">Tamaño</th>
+            <th class="sticky-column">{{'SIZE_PRICE.TABLES.COLUMNS.SIZE' | translate}}</th>
             <th *ngFor="let company of group.sizes[0]?.companies" class="text-nowrap">
               {{company.company.name}}
             </th>
@@ -32,5 +32,5 @@
 </div>
 
 <div *ngIf="processedData.length === 0" class="text-center text-muted py-5">
-  No hay datos disponibles para mostrar
+  {{'COMMON.NO_DATA_AVAILABLE' | translate}}
 </div>

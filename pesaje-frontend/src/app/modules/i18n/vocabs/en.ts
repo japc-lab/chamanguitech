@@ -167,10 +167,13 @@ export const locale = {
       SEARCH: 'Search',
       LOADING: 'Loading...',
       NEW: 'New',
+      NO_DATA_AVAILABLE: 'No data available to display',
     },
     SIZE_PRICE: {
       TITLE: 'Periods',
       NEW_PERIOD_TITLE: 'New Period',
+      BEST_PRICES_TITLE: 'Best Prices',
+      SELECT_PERIOD_MESSAGE: 'Select a period to view its prices by size.',
       FIELDS: {
         COMPANY: 'Company',
         PERIOD: 'Period',
@@ -200,6 +203,7 @@ export const locale = {
         PERIOD_START_DATE_REQUIRED: 'Period start date is required.',
         PERIOD_END_DATE_REQUIRED: 'Period end date is required.',
         TIME_OF_DAY_REQUIRED: 'Time of day is required.',
+        PERIOD_SELECTION_REQUIRED: 'You must select a period',
       },
       TABLES: {
         HEADLESS: 'Tail',

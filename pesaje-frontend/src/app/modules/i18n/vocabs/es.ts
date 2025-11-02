@@ -169,10 +169,13 @@ export const locale = {
       SEARCH: 'Buscar',
       LOADING: 'Cargando...',
       NEW: 'Nuevo',
+      NO_DATA_AVAILABLE: 'No hay datos disponibles para mostrar',
     },
     SIZE_PRICE: {
       TITLE: 'Períodos',
       NEW_PERIOD_TITLE: 'Nuevo Periodo',
+      BEST_PRICES_TITLE: 'Mejores Precios',
+      SELECT_PERIOD_MESSAGE: 'Selecciona un periodo para ver sus precios por talla.',
       FIELDS: {
         COMPANY: 'Compañía',
         PERIOD: 'Período',
@@ -202,6 +205,7 @@ export const locale = {
         PERIOD_START_DATE_REQUIRED: 'La fecha de inicio del periodo es obligatoria.',
         PERIOD_END_DATE_REQUIRED: 'La fecha de fin del periodo es obligatoria.',
         TIME_OF_DAY_REQUIRED: 'La hora del día es obligatoria.',
+        PERIOD_SELECTION_REQUIRED: 'Debe seleccionar un período',
       },
       TABLES: {
         HEADLESS: 'Cola',
