@@ -27,6 +27,7 @@ import {
 import { AlertService } from 'src/app/utils/alert.service';
 import { IPaymentMethodModel } from '../../shared/interfaces/payment-method.interface';
 import { DateUtilsService } from 'src/app/utils/date-utils.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-purchase-payment-listing',
@@ -54,57 +55,7 @@ export class PurchasePaymentListingComponent implements OnInit, OnDestroy {
 
   @ViewChild('myForm') paymentForm!: NgForm;
 
-  datatableConfig: Config = {
-    serverSide: false,
-    paging: true,
-    pageLength: 10,
-    data: [],
-    columns: [
-      {
-        title: 'Tipo de Pago',
-        data: 'paymentMethod.name',
-        render: function (data) {
-          return data ? data : '-';
-        },
-      },
-      {
-        title: 'Nombre de Cuenta Bancaria',
-        data: 'accountName',
-        render: function (data) {
-          return data ? data : '-';
-        },
-      },
-      {
-        title: 'Monto',
-        data: 'amount',
-        render: function (data) {
-          if (!data && data !== 0) return '-';
-
-          const formatted = new Intl.NumberFormat('es-ES', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          }).format(data);
-
-          return `$${formatted}`;
-        },
-      },
-      {
-        title: 'Fecha de Pago',
-        data: 'paymentDate',
-        render: function (data) {
-          if (!data) return '-';
-          const date = new Date(data);
-          return date.toLocaleDateString('es-ES');
-        },
-      },
-    ],
-    language: {
-      url: 'https://cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json',
-    },
-    createdRow: function (row, data, dataIndex) {
-      $('td:eq(0)', row).addClass('d-flex align-items-center');
-    },
-  };
+  datatableConfig: Config = {} as Config;
 
   constructor(
     private purchasePaymentService: PurchasePaymentService,
@@ -115,12 +66,80 @@ export class PurchasePaymentListingComponent implements OnInit, OnDestroy {
     private alertService: AlertService,
     private dateUtils: DateUtilsService,
     private modalService: NgbModal,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {
+    this.initializeDatatableConfig();
+
+    // Subscribe to language changes and reinitialize datatable config with new translations
+    const langSub = this.translate.onLangChange.subscribe(() => {
+      this.initializeDatatableConfig();
+      this.cdr.detectChanges();
+    });
+    this.unsubscribe.push(langSub);
+
     this.loadPaymentsMethods();
     this.loadPurchasePaymentsById(this.purchaseId);
+  }
+
+  // 🔹 Initialize DataTable Configuration with Translations
+  initializeDatatableConfig(): void {
+    // Preserve existing data when reinitializing (e.g., during language change)
+    const currentData = this.datatableConfig?.data || [];
+
+    this.datatableConfig = {
+      serverSide: false,
+      paging: true,
+      pageLength: 10,
+      data: currentData,
+      columns: [
+        {
+          title: this.translate.instant('PAYMENTS.FIELDS.PAYMENT_TYPE'),
+          data: 'paymentMethod.name',
+          render: function (data) {
+            return data ? data : '-';
+          },
+        },
+        {
+          title: this.translate.instant('PAYMENTS.FIELDS.ACCOUNT_NAME'),
+          data: 'accountName',
+          render: function (data) {
+            return data ? data : '-';
+          },
+        },
+        {
+          title: this.translate.instant('PAYMENTS.FIELDS.AMOUNT'),
+          data: 'amount',
+          render: function (data) {
+            if (!data && data !== 0) return '-';
+
+            const formatted = new Intl.NumberFormat('es-ES', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            }).format(data);
+
+            return `$${formatted}`;
+          },
+        },
+        {
+          title: this.translate.instant('PAYMENTS.FIELDS.PAYMENT_DATE'),
+          data: 'paymentDate',
+          render: function (data) {
+            if (!data) return '-';
+            const date = new Date(data);
+            return date.toLocaleDateString('es-ES');
+          },
+        },
+      ],
+      language: {
+        url: 'https://cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json',
+      },
+      createdRow: function (row, data, dataIndex) {
+        $('td:eq(0)', row).addClass('d-flex align-items-center');
+      },
+    };
   }
 
   loadPurchasePaymentsById(purchaseId: string): void {

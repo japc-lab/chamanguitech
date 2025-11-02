@@ -1,22 +1,22 @@
 <div class="card">
   <div class="card-body">
     <div class="d-flex flex-wrap flex-stack mb-3">
-      <h3 class="fw-bolder my-2">Buscar por</h3>
+      <h3 class="fw-bolder my-2">{{ 'PURCHASES.RECENT_PURCHASES.TITLE' | translate }}</h3>
     </div>
 
     <div class="row g-3">
 
       <!-- Row 1: Control Number + Cliente -->
       <div class="col-md-3">
-        <label for="controlNumber" class="fw-semibold fs-6 mb-2">Número de control</label>
+        <label for="controlNumber" class="fw-semibold fs-6 mb-2">{{ 'PURCHASES.FIELDS.CONTROL_NUMBER' | translate }}</label>
         <input type="text" id="controlNumber" name="controlNumber" placeholder="0" class="form-control form-control-sm"
           [(ngModel)]="controlNumber" />
       </div>
 
       <div class="col-md-5">
-        <label for="client" class="fw-semibold fs-6 mb-2">Cliente</label>
+        <label for="client" class="fw-semibold fs-6 mb-2">{{ 'PURCHASES.FIELDS.CLIENT' | translate }}</label>
         <select id="client" name="client" class="form-select form-select-sm" [(ngModel)]="selectedClient">
-          <option value="" selected>Seleccione una opción</option>
+          <option value="" selected>{{ 'PURCHASES.PLACEHOLDERS.SELECT_OPTION' | translate }}</option>
           <option *ngFor="let client of clients" [value]="client.id">
             {{ client.person.names }} {{ client.person.lastNames }}
           </option>
@@ -28,10 +28,10 @@
 
       <!-- Row 2: Compañía + Periodo + Buttons -->
       <div class="col-md-4">
-        <label for="company" class="fw-semibold fs-6 mb-2">Compañía</label>
+        <label for="company" class="fw-semibold fs-6 mb-2">{{ 'PURCHASES.FIELDS.COMPANY' | translate }}</label>
         <select id="company" name="company" class="form-select form-select-sm" [(ngModel)]="selectedCompany"
           (change)="onCompanyChange()">
-          <option value="" selected>Seleccione una opción</option>
+          <option value="" selected>{{ 'PURCHASES.PLACEHOLDERS.SELECT_OPTION' | translate }}</option>
           <option *ngFor="let company of companies" [value]="company.id">
             {{ company.name }}
           </option>
@@ -39,9 +39,9 @@
       </div>
 
       <div class="col-md-4">
-        <label for="period" class="fw-semibold fs-6 mb-2">Período</label>
+        <label for="period" class="fw-semibold fs-6 mb-2">{{ 'PURCHASES.FIELDS.PERIOD' | translate }}</label>
         <select id="period" name="period" class="form-select form-select-sm" [(ngModel)]="selectedPeriod">
-          <option value="" selected>Seleccione una opción</option>
+          <option value="" selected>{{ 'PURCHASES.PLACEHOLDERS.SELECT_OPTION' | translate }}</option>
           <option *ngFor="let period of existingPeriods" [value]="period.id">
             {{ period.name }}
           </option>
@@ -50,8 +50,8 @@
 
       <!-- Button Group -->
       <div class="col-md-4 d-flex align-items-end justify-content-end gap-2">
-        <button class="btn btn-primary btn-sm px-4" (click)="loadRecentPurchases()">Buscar</button>
-        <button class="btn btn-secondary btn-sm px-4" (click)="clearFilters()">Limpiar Filtros</button>
+        <button class="btn btn-primary btn-sm px-4" (click)="loadRecentPurchases()">{{ 'PURCHASES.RECENT_PURCHASES.BUTTONS.SEARCH' | translate }}</button>
+        <button class="btn btn-secondary btn-sm px-4" (click)="clearFilters()">{{ 'PURCHASES.RECENT_PURCHASES.BUTTONS.CLEAR_FILTERS' | translate }}</button>
       </div>
 
     </div>

@@ -17,6 +17,7 @@ import { NewPurchaseComponent } from './new-purchase/new-purchase.component';
 import { MaterialModule } from 'src/app/material.module';
 import { PurchasePaymentListingComponent } from './purchase-payment-listing/purchase-payment-listing.component';
 import { RecentPurchasesComponent } from './recent-purchases/recent-purchases.component';
+import { TranslationModule } from '../i18n/translation.module';
 
 @NgModule({
   declarations: [
@@ -38,6 +39,7 @@ import { RecentPurchasesComponent } from './recent-purchases/recent-purchases.co
     NgbDropdownModule,
     NgbCollapseModule,
     NgbTooltipModule,
+    TranslationModule,
   ],
 })
 export class PurchasesModule {}
