@@ -38,7 +38,7 @@ import { CompanyService } from 'src/app/modules/settings/services/company.servic
   templateUrl: './size-price.component.html',
 })
 export class SizePriceComponent implements OnInit, OnDestroy {
-  PERMISSION_ROUTE = PERMISSION_ROUTES.PRICES;
+  PERMISSION_ROUTE = PERMISSION_ROUTES.PRICES.BY_COMPANY;
 
   @ViewChild(WholeTableComponent) wholeTableComponent!: WholeTableComponent;
   @ViewChild(HeadlessTableComponent)

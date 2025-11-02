@@ -168,6 +168,59 @@ export const locale = {
     COMMON: {
       SEARCH: 'Buscar',
       LOADING: 'Cargando...',
+      NEW: 'Nuevo',
+    },
+    SIZE_PRICE: {
+      TITLE: 'Períodos',
+      NEW_PERIOD_TITLE: 'Nuevo Periodo',
+      FIELDS: {
+        COMPANY: 'Compañía',
+        PERIOD: 'Período',
+        YEAR: 'Año',
+        PERIOD_NUMBER: 'Periodo',
+        RECEIVED_DATE: 'Fecha de recibido',
+        RECEIVED_TIME: 'Hora de recibido',
+        PERIOD_START_DATE: 'Fecha inicio periodo',
+        PERIOD_END_DATE: 'Fecha fin periodo',
+        TIME_OF_DAY: 'Hora del día',
+      },
+      PLACEHOLDERS: {
+        SELECT_OPTION: 'Seleccione una opción',
+        PERIOD_NUMBER: '0',
+      },
+      TIME_OPTIONS: {
+        DAY: 'Día',
+        NIGHT: 'Noche',
+      },
+      VALIDATIONS: {
+        COMPANY_REQUIRED: 'Debe seleccionar una compañía',
+        PERIOD_REQUIRED: 'Debe seleccionar un mes',
+        YEAR_REQUIRED: 'Debe seleccionar un año',
+        PERIOD_NUMBER_REQUIRED: 'Debe ingresar un periodo',
+        RECEIVED_DATE_REQUIRED: 'La fecha de recibido es obligatoria.',
+        RECEIVED_TIME_REQUIRED: 'La hora de recibido es obligatoria.',
+        PERIOD_START_DATE_REQUIRED: 'La fecha de inicio del periodo es obligatoria.',
+        PERIOD_END_DATE_REQUIRED: 'La fecha de fin del periodo es obligatoria.',
+        TIME_OF_DAY_REQUIRED: 'La hora del día es obligatoria.',
+      },
+      TABLES: {
+        HEADLESS: 'Cola',
+        WHOLE: 'Entero',
+        RESIDUAL: 'Residual',
+        COLUMNS: {
+          SIZE: 'Talla',
+          PRICE: 'Precio ($)',
+          PRICE_TAIL_A: 'Precio ($) Cola A',
+          PRICE_TAIL_A_MINUS: 'Precio ($) Cola A-',
+          PRICE_TAIL_B: 'Precio ($) Cola B',
+        },
+        PLACEHOLDERS: {
+          PRICE: '0.00',
+        },
+        VALIDATIONS: {
+          INVALID_NUMBER: 'Ingrese un número válido',
+        },
+      },
     },
     PROFILE: {
       MY_PROFILE: {

@@ -5,7 +5,10 @@ export const PERMISSION_ROUTES = {
     BROKERS: '/personal-profile/brokers',
   },
   CLIENTS: '/clients',
-  PRICES: '/prices',
+  PRICES: {
+    BY_COMPANY: '/prices/by-company',
+    BEST_PRICES: '/prices/best-prices',
+  },
   PURCHASES: {
     PURCHASE_FORM: '/purchases/form',
     RECENT_PRUCHASES: '/purchases/list',

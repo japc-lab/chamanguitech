@@ -166,6 +166,59 @@ export const locale = {
     COMMON: {
       SEARCH: 'Search',
       LOADING: 'Loading...',
+      NEW: 'New',
+    },
+    SIZE_PRICE: {
+      TITLE: 'Periods',
+      NEW_PERIOD_TITLE: 'New Period',
+      FIELDS: {
+        COMPANY: 'Company',
+        PERIOD: 'Period',
+        YEAR: 'Year',
+        PERIOD_NUMBER: 'Period',
+        RECEIVED_DATE: 'Received Date',
+        RECEIVED_TIME: 'Received Time',
+        PERIOD_START_DATE: 'Period Start Date',
+        PERIOD_END_DATE: 'Period End Date',
+        TIME_OF_DAY: 'Time of Day',
+      },
+      PLACEHOLDERS: {
+        SELECT_OPTION: 'Select an option',
+        PERIOD_NUMBER: '0',
+      },
+      TIME_OPTIONS: {
+        DAY: 'Day',
+        NIGHT: 'Night',
+      },
+      VALIDATIONS: {
+        COMPANY_REQUIRED: 'You must select a company',
+        PERIOD_REQUIRED: 'You must select a month',
+        YEAR_REQUIRED: 'You must select a year',
+        PERIOD_NUMBER_REQUIRED: 'You must enter a period',
+        RECEIVED_DATE_REQUIRED: 'Received date is required.',
+        RECEIVED_TIME_REQUIRED: 'Received time is required.',
+        PERIOD_START_DATE_REQUIRED: 'Period start date is required.',
+        PERIOD_END_DATE_REQUIRED: 'Period end date is required.',
+        TIME_OF_DAY_REQUIRED: 'Time of day is required.',
+      },
+      TABLES: {
+        HEADLESS: 'Tail',
+        WHOLE: 'Whole',
+        RESIDUAL: 'Residual',
+        COLUMNS: {
+          SIZE: 'Size',
+          PRICE: 'Price ($)',
+          PRICE_TAIL_A: 'Price ($) Tail A',
+          PRICE_TAIL_A_MINUS: 'Price ($) Tail A-',
+          PRICE_TAIL_B: 'Price ($) Tail B',
+        },
+        PLACEHOLDERS: {
+          PRICE: '0.00',
+        },
+        VALIDATIONS: {
+          INVALID_NUMBER: 'Enter a valid number',
+        },
+      },
     },
     PROFILE: {
       MY_PROFILE: {
