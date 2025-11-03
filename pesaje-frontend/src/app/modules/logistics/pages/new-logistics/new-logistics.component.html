@@ -2,18 +2,18 @@
 <div class="card card-xl-stretch mb-xl-8">
   <div class="card-header border-0 pt-5 d-flex justify-content-between align-items-center">
     <h4 class="card-title align-items-start flex-column">
-      <span class="card-label fw-bolder fs-3 mb-1">Buscar por número de control</span>
+      <span class="card-label fw-bolder fs-3 mb-1" translate="LOGISTICS.SECTIONS.SEARCH_INFO"></span>
     </h4>
 
     <div class="d-flex gap-2">
       <!-- Back Button -->
       <button *ngIf="logisticsId" type="button" class="btn btn-light btn-sm" (click)="goBack()">
-        <i class="bi bi-arrow-left me-1"></i> Volver
+        <i class="bi bi-arrow-left me-1"></i> <span translate="BUTTONS.BACK"></span>
       </button>
 
       <!-- New Button -->
       <button *ngIf="logisticsId" type="button" class="btn btn-outline-success btn-sm" (click)="handleNewLogistics()">
-        <i class="bi bi-plus-circle me-1"></i> Nuevo
+        <i class="bi bi-plus-circle me-1"></i> <span translate="COMMON.NEW"></span>
       </button>
     </div>
   </div>
@@ -22,18 +22,19 @@
       <div class="d-flex align-items-center gap-4">
         <!-- Control Number Input -->
         <input type="text" id="controlNumber" name="controlNumber" class="form-control form-control-sm text-end"
-          placeholder="CO-0" style="max-width: 180px" [disabled]="!!logisticsId" [(ngModel)]="controlNumber" />
+          [placeholder]="'LOGISTICS.PLACEHOLDERS.CONTROL_NUMBER' | translate" style="max-width: 180px"
+          [disabled]="!!logisticsId" [(ngModel)]="controlNumber" />
 
         <!-- Search Button -->
         <button *ngIf="!logisticsId" class="btn btn-outline-primary btn-sm d-flex align-items-center gap-2"
           (click)="searchPurchase()">
-          <i class="bi bi-search"></i> Buscar
+          <i class="bi bi-search"></i> <span translate="COMMON.SEARCH"></span>
         </button>
       </div>
 
       <!-- Required Message -->
       <div *ngIf="searchSubmitted && !controlNumber" class="text-danger mt-1 ms-1 small">
-        El número de control es obligatorio.
+        {{ 'LOGISTICS.VALIDATIONS.CONTROL_NUMBER_REQUIRED' | translate }}
       </div>
     </div>
 
@@ -47,7 +48,7 @@
   <!-- begin::Header -->
   <div class="card-header border-0 pt-5">
     <h4 class="card-title align-items-start flex-column">
-      <span class="card-label fw-bolder fs-3 mb-1">Información de la Compra</span>
+      <span class="card-label fw-bolder fs-3 mb-1" translate="LOGISTICS.SECTIONS.PURCHASE_INFO"></span>
     </h4>
   </div>
   <!-- end::Header -->
@@ -58,42 +59,42 @@
     <div class="row g-5 g-xl-8">
       <!-- Purchase Date -->
       <div class="col-md-6">
-        <label for="purchaseDate" class="fw-semibold fs-6 mb-2">Fecha de la compra</label>
+        <label for="purchaseDate" class="fw-semibold fs-6 mb-2" translate="LOGISTICS.FIELDS.PURCHASE_DATE"></label>
         <input type="date" class="form-control form-control-sm" id="purchaseDate" name="purchaseDate"
           [(ngModel)]="purchaseDateFormatted" disabled>
       </div>
 
       <!-- Buyer -->
       <div class="col-md-6">
-        <label for="buyer" class="fw-semibold fs-6 mb-2">Comprador Responsable</label>
+        <label for="buyer" class="fw-semibold fs-6 mb-2" translate="LOGISTICS.FIELDS.BUYER"></label>
         <input type="text" id="buyer" name="buyer" class="form-control form-control-sm"
           [(ngModel)]="purchaseModel.buyer.fullName" disabled />
       </div>
 
       <!-- Bróker -->
       <div class="col-md-6">
-        <label for="broker" class="fw-semibold fs-6 mb-2">Bróker</label>
+        <label for="broker" class="fw-semibold fs-6 mb-2" translate="LOGISTICS.FIELDS.BROKER"></label>
         <input type="text" id="broker" name="broker" class="form-control form-control-sm"
           [(ngModel)]="purchaseModel.broker.fullName" disabled />
       </div>
 
       <!-- Client -->
       <div class="col-md-6">
-        <label for="company" class="fw-semibold fs-6 mb-2">Propietario de la Piscina</label>
+        <label for="company" class="fw-semibold fs-6 mb-2" translate="LOGISTICS.FIELDS.POOL_OWNER"></label>
         <input type="text" id="company" name="company" class="form-control form-control-sm"
           [(ngModel)]="purchaseModel.client.fullName" disabled />
       </div>
 
       <!-- Shrimp Farm -->
       <div class="col-md-6">
-        <label for="shrimpFarm" class="fw-semibold fs-6 mb-2">Nombre de la Piscina</label>
+        <label for="shrimpFarm" class="fw-semibold fs-6 mb-2" translate="LOGISTICS.FIELDS.POOL_NAME"></label>
         <input type="text" id="shrimpFarm" name="shrimpFarm" class="form-control form-control-sm"
           [(ngModel)]="purchaseModel.shrimpFarm.identifier" disabled />
       </div>
 
       <!-- Farm Place-->
       <div class="col-md-6">
-        <label for="farmPlace" class="fw-semibold fs-6 mb-2">Ubicación de la Piscina</label>
+        <label for="farmPlace" class="fw-semibold fs-6 mb-2" translate="LOGISTICS.FIELDS.POOL_LOCATION"></label>
         <input type="text" id="farmPlace" name="farmPlace" class="form-control form-control-sm"
           [(ngModel)]="purchaseModel.shrimpFarm.place" disabled />
       </div>
@@ -111,11 +112,11 @@
     <div class="card-header border-0 pt-8">
       <div class="d-flex flex-column">
         <h4 class="card-title align-items-start flex-column">
-          <span class="card-label fw-bolder fs-3 mb-1">Información de Logística</span>
+          <span class="card-label fw-bolder fs-3 mb-1" translate="LOGISTICS.SECTIONS.LOGISTICS_INFO"></span>
         </h4>
         <!-- Draft Indicator -->
         <span *ngIf="isEditMode && logisticsModel.status === 'DRAFT'" class="badge badge-warning fs-7 mt-1">
-          <i class="bi bi-pencil-square me-1"></i> Borrador
+          <i class="bi bi-pencil-square me-1"></i> <span translate="LOGISTICS.STATUS.DRAFT"></span>
         </span>
       </div>
     </div>
@@ -127,43 +128,45 @@
       <div class="row g-5 g-xl-8">
         <!-- Logistics Type -->
         <div class="col-md-6">
-          <label for="type" class="required fw-semibold fs-6 mb-2">Tipo</label>
+          <label for="type" class="required fw-semibold fs-6 mb-2" translate="LOGISTICS.FIELDS.TYPE"></label>
           <select id="type" name="type" class="form-select form-select-sm" [(ngModel)]="logisticsModel.type"
             #type="ngModel" required [disabled]="isEditMode && logisticsModel.status !== LogisticsStatusEnum.DRAFT">
-            <option value="" disabled selected>Seleccione una opción</option>
+            <option value="" disabled selected>{{ 'LOGISTICS.PLACEHOLDERS.SELECT_OPTION' | translate }}</option>
             <option *ngFor="let option of logisticsTypes" [ngValue]="option">
               {{ logisticsTypeLabels[option] }}
             </option>
           </select>
           <div *ngIf="logisticsForm.submitted && type.invalid"
             class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-            <div>Debe seleccionar una opción.</div>
+            <div>{{ 'LOGISTICS.VALIDATIONS.TYPE_REQUIRED' | translate }}</div>
           </div>
         </div>
 
         <!-- Logistic Date -->
         <div class="col-md-6">
-          <label for="logisticsDate" class="required fw-semibold fs-6 mb-2">Fecha de logística</label>
+          <label for="logisticsDate" class="required fw-semibold fs-6 mb-2"
+            translate="LOGISTICS.FIELDS.LOGISTICS_DATE"></label>
           <input type="date" class="form-control form-control-sm" id="logisticsDate" name="logisticsDate"
             [ngModel]="logisticsDateFormatted" (ngModelChange)="onDateChange($event)" required #logisticsDate="ngModel">
           <div
             *ngIf="(logisticsForm.submitted || logisticsDate.dirty || logisticsDate.touched) && logisticsDate.errors?.['required']"
             class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-            <div>La fecha de logística es obligatoria.</div>
+            <div>{{ 'LOGISTICS.VALIDATIONS.LOGISTICS_DATE_REQUIRED' | translate }}</div>
           </div>
         </div>
 
         <!-- Logistics Sheet Number -->
         <div class="col-md-6">
-          <label for="logisticsSheetNumber" class="required fw-semibold fs-6 mb-2"># Hoja de logística</label>
+          <label for="logisticsSheetNumber" class="required fw-semibold fs-6 mb-2"
+            translate="LOGISTICS.FIELDS.LOGISTICS_SHEET_NUMBER"></label>
           <input type="text" id="logisticsSheetNumber" name="logisticsSheetNumber"
             [(ngModel)]="logisticsModel.logisticsSheetNumber" #logisticsSheetNumber="ngModel"
             (keypress)="validateNumber($event)" (blur)="formatLogisticsSheetNumberOnBlur($event)"
             (focus)="onLogisticsSheetNumberFocus($event)" class="form-control form-control-sm" maxlength="8"
-            placeholder="00000000" required />
+            [placeholder]="'LOGISTICS.PLACEHOLDERS.LOGISTICS_SHEET_NUMBER' | translate" required />
           <div *ngIf="logisticsForm.submitted && logisticsSheetNumber.invalid"
             class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-            <div>El número de hoja de logística es obligatorio.</div>
+            <div>{{ 'LOGISTICS.VALIDATIONS.LOGISTICS_SHEET_NUMBER_REQUIRED' | translate }}</div>
           </div>
         </div>
       </div>
@@ -188,12 +191,12 @@
   <!-- end::Fifth Section: Logistics Payments Tracking -->
 
   <!-- Sixth Section: Submit Button -->
-  <div class="card card-xl-stretch mb-xl-8 mt-2">
+  <div *ngIf="canSaveLogistics()" class="card card-xl-stretch mb-xl-8 mt-2">
 
     <div class="card-footer d-flex justify-content-end py-6 px-9">
       <!-- Submit Button -->
-      <button *ngIf="canSaveLogistics()" type="submit" class="btn btn-primary">
-        Guardar
+      <button type="submit" class="btn btn-primary">
+        <span translate="BUTTONS.SAVE"></span>
       </button>
     </div>
   </div>

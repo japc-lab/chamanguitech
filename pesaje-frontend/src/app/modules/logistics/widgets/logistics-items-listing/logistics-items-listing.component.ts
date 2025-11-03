@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
 import { ILogisticsItemModel } from '../../interfaces/logistics-item.interface';
 import {
   LogisticsFinanceCategoryEnum,
@@ -6,14 +6,16 @@ import {
 } from '../../interfaces/logistics.interface';
 import { InputUtilsService } from 'src/app/utils/input-utils.service';
 import { NgModel } from '@angular/forms';
+import { TranslateService } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-logistics-items-listing',
   templateUrl: './logistics-items-listing.component.html',
   styleUrl: './logistics-items-listing.component.scss',
 })
-export class LogisticsItemsListingComponent implements OnInit, OnChanges {
-  @Input() title: string = 'Detalles de Logística';
+export class LogisticsItemsListingComponent implements OnInit, OnChanges, OnDestroy {
+  @Input() title: string = '';
   @Input() logisticsItems: ILogisticsItemModel[] = [];
   @Output() logisticsItemsChange = new EventEmitter<ILogisticsItemModel[]>();
 
@@ -25,10 +27,17 @@ export class LogisticsItemsListingComponent implements OnInit, OnChanges {
   tableRows: ILogisticsItemModel[] = [];
   total = 0;
 
-  constructor(private inputUtils: InputUtilsService) {}
+  private langChangeSubscription?: Subscription;
+
+  constructor(
+    private inputUtils: InputUtilsService,
+    private translate: TranslateService
+  ) {}
 
   ngOnInit(): void {
+    this.initializeTitle();
     this.initializeTableRows();
+    this.subscribeToLanguageChanges();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -38,6 +47,24 @@ export class LogisticsItemsListingComponent implements OnInit, OnChanges {
       if (this.logisticsItems.length > 0 && this.tableRows.length === 0) {
         this.initializeTableRows();
       }
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.langChangeSubscription) {
+      this.langChangeSubscription.unsubscribe();
+    }
+  }
+
+  subscribeToLanguageChanges(): void {
+    this.langChangeSubscription = this.translate.onLangChange.subscribe(() => {
+      this.initializeTitle();
+    });
+  }
+
+  initializeTitle(): void {
+    if (!this.title) {
+      this.title = this.translate.instant('LOGISTICS.ITEMS.TITLE');
     }
   }
 
@@ -163,17 +190,17 @@ export class LogisticsItemsListingComponent implements OnInit, OnChanges {
   // Helper methods for template
   getFinanceCategoryLabel(category: LogisticsFinanceCategoryEnum): string {
     const labels = {
-      [LogisticsFinanceCategoryEnum.INVOICE]: 'Factura',
-      [LogisticsFinanceCategoryEnum.PETTY_CASH]: 'Caja Chica',
-      [LogisticsFinanceCategoryEnum.ADDITIONAL]: 'Adicional',
+      [LogisticsFinanceCategoryEnum.INVOICE]: this.translate.instant('LOGISTICS.ITEMS.FINANCE_CATEGORIES.INVOICE'),
+      [LogisticsFinanceCategoryEnum.PETTY_CASH]: this.translate.instant('LOGISTICS.ITEMS.FINANCE_CATEGORIES.PETTY_CASH'),
+      [LogisticsFinanceCategoryEnum.ADDITIONAL]: this.translate.instant('LOGISTICS.ITEMS.FINANCE_CATEGORIES.ADDITIONAL'),
     };
     return labels[category] || category;
   }
 
   getResourceCategoryLabel(category: LogisticsResourceCategoryEnum): string {
     const labels = {
-      [LogisticsResourceCategoryEnum.PERSONNEL]: 'Personal',
-      [LogisticsResourceCategoryEnum.RESOURCES]: 'Recursos',
+      [LogisticsResourceCategoryEnum.PERSONNEL]: this.translate.instant('LOGISTICS.ITEMS.RESOURCE_CATEGORIES.PERSONNEL'),
+      [LogisticsResourceCategoryEnum.RESOURCES]: this.translate.instant('LOGISTICS.ITEMS.RESOURCE_CATEGORIES.RESOURCES'),
     };
     return labels[category] || category;
   }

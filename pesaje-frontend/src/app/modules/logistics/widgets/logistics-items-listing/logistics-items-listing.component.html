@@ -5,7 +5,7 @@
   </h3>
   <div class="card-toolbar">
     <button type="button" class="btn btn-primary btn-sm" (click)="addRow()">
-      <i class="fas fa-plus"></i> Agregar Detalle
+      <i class="fas fa-plus"></i> <span translate="LOGISTICS.ITEMS.ADD_DETAIL"></span>
     </button>
   </div>
 </div>
@@ -19,13 +19,20 @@
     <table class="table align-middle gs-0 gy-3">
       <thead>
         <tr class="border-bottom border-gray-300">
-          <th class="p-3 text-start text-muted fw-semibold text-uppercase fs-7 pb-2">Tipo</th>
-          <th class="p-3 text-start text-muted fw-semibold text-uppercase fs-7 pb-2">Recurso</th>
-          <th class="p-3 text-start text-muted fw-semibold text-uppercase fs-7 pb-2">Descripción</th>
-          <th class="p-3 text-end text-muted fw-semibold text-uppercase fs-7 pb-2">Unidad (u)</th>
-          <th class="p-3 text-end text-muted fw-semibold text-uppercase fs-7 pb-2">Costo ($)</th>
-          <th class="p-3 text-end text-muted fw-semibold text-uppercase fs-7 pb-2">Total ($)</th>
-          <th class="p-3 text-center text-muted fw-semibold text-uppercase fs-7 pb-2">Acciones</th>
+          <th class="p-3 text-start text-muted fw-semibold text-uppercase fs-7 pb-2"
+            translate="LOGISTICS.ITEMS.TABLE.TYPE"></th>
+          <th class="p-3 text-start text-muted fw-semibold text-uppercase fs-7 pb-2"
+            translate="LOGISTICS.ITEMS.TABLE.RESOURCE"></th>
+          <th class="p-3 text-start text-muted fw-semibold text-uppercase fs-7 pb-2"
+            translate="LOGISTICS.ITEMS.TABLE.DESCRIPTION"></th>
+          <th class="p-3 text-end text-muted fw-semibold text-uppercase fs-7 pb-2"
+            translate="LOGISTICS.ITEMS.TABLE.UNIT"></th>
+          <th class="p-3 text-end text-muted fw-semibold text-uppercase fs-7 pb-2"
+            translate="LOGISTICS.ITEMS.TABLE.COST"></th>
+          <th class="p-3 text-end text-muted fw-semibold text-uppercase fs-7 pb-2"
+            translate="LOGISTICS.ITEMS.TABLE.TOTAL"></th>
+          <th class="p-3 text-center text-muted fw-semibold text-uppercase fs-7 pb-2"
+            translate="LOGISTICS.ITEMS.TABLE.ACTIONS"></th>
         </tr>
       </thead>
       <tbody>
@@ -57,7 +64,8 @@
           <td class="text-start">
             <input type="text" class="form-control form-control-sm" [(ngModel)]="row.description"
               (ngModelChange)="onDescriptionChange(row, $event)"
-              [id]="'description-' + i" [name]="'description-' + i" placeholder="Descripción" />
+              [id]="'description-' + i" [name]="'description-' + i"
+              [placeholder]="'LOGISTICS.PLACEHOLDERS.DESCRIPTION' | translate" />
           </td>
 
           <!-- Unit -->
@@ -86,7 +94,7 @@
           <!-- Actions -->
           <td class="text-center" style="width: 80px;">
             <button type="button" class="btn btn-sm btn-icon btn-light-danger" (click)="removeRow(row)"
-              title="Eliminar fila">
+              [title]="'LOGISTICS.ITEMS.DELETE_ROW' | translate">
               <i class="fas fa-trash"></i>
             </button>
           </td>
@@ -95,7 +103,7 @@
         <!-- Subtotals by finance category -->
         <tr *ngFor="let category of getFinanceCategoriesWithItems()" class="table-light border-top">
           <td colspan="5" class="text-end fw-bold text-primary">
-            Subtotal {{ getFinanceCategoryLabel(category) }}
+            {{ 'LOGISTICS.ITEMS.TABLE.SUBTOTAL' | translate }} {{ getFinanceCategoryLabel(category) }}
           </td>
           <td class="text-end fw-bold text-primary">$ {{ getFinanceCategorySubtotal(category) | number: '1.2-2' }}</td>
           <td></td>
@@ -105,8 +113,8 @@
         <tr *ngIf="tableRows.length === 0">
           <td colspan="7" class="text-center text-muted py-4">
             <i class="fas fa-inbox fa-2x mb-2"></i>
-            <p class="mb-0">No hay detalles agregados</p>
-            <small>Haz clic en "Agregar Detalle" para comenzar</small>
+            <p class="mb-0">{{ 'LOGISTICS.ITEMS.EMPTY_STATE.NO_DETAILS' | translate }}</p>
+            <small>{{ 'LOGISTICS.ITEMS.EMPTY_STATE.CLICK_TO_START' | translate }}</small>
           </td>
         </tr>
 

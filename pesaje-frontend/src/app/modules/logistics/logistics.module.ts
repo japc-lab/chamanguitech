@@ -9,6 +9,7 @@ import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { RecentLogisticsComponent } from './pages/recent-logistics/recent-logistics.component';
 import { LogisticsItemsListingComponent } from './widgets/logistics-items-listing/logistics-items-listing.component';
 import { LogisticsPaymentsTrackingComponent } from './widgets/logistics-payments-tracking/logistics-payments-tracking.component';
+import { TranslationModule } from '../i18n/translation.module';
 
 @NgModule({
   declarations: [
@@ -25,6 +26,7 @@ import { LogisticsPaymentsTrackingComponent } from './widgets/logistics-payments
     CrudModule,
     SharedModule,
     NgbModule,
+    TranslationModule,
   ],
   providers: [NgbActiveModal],
 })
