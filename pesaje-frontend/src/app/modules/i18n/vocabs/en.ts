@@ -447,6 +447,30 @@ export const locale = {
       },
       STATUS: {
         DRAFT: 'Draft',
+        NO_PAYMENTS: 'No Payments',
+        IN_PROGRESS: 'In Progress',
+        PAYMENT_COMPLETE: 'Payment Complete',
+        INFORMATION_COMPLETE: 'Information Complete',
+        CLOSED: 'Closed',
+        UNKNOWN: 'Unknown',
+      },
+      RECENT_LOGISTICS: {
+        TITLE: 'Search By Control Number',
+        BUTTONS: {
+          SEARCH: 'Search',
+          CLEAR_FILTERS: 'Clear Filters',
+        },
+        TABLE: {
+          CONTROL_NUMBER: 'Control Number',
+          STATUS: 'Status',
+          TYPE: 'Type',
+          LOGISTICS_DATE: 'Logistics Date',
+          TOTAL_POUNDS: 'Total Pounds (lb)',
+          GRAND_TOTAL: 'Grand Total',
+          PRICE_PER_POUND: 'Price per Pound ($/lb)',
+          BUYER: 'Buyer',
+          CLIENT: 'Client',
+        },
       },
       FIELDS: {
         CONTROL_NUMBER: 'Control Number',

@@ -454,6 +454,30 @@ export const locale = {
       },
       STATUS: {
         DRAFT: 'Borrador',
+        NO_PAYMENTS: 'Sin pagos',
+        IN_PROGRESS: 'En progreso',
+        PAYMENT_COMPLETE: 'Pago Completo',
+        INFORMATION_COMPLETE: 'Información Completa',
+        CLOSED: 'Cerrado',
+        UNKNOWN: 'Desconocido',
+      },
+      RECENT_LOGISTICS: {
+        TITLE: 'Buscar por número de control',
+        BUTTONS: {
+          SEARCH: 'Buscar',
+          CLEAR_FILTERS: 'Limpiar Filtros',
+        },
+        TABLE: {
+          CONTROL_NUMBER: 'Numero de Control',
+          STATUS: 'Estado',
+          TYPE: 'Tipo',
+          LOGISTICS_DATE: 'Fecha de Logística',
+          TOTAL_POUNDS: 'Total Libras (lb)',
+          GRAND_TOTAL: 'Total General',
+          PRICE_PER_POUND: 'Precio por Libra ($/lb)',
+          BUYER: 'Comprador',
+          CLIENT: 'Cliente',
+        },
       },
       FIELDS: {
         CONTROL_NUMBER: 'Número de control',
