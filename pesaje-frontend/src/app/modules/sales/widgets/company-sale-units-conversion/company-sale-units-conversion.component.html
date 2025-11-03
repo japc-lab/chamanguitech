@@ -1,7 +1,7 @@
 <!-- Summary Widget -->
 <div class="card border-0 shadow-sm mt-4" *ngIf="wholeDetail && wholeDetail.items.length > 0">
   <div class="card-header bg-success text-white d-flex justify-content-start align-items-center py-3">
-    <span class="fw-bold">Resumen por Clase y Talla</span>
+    <span class="fw-bold" translate="SALES.COMPANY_SALE.UNITS_CONVERSION.TITLE"></span>
   </div>
 
   <div class="card-body p-0">
@@ -9,17 +9,17 @@
       <table class="table table-sm table-hover mb-0 border-0">
         <thead>
           <tr class="bg-light text-muted fw-bold border-bottom">
-            <th class="text-center py-3 ps-4">Clase</th>
-            <th class="text-center py-3">Talla</th>
-            <th class="text-end py-3">Cantidad Kg</th>
-            <th class="text-end py-3 pe-4">Cantidad Libras</th>
+            <th class="text-center py-3 ps-4" translate="SALES.COMPANY_SALE.UNITS_CONVERSION.TABLE.CLASS"></th>
+            <th class="text-center py-3" translate="SALES.COMPANY_SALE.UNITS_CONVERSION.TABLE.SIZE"></th>
+            <th class="text-end py-3" translate="SALES.COMPANY_SALE.UNITS_CONVERSION.TABLE.QUANTITY_KG"></th>
+            <th class="text-end py-3 pe-4" translate="SALES.COMPANY_SALE.UNITS_CONVERSION.TABLE.QUANTITY_LB"></th>
           </tr>
         </thead>
         <tbody>
           <tr *ngIf="summaryData.length === 0">
             <td colspan="4" class="text-center text-muted py-5">
               <i class="bi bi-inbox fs-2 d-block mb-2 text-muted"></i>
-              <span>No hay datos para mostrar</span>
+              <span translate="SALES.COMPANY_SALE.UNITS_CONVERSION.EMPTY_MESSAGE"></span>
             </td>
           </tr>
           <tr *ngFor="let summary of summaryData" class="border-bottom">
@@ -37,8 +37,7 @@
 
           <!-- Total Row -->
           <tr class="bg-success text-white" *ngIf="summaryData.length > 0">
-            <td colspan="2" class="text-end fw-bold py-3 ps-4">
-              Total
+            <td colspan="2" class="text-end fw-bold py-3 ps-4" translate="SALES.COMPANY_SALE.UNITS_CONVERSION.TABLE.TOTAL">
             </td>
             <td class="text-end fw-bold py-3">{{ totalSummary.quantityKg | number: '1.2-2' }}</td>
             <td class="text-end fw-bold py-3 pe-4">{{ totalSummary.quantityLb | number: '1.2-2' }}</td>
