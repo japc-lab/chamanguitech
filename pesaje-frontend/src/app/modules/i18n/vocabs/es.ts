@@ -443,6 +443,42 @@ export const locale = {
         ADD_PAYMENT: 'Agregar Pago',
       },
     },
+    SALES: {
+      TITLE: 'Ventas',
+      STATUS: {
+        NO_PAYMENTS: 'Sin pagos',
+        IN_PROGRESS: 'Pendiente',
+        COMPLETED: 'Pagado',
+        CLOSED: 'Cerrado',
+        UNKNOWN: 'Desconocido',
+      },
+      TYPE: {
+        COMPANY: 'Venta a Compañía',
+        LOCAL: 'Venta Local',
+      },
+      RECENT_SALES: {
+        TITLE: 'Buscar por número de control',
+        BUTTONS: {
+          SEARCH: 'Buscar',
+          CLEAR_FILTERS: 'Limpiar Filtros',
+        },
+        TABLE: {
+          CONTROL_NUMBER: 'Numero de Control',
+          STATUS: 'Estado',
+          TYPE: 'Tipo',
+          COMPANY: 'Compañía',
+          SALE_DATE: 'Fecha de Venta',
+          TOTAL: 'Total',
+          TOTAL_PAID: 'Total Abonado',
+          PAID_PERCENTAGE: '% Abonado',
+          BUYER: 'Comprador',
+          CLIENT: 'Cliente',
+          HAS_INVOICE: '¿Factura enviada?',
+          INVOICE_NUMBER: 'Número Factura',
+          INVOICE_NAME: 'Nombre en Factura',
+        },
+      },
+    },
     LOGISTICS: {
       TITLE: 'Logística',
       SECTIONS: {

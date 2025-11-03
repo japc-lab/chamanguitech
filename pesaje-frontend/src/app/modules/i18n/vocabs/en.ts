@@ -436,6 +436,42 @@ export const locale = {
         ADD_PAYMENT: 'Add Payment',
       },
     },
+    SALES: {
+      TITLE: 'Sales',
+      STATUS: {
+        NO_PAYMENTS: 'No payments',
+        IN_PROGRESS: 'Pending',
+        COMPLETED: 'Paid',
+        CLOSED: 'Closed',
+        UNKNOWN: 'Unknown',
+      },
+      TYPE: {
+        COMPANY: 'Company Sale',
+        LOCAL: 'Local Sale',
+      },
+      RECENT_SALES: {
+        TITLE: 'Search By Control Number',
+        BUTTONS: {
+          SEARCH: 'Search',
+          CLEAR_FILTERS: 'Clear Filters',
+        },
+        TABLE: {
+          CONTROL_NUMBER: 'Control Number',
+          STATUS: 'Status',
+          TYPE: 'Type',
+          COMPANY: 'Company',
+          SALE_DATE: 'Sale Date',
+          TOTAL: 'Total',
+          TOTAL_PAID: 'Total Paid',
+          PAID_PERCENTAGE: '% Paid',
+          BUYER: 'Buyer',
+          CLIENT: 'Client',
+          HAS_INVOICE: 'Invoice Sent?',
+          INVOICE_NUMBER: 'Invoice Number',
+          INVOICE_NAME: 'Invoice Name',
+        },
+      },
+    },
     LOGISTICS: {
       TITLE: 'Logistics',
       SECTIONS: {
