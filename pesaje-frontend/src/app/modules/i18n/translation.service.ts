@@ -3,6 +3,7 @@
 
 import { Injectable } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 export interface Locale {
   lang: string;
@@ -17,6 +18,7 @@ const LOCALIZATION_LOCAL_STORAGE_KEY = 'language';
 export class TranslationService {
   // Private properties
   private langIds: any = [];
+  private languageChange$ = new BehaviorSubject<string>('es');
 
   constructor(private translate: TranslateService) {
     // add new langIds to the list
@@ -39,6 +41,7 @@ export class TranslationService {
     // add new languages to the list
     this.translate.addLangs(this.langIds);
     this.translate.use(this.getSelectedLanguage());
+    this.languageChange$.next(this.getSelectedLanguage());
   }
 
   setLanguage(lang: string) {
@@ -46,6 +49,7 @@ export class TranslationService {
       this.translate.use(this.translate.getDefaultLang());
       this.translate.use(lang);
       localStorage.setItem(LOCALIZATION_LOCAL_STORAGE_KEY, lang);
+      this.languageChange$.next(lang);
     }
   }
 
@@ -57,5 +61,12 @@ export class TranslationService {
       localStorage.getItem(LOCALIZATION_LOCAL_STORAGE_KEY) ||
       this.translate.getDefaultLang()
     );
+  }
+
+  /**
+   * Returns an observable of language changes
+   */
+  getLanguageChange(): Observable<string> {
+    return this.languageChange$.asObservable();
   }
 }

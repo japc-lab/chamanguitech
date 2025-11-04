@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { IPermissionModel } from 'src/app/modules/auth/interfaces/permission.interface';
+import { TranslationService } from 'src/app/modules/i18n/translation.service';
 
 @Component({
   selector: 'app-sidebar-dynamic-menu',
@@ -10,9 +11,27 @@ import { IPermissionModel } from 'src/app/modules/auth/interfaces/permission.int
 export class SidebarDynamicMenuComponent implements OnInit {
   @Input() menuOptions: IPermissionModel[];
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private translationService: TranslationService) {}
 
   ngOnInit(): void {}
+
+  /**
+   * ✅ Gets the translated label for an option based on current language
+   */
+  getOptionLabel(option: IPermissionModel): string {
+    const currentLang = this.translationService.getSelectedLanguage();
+
+    // If translations exist and current language is available, use it
+    if (option.translations && currentLang && (currentLang === 'en' || currentLang === 'es')) {
+      const translation = option.translations[currentLang as keyof typeof option.translations];
+      if (translation) {
+        return translation;
+      }
+    }
+
+    // Fallback to default name
+    return option.name;
+  }
 
   /**
    * ✅ Checks if the option's route is active

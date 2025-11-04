@@ -2,6 +2,7 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { ILayout, LayoutType } from '../../core/configs/config';
 import { LayoutService } from '../../core/layout.service';
+import { PageInfoService } from '../../core/page-info.service';
 import { AuthService } from 'src/app/modules/auth';
 import { IPermissionModel } from 'src/app/modules/auth/interfaces/permission.interface';
 
@@ -44,11 +45,13 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   constructor(
     private layout: LayoutService,
-    private authService: AuthService
+    private authService: AuthService,
+    private pageInfoService: PageInfoService
   ) {}
 
   ngOnInit(): void {
     this.menuData = this.authService.currentUserValue?.permissions || [];
+    this.pageInfoService.setMenuOptions(this.menuData);
 
     const subscr = this.layout.layoutConfigSubject
       .asObservable()
