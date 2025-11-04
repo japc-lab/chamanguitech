@@ -23,6 +23,7 @@ import {
 import { RoleService } from '../../../shared/services/role.service';
 import { AlertService } from 'src/app/utils/alert.service';
 import { DateUtilsService } from 'src/app/utils/date-utils.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-broker-listing',
@@ -57,7 +58,7 @@ export class UsersListingComponent implements OnInit, AfterViewInit, OnDestroy {
     data: [], // ✅ Ensure default is an empty array
     columns: [
       {
-        title: 'Nombre Completo',
+        title: '',
         data: 'person',
         render: function (data, type, full) {
           const colorClasses = ['success', 'info', 'warning', 'danger'];
@@ -95,25 +96,25 @@ export class UsersListingComponent implements OnInit, AfterViewInit, OnDestroy {
         },
       },
       {
-        title: 'Nombre de Usuario',
+        title: '',
         data: 'username',
         render: function (data) {
           return data ? data : '-';
         },
       },
       {
-        title: 'Estado',
+        title: '',
         data: 'deletedAt',
-        render: function (data) {
+        render: (data: any) => {
           if (data) {
-            return `<span class="badge bg-warning">Inactivo</span>`;
+            return `<span class="badge bg-warning">${this.translateService.instant('LISTING.STATUS_BADGES.INACTIVE')}</span>`;
           } else {
-            return `<span class="badge bg-success">Activo</span>`;
+            return `<span class="badge bg-success">${this.translateService.instant('LISTING.STATUS_BADGES.ACTIVE')}</span>`;
           }
         },
       },
       {
-        title: 'Roles',
+        title: '',
         data: 'roles',
         render: function (data: IRoleModel[]) {
           return data && data.length
@@ -136,10 +137,12 @@ export class UsersListingComponent implements OnInit, AfterViewInit, OnDestroy {
     private dateUtils: DateUtilsService,
     private router: Router,
     private cdr: ChangeDetectorRef,
-    private roleService: RoleService
+    private roleService: RoleService,
+    private translateService: TranslateService
   ) {}
 
   ngOnInit(): void {
+    this.initializeDatatableConfig();
     this.loadUsers();
     this.loadRoles();
   }
@@ -260,6 +263,36 @@ export class UsersListingComponent implements OnInit, AfterViewInit, OnDestroy {
         this.isLoading = false;
       },
     });
+  }
+
+  // 🔹 Initialize DataTable Configuration with Translations
+  initializeDatatableConfig(): void {
+    // Subscribe to language changes and reinitialize datatable config with new translations
+    const langSub = this.translateService.onLangChange.subscribe(() => {
+      this.updateDatatableColumnTitles();
+      this.cdr.detectChanges();
+    });
+    this.unsubscribe.push(langSub);
+
+    this.updateDatatableColumnTitles();
+  }
+
+  // 🔹 Update DataTable Column Titles with Current Language
+  private updateDatatableColumnTitles(): void {
+    if (this.datatableConfig.columns) {
+      this.datatableConfig.columns[0].title = this.translateService.instant(
+        'LISTING.TABLE_COLUMNS.FULL_NAME'
+      );
+      this.datatableConfig.columns[1].title = this.translateService.instant(
+        'LISTING.TABLE_COLUMNS.USERNAME'
+      );
+      this.datatableConfig.columns[2].title = this.translateService.instant(
+        'LISTING.TABLE_COLUMNS.STATUS'
+      );
+      this.datatableConfig.columns[3].title = this.translateService.instant(
+        'LISTING.TABLE_COLUMNS.ROLES'
+      );
+    }
   }
 
   ngOnDestroy(): void {

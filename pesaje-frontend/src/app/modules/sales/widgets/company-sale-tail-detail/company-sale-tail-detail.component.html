@@ -2,16 +2,16 @@
   <!-- Header -->
   <div class="card-header border-0 pt-5 d-flex justify-content-between align-items-center">
     <h4 class="card-title align-items-start flex-column">
-      <span class="fw-bolder fs-3 mb-1">Venta Camarón Cola</span>
+      <span class="fw-bolder fs-3 mb-1" translate="SALES.COMPANY_SALE.TAIL_DETAIL.TITLE"></span>
     </h4>
 
     <div class="d-flex gap-2">
       <button *ngIf="!tailDetail" type="button" class="btn btn-primary btn-sm" (click)="addDetail()">
-        <i class="bi bi-plus-circle me-1"></i> Agregar
+        <i class="bi bi-plus-circle me-1"></i> <span translate="SALES.COMPANY_SALE.TAIL_DETAIL.ADD"></span>
       </button>
 
       <button *ngIf="tailDetail" type="button" class="btn btn-outline-danger btn-sm" (click)="cancelAndCollapse()">
-        <i class="bi bi-x-circle me-1"></i> Eliminar
+        <i class="bi bi-x-circle me-1"></i> <span translate="SALES.COMPANY_SALE.TAIL_DETAIL.DELETE"></span>
       </button>
     </div>
   </div>
@@ -22,35 +22,34 @@
       <!-- Detail Header Info -->
       <div class="card border border-primary mb-4">
         <div class="card-header bg-primary text-white d-flex justify-content-start align-items-center py-1">
-          <span class="fw-bold">Detalles</span>
+          <span class="fw-bold" translate="SALES.COMPANY_SALE.TAIL_DETAIL.DETAILS"></span>
         </div>
 
         <div class="card-body">
           <div class="row g-3">
             <div class="col-md-4">
-              <label for="tailBatch" class="required fw-semibold fs-6 mb-2">Lote</label>
+              <label for="tailBatch" class="required fw-semibold fs-6 mb-2" translate="SALES.COMPANY_SALE.TAIL_DETAIL.FIELDS.BATCH"></label>
               <input type="text" id="tailBatch" name="tailBatch" [(ngModel)]="tailDetail.batch"
                 class="form-control form-control-sm" required />
             </div>
 
             <div class="col-md-4">
-              <label for="tailSettleDate" class="required fw-semibold fs-6 mb-2">Fecha de Liquidación</label>
+              <label for="tailSettleDate" class="required fw-semibold fs-6 mb-2" translate="SALES.COMPANY_SALE.TAIL_DETAIL.FIELDS.SETTLE_DATE"></label>
               <input type="date" id="tailSettleDate" name="tailSettleDate" [(ngModel)]="tailDetail.settleDate"
                 class="form-control form-control-sm" required />
             </div>
 
             <div class="col-md-4">
-              <label for="tailPredominantSize" class="required fw-semibold fs-6 mb-2">Talla Predominante</label>
+              <label for="tailPredominantSize" class="required fw-semibold fs-6 mb-2" translate="SALES.COMPANY_SALE.TAIL_DETAIL.FIELDS.PREDOMINANT_SIZE"></label>
               <select [(ngModel)]="tailDetail.predominantSize" name="tailPredominantSize" id="tailPredominantSize"
                 class="form-select form-select-sm" required>
-                <option value="" disabled selected>Seleccione</option>
+                <option value="" disabled selected>{{ 'SALES.COMPANY_SALE.PLACEHOLDERS.SELECT_OPTION' | translate }}</option>
                 <option *ngFor="let size of tailSizes" [value]="size.size">{{ size.size }}</option>
               </select>
             </div>
 
             <div class="col-md-4">
-              <label for="receivedPoundsReported" class="required fw-semibold fs-6 mb-2">Lb recibidas con cabeza
-                reportadas por la compania
+              <label for="receivedPoundsReported" class="required fw-semibold fs-6 mb-2" translate="SALES.COMPANY_SALE.TAIL_DETAIL.FIELDS.RECEIVED_POUNDS_REPORTED">
               </label>
               <input type="number" id="receivedPoundsReported" name="receivedPoundsReported"
                 [(ngModel)]="tailDetail.receivedPoundsReported" (ngModelChange)="recalculateTotals()"
@@ -59,7 +58,7 @@
             </div>
 
             <div class="col-md-4">
-              <label for="totalTailPounds" class="required fw-semibold fs-6 mb-2">Lb. Totales en cola procesadas
+              <label for="totalTailPounds" class="required fw-semibold fs-6 mb-2" translate="SALES.COMPANY_SALE.TAIL_DETAIL.FIELDS.TOTAL_TAIL_POUNDS_PROCESSED">
               </label>
               <input type="number" id="totalTailPounds" name="totalTailPounds"
                 [(ngModel)]="tailDetail.totalTailPoundsProcessed" class="form-control form-control-sm"
@@ -67,7 +66,7 @@
             </div>
 
             <div class="col-md-4">
-              <label for="performancePercentage" class="required fw-semibold fs-6 mb-2">Rendimiento Libras Cola (%)</label>
+              <label for="performancePercentage" class="required fw-semibold fs-6 mb-2" translate="SALES.COMPANY_SALE.TAIL_DETAIL.FIELDS.PERFORMANCE_PERCENTAGE_TAIL_POUNDS"></label>
               <div class="input-group input-group-sm">
                 <input type="number" id="performancePercentage" name="performancePercentage"
                   [(ngModel)]="tailDetail.performancePercentageTailPounts"
@@ -83,9 +82,9 @@
 
       <!-- Add Item Button -->
       <div class="d-flex justify-content-between align-items-center mb-3">
-        <h6 class="mb-0 fw-bold text-muted">Items de Venta</h6>
+        <h6 class="mb-0 fw-bold text-muted" translate="SALES.COMPANY_SALE.TAIL_DETAIL.ITEMS_TITLE"></h6>
         <button type="button" class="btn btn-outline-success btn-sm" (click)="addItem()">
-          <i class="bi bi-plus me-1"></i> Agregar Item
+          <i class="bi bi-plus me-1"></i> <span translate="SALES.COMPANY_SALE.TAIL_DETAIL.ADD_ITEM"></span>
         </button>
       </div>
 
@@ -94,34 +93,34 @@
         <table class="table table-bordered align-middle">
           <thead>
             <tr class="bg-light text-muted fw-bold">
-              <th class="text-start">Estilo</th>
-              <th class="text-start">Clase</th>
-              <th class="text-start">Talla</th>
-              <th class="text-end">Precio Ref. ($)</th>
-              <th class="text-center">Unidad</th>
-              <th class="text-end">Cantidad</th>
-              <th class="text-end">Precio ($)</th>
-              <th class="text-end">Total ($)</th>
-              <th class="text-end">%</th>
-              <th class="text-center">Acciones</th>
+              <th class="text-start" translate="SALES.COMPANY_SALE.TAIL_DETAIL.TABLE.STYLE"></th>
+              <th class="text-start" translate="SALES.COMPANY_SALE.TAIL_DETAIL.TABLE.CLASS"></th>
+              <th class="text-start" translate="SALES.COMPANY_SALE.TAIL_DETAIL.TABLE.SIZE"></th>
+              <th class="text-end" translate="SALES.COMPANY_SALE.TAIL_DETAIL.TABLE.REFERENCE_PRICE"></th>
+              <th class="text-center" translate="SALES.COMPANY_SALE.TAIL_DETAIL.TABLE.UNIT"></th>
+              <th class="text-end" translate="SALES.COMPANY_SALE.TAIL_DETAIL.TABLE.AMOUNT"></th>
+              <th class="text-end" translate="SALES.COMPANY_SALE.TAIL_DETAIL.TABLE.PRICE"></th>
+              <th class="text-end" translate="SALES.COMPANY_SALE.TAIL_DETAIL.TABLE.TOTAL"></th>
+              <th class="text-end" translate="SALES.COMPANY_SALE.TAIL_DETAIL.TABLE.PERCENTAGE"></th>
+              <th class="text-center" translate="SALES.COMPANY_SALE.TAIL_DETAIL.TABLE.ACTIONS"></th>
             </tr>
           </thead>
           <tbody>
             <tr *ngIf="tailDetail.items.length === 0">
               <td colspan="10" class="text-center text-muted py-4">
                 <i class="bi bi-inbox fs-1 d-block mb-2"></i>
-                <span>No hay items agregados. Haga clic en "Agregar Item" para comenzar.</span>
+                <span translate="SALES.COMPANY_SALE.TAIL_DETAIL.EMPTY_ITEMS_MESSAGE"></span>
               </td>
             </tr>
             <tr *ngFor="let item of tailDetail.items; let itemIndex = index">
               <td class="text-center">
-                <span class="badge badge-light-info">Cola</span>
+                <span class="badge badge-light-info" translate="SALES.COMPANY_SALE.TAIL_DETAIL.TABLE.TAIL_BADGE"></span>
               </td>
 
               <td>
                 <select [(ngModel)]="item.class" name="tailClass{{ itemIndex }}" (ngModelChange)="onClassChange(item)"
                   class="form-select form-select-sm">
-                  <option value="" disabled selected>Seleccione</option>
+                  <option value="" disabled selected>{{ 'SALES.COMPANY_SALE.PLACEHOLDERS.SELECT_OPTION' | translate }}</option>
                   <option *ngFor="let classOption of shrimpClassList" [value]="classOption.type">{{ classOption.label }}
                   </option>
                 </select>
@@ -131,7 +130,7 @@
                 <select [(ngModel)]="item.size" name="tailSize{{ itemIndex }}"
                   (ngModelChange)="onSizeChange(item, $event)" class="form-select form-select-sm"
                   [disabled]="!item.class">
-                  <option value="" disabled selected>Seleccione</option>
+                  <option value="" disabled selected>{{ 'SALES.COMPANY_SALE.PLACEHOLDERS.SELECT_OPTION' | translate }}</option>
                   <option *ngFor="let size of getSizesForClass(item.class)" [value]="size.size">{{ size.size }}</option>
                 </select>
               </td>
@@ -177,7 +176,7 @@
             <!-- Subtotals by Class -->
             <ng-container *ngFor="let className of getUniqueClasses()">
               <tr class="fw-bold bg-light">
-                <td class="text-end" colspan="5">Subtotal Clase {{ getClassLabel(className) }}</td>
+                <td class="text-end" colspan="5">{{ 'SALES.COMPANY_SALE.TAIL_DETAIL.SUBTOTAL_CLASS' | translate }} {{ getClassLabel(className) }}</td>
                 <td class="text-end">{{ getClassSubtotal(className).amount | number: '1.2-2' }}</td>
                 <td></td>
                 <td class="text-end">${{ getClassSubtotal(className).total | number: '1.2-2' }}</td>
@@ -188,7 +187,7 @@
 
             <!-- Grand Total Row -->
             <tr class="fw-bold bg-primary text-white" *ngIf="tailDetail.items.length > 0">
-              <td class="text-end" colspan="5">Total General</td>
+              <td class="text-end" colspan="5" translate="SALES.COMPANY_SALE.TAIL_DETAIL.GRAND_TOTAL"></td>
               <td class="text-end">{{ tailDetail.poundsGrandTotal | number: '1.2-2' }}</td>
               <td></td>
               <td class="text-end">${{ tailDetail.grandTotal | number: '1.2-2' }}</td>

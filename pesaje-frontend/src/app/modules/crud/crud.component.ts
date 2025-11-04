@@ -3,10 +3,12 @@ import {
   Component,
   EventEmitter,
   Input,
+  OnChanges,
   OnDestroy,
   OnInit,
   Output,
   Renderer2,
+  SimpleChanges,
   TemplateRef,
   ViewChild,
 } from '@angular/core';
@@ -78,6 +80,7 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
   confirmDeleteTitle = '';
   confirmDeleteText = '';
   deleteSuccessTitle = '';
+  actionsColumnTitle = '';
 
   private modalRef: NgbModalRef;
 
@@ -96,18 +99,29 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.translate.onLangChange.subscribe((event: LangChangeEvent) => {
       this.loadTranslations(); // Reload on language change
+      // Small delay to allow parent component to update datatableConfig first
+      setTimeout(() => {
+        this.reloadDatatableWithNewLanguage(); // Reload datatable with new language
+      }, 50);
     });
+
+    const languageUrl =
+      this.translate.currentLang === 'es'
+        ? 'https://cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json'
+        : 'https://cdn.datatables.net/plug-ins/1.13.7/i18n/en-GB.json';
 
     this.dtOptions = {
       dom:
         "<'row'<'col-sm-12'tr>>" +
         "<'d-flex justify-content-between'<'col-sm-12 col-md-5'i><'d-flex justify-content-between'p>>",
       processing: true,
+      ...this.datatableConfig,
       language: {
         processing:
           '<span class="spinner-border spinner-border-sm align-middle"></span> Loading...',
+        ...this.datatableConfig.language,
+        url: languageUrl,
       },
-      ...this.datatableConfig,
     };
 
     this.renderActionColumn();
@@ -144,7 +158,7 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
   renderActionColumn(): void {
     const actionColumn = {
       sortable: false,
-      title: 'Acciones',
+      title: this.actionsColumnTitle || 'Acciones',
       className: this.stickyActionColumn ? 'sticky-right' : undefined,
       render: (data: any, type: any, full: any) => {
         const editButton = !this.isExternalModal
@@ -294,11 +308,13 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
         'MESSAGES.DELETE_SUCCESS',
         'BUTTONS.OK',
         'BUTTONS.CANCEL',
+        'TABLE.ACTIONS',
       ])
       .subscribe((translations) => {
         this.confirmDeleteTitle = translations['MESSAGES.DELETE_CONFIRM_TITLE'];
         this.confirmDeleteText = translations['MESSAGES.DELETE_CONFIRM_TEXT'];
         this.deleteSuccessTitle = translations['MESSAGES.DELETE_SUCCESS'];
+        this.actionsColumnTitle = translations['TABLE.ACTIONS'];
 
         this.swalOptions = {
           buttonsStyling: false,
@@ -306,6 +322,82 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
           cancelButtonText: translations['BUTTONS.CANCEL'],
         };
       });
+  }
+
+  reloadDatatableWithNewLanguage(): void {
+    if (!this.datatableElement || !this.datatableElement.dtInstance) {
+      return;
+    }
+
+    this.datatableElement.dtInstance.then((dtInstance: Api) => {
+      // Store current data if client-side
+      const currentData = this.datatableConfig.data || [];
+
+      // Completely destroy the DataTable instance
+      dtInstance.destroy();
+
+      // Rebuild column definitions with new translations from parent
+      const newColumns = this.datatableConfig.columns ? [...this.datatableConfig.columns] : [];
+
+      // Get the correct language URL based on current language
+      const languageUrl =
+        this.translate.currentLang === 'es'
+          ? 'https://cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json'
+          : 'https://cdn.datatables.net/plug-ins/1.13.7/i18n/en-GB.json';
+
+      // Rebuild dtOptions with new language URL and columns
+      this.dtOptions = {
+        dom:
+          "<'row'<'col-sm-12'tr>>" +
+          "<'d-flex justify-content-between'<'col-sm-12 col-md-5'i><'d-flex justify-content-between'p>>",
+        processing: true,
+        ...this.datatableConfig,
+        columns: newColumns,
+        data: currentData,
+        language: {
+          processing:
+            '<span class="spinner-border spinner-border-sm align-middle"></span> Loading...',
+          ...this.datatableConfig.language,
+          url: languageUrl,
+        },
+      };
+
+      // Re-add the action column
+      this.renderActionColumn();
+
+      // Recreate the DataTable
+      const table = (dtInstance as any).table().node();
+      this.datatableElement.dtInstance = new Promise((resolve) => {
+        setTimeout(() => {
+          const newInstance = new (window as any).DataTable(table, this.dtOptions);
+          resolve(newInstance);
+        }, 100);
+      });
+    });
+  }
+
+  updateDatatableColumns(): void {
+    if (this.datatableElement && this.datatableElement.dtInstance) {
+      this.datatableElement.dtInstance.then((dtInstance: Api) => {
+        // Update column definitions
+        this.dtOptions.columns = this.datatableConfig.columns ? [...this.datatableConfig.columns] : [];
+        this.renderActionColumn();
+
+        // Update column headers
+        dtInstance.columns().header().each((header: HTMLElement, index: number) => {
+          if (this.dtOptions.columns && this.dtOptions.columns[index]) {
+            const columnDef = this.dtOptions.columns[index] as any;
+            if (columnDef.title) {
+              header.textContent = columnDef.title;
+            }
+          }
+        });
+
+        // Redraw table
+        const currentData = this.datatableConfig.data || [];
+        dtInstance.clear().rows.add(currentData).draw();
+      });
+    }
   }
 
   // setupSweetAlert() {

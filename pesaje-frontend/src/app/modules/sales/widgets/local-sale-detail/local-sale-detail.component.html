@@ -1,9 +1,9 @@
 <!-- local-sale-details.component.html -->
 <div class="card card-xl-stretch mb-6">
   <div class="card-header border-0 pt-5 d-flex justify-content-between align-items-center">
-    <h3 class="card-title fw-bolder fs-3 mb-1">Venta Local Camarón {{title}}</h3>
+    <h3 class="card-title fw-bolder fs-3 mb-1">{{ 'SALES.LOCAL_SALE.DETAIL.TITLE_' + (style === 'WHOLE' ? 'WHOLE' : 'TAIL') | translate }}</h3>
     <button type="button" class="btn btn-primary btn-sm" (click)="addItem()">
-      <i class="bi bi-plus-circle me-1"></i> Agregar Item
+      <i class="bi bi-plus-circle me-1"></i> <span translate="SALES.LOCAL_SALE.DETAIL.ADD_ITEM"></span>
     </button>
   </div>
 
@@ -12,14 +12,14 @@
     <div *ngIf="!localSaleDetail || !localSaleDetail.items || localSaleDetail.items.length === 0"
       class="text-center py-5">
       <i class="bi bi-inbox fs-1 text-muted mb-3 d-block"></i>
-      <h5 class="text-muted mb-2">No hay items agregados</h5>
-      <p class="text-muted mb-3">Haga clic en "Agregar Item" para comenzar a registrar los detalles de venta.</p>
+      <h5 class="text-muted mb-2" translate="SALES.LOCAL_SALE.DETAIL.EMPTY_STATE_TITLE"></h5>
+      <p class="text-muted mb-3" translate="SALES.LOCAL_SALE.DETAIL.EMPTY_STATE_MESSAGE"></p>
     </div>
 
     <!-- Items Table -->
     <div *ngIf="localSaleDetail && localSaleDetail.items && localSaleDetail.items.length > 0">
       <div class="mb-3">
-        <h6 class="mb-0 fw-bold text-muted">Items de Venta</h6>
+        <h6 class="mb-0 fw-bold text-muted" translate="SALES.LOCAL_SALE.DETAIL.ITEMS_TITLE"></h6>
       </div>
 
       <!-- Detail Items Table -->
@@ -27,21 +27,21 @@
         <table class="table table-bordered align-middle">
           <thead>
             <tr class="bg-light text-muted fw-bold">
-              <th class="text-start">Talla</th>
-              <th class="text-end">Libras (lb)</th>
-              <th class="text-end">Precio ($)</th>
-              <th class="text-end">Total ($)</th>
-              <th class="text-start">Comerciante</th>
-              <th class="text-start">Identificación</th>
-              <th class="text-center">Estado Pago</th>
-              <th class="text-center">Método Pago</th>
-              <th class="text-center">Factura o recibo</th>
-              <th class="text-center">Núm. Factura</th>
-              <th class="text-end">Pago 1 ($)</th>
-              <th class="text-end">Pago 2 ($)</th>
-              <th class="text-end">Total Pago ($)</th>
-              <th class="text-end">Total Recibido ($)</th>
-              <th class="text-center">Acciones</th>
+              <th class="text-start" translate="SALES.LOCAL_SALE.DETAIL.TABLE.SIZE"></th>
+              <th class="text-end" translate="SALES.LOCAL_SALE.DETAIL.TABLE.POUNDS"></th>
+              <th class="text-end" translate="SALES.LOCAL_SALE.DETAIL.TABLE.PRICE"></th>
+              <th class="text-end" translate="SALES.LOCAL_SALE.DETAIL.TABLE.TOTAL"></th>
+              <th class="text-start" translate="SALES.LOCAL_SALE.DETAIL.TABLE.MERCHANT"></th>
+              <th class="text-start" translate="SALES.LOCAL_SALE.DETAIL.TABLE.MERCHANT_ID"></th>
+              <th class="text-center" translate="SALES.LOCAL_SALE.DETAIL.TABLE.PAYMENT_STATUS"></th>
+              <th class="text-center" translate="SALES.LOCAL_SALE.DETAIL.TABLE.PAYMENT_METHOD"></th>
+              <th class="text-center" translate="SALES.LOCAL_SALE.DETAIL.TABLE.HAS_INVOICE"></th>
+              <th class="text-center" translate="SALES.LOCAL_SALE.DETAIL.TABLE.INVOICE_NUMBER"></th>
+              <th class="text-end" translate="SALES.LOCAL_SALE.DETAIL.TABLE.PAYMENT_ONE"></th>
+              <th class="text-end" translate="SALES.LOCAL_SALE.DETAIL.TABLE.PAYMENT_TWO"></th>
+              <th class="text-end" translate="SALES.LOCAL_SALE.DETAIL.TABLE.TOTAL_PAYMENT"></th>
+              <th class="text-end" translate="SALES.LOCAL_SALE.DETAIL.TABLE.TOTAL_RECEIVED"></th>
+              <th class="text-center" translate="SALES.LOCAL_SALE.DETAIL.TABLE.ACTIONS"></th>
             </tr>
           </thead>
           <tbody>
@@ -77,13 +77,13 @@
               <!-- Comerciante -->
               <td>
                 <input type="text" [(ngModel)]="item.merchantName" name="merchantName{{ itemIndex }}"
-                  class="form-control form-control-sm" placeholder="Nombre comerciante" required />
+                  class="form-control form-control-sm" [placeholder]="'SALES.LOCAL_SALE.DETAIL.PLACEHOLDERS.MERCHANT_NAME' | translate" required />
               </td>
 
               <!-- ID Comerciante -->
               <td>
                 <input type="text" [(ngModel)]="item.merchantId" name="merchantId{{ itemIndex }}"
-                  class="form-control form-control-sm" placeholder="ID comerciante" required />
+                  class="form-control form-control-sm" [placeholder]="'SALES.LOCAL_SALE.DETAIL.PLACEHOLDERS.MERCHANT_ID' | translate" required />
               </td>
 
               <!-- Estado Pago -->
@@ -102,14 +102,14 @@
                   name="paymentMethod{{ itemIndex }}" (change)="onPaymentMethodChange(item, $any($event.target).value)"
                   [disabled]="!isPaymentMethodRequired(item)"
                   [class.is-invalid]="isPaymentMethodRequired(item) && !getSelectedPaymentMethodId(item)">
-                  <option value="">Seleccionar</option>
+                  <option value="">{{ 'SALES.LOCAL_SALE.DETAIL.PLACEHOLDERS.SELECT' | translate }}</option>
                   <option *ngFor="let method of paymentMethods" [value]="method.id">
                     {{ method.name }}
                   </option>
                 </select>
                 <div *ngIf="isPaymentMethodRequired(item) && !getSelectedPaymentMethodId(item)"
                   class="invalid-feedback d-block small">
-                  Método de pago requerido
+                  {{ 'SALES.LOCAL_SALE.DETAIL.VALIDATIONS.PAYMENT_METHOD_REQUIRED' | translate }}
                 </div>
               </td>
 
@@ -127,11 +127,11 @@
               <!-- Núm. Factura -->
               <td>
                 <input type="text" [(ngModel)]="item.invoiceNumber" name="invoiceNumber{{ itemIndex }}"
-                  class="form-control form-control-sm" placeholder="Número" [disabled]="!isInvoiceNumberRequired(item)"
+                  class="form-control form-control-sm" [placeholder]="'SALES.LOCAL_SALE.DETAIL.PLACEHOLDERS.NUMBER' | translate" [disabled]="!isInvoiceNumberRequired(item)"
                   [class.is-invalid]="isInvoiceNumberRequired(item) && !item.invoiceNumber" />
                 <div *ngIf="isInvoiceNumberRequired(item) && !item.invoiceNumber"
                   class="invalid-feedback d-block small">
-                  Número de factura requerido
+                  {{ 'SALES.LOCAL_SALE.DETAIL.VALIDATIONS.INVOICE_NUMBER_REQUIRED' | translate }}
                 </div>
               </td>
 
@@ -179,7 +179,7 @@
 
             <!-- Totals Row -->
             <tr class="fw-bold bg-light">
-              <td>Subtotal</td>
+              <td translate="SALES.LOCAL_SALE.DETAIL.SUBTOTAL"></td>
               <td class="text-end">{{ localSaleDetail.poundsGrandTotal | number: '1.2-2' }}</td>
               <td></td>
               <td class="text-end">${{ localSaleDetail.grandTotal | number: '1.2-2' }}</td>
@@ -189,7 +189,7 @@
 
             <!-- Retention Percentage Row -->
             <tr class="bg-light">
-              <td colspan="3" class="text-end fw-semibold">Porcentaje de Retención (%):</td>
+              <td colspan="3" class="text-end fw-semibold" translate="SALES.LOCAL_SALE.DETAIL.RETENTION_PERCENTAGE"></td>
               <td>
                 <input type="number" [(ngModel)]="localSaleDetail.retentionPercentage" name="retentionPercentage"
                   #retentionPercentageCtrl="ngModel" (ngModelChange)="onRetentionPercentageChange(localSaleDetail!)"
@@ -201,14 +201,14 @@
 
             <!-- Retention Amount Row -->
             <tr class="bg-light">
-              <td colspan="3" class="text-end fw-semibold">Monto de Retención:</td>
+              <td colspan="3" class="text-end fw-semibold" translate="SALES.LOCAL_SALE.DETAIL.RETENTION_AMOUNT"></td>
               <td class="text-end fw-bold">${{ localSaleDetail.retentionAmount | number: '1.2-2' }}</td>
               <td colspan="11"></td>
             </tr>
 
             <!-- Other Penalties Row -->
             <tr class="bg-light">
-              <td colspan="3" class="text-end fw-semibold">Penalidades Adicionales:</td>
+              <td colspan="3" class="text-end fw-semibold" translate="SALES.LOCAL_SALE.DETAIL.ADDITIONAL_PENALTIES"></td>
               <td>
                 <div class="input-group input-group-sm">
                   <span class="input-group-text">$</span>
@@ -223,7 +223,7 @@
 
             <!-- Net Grand Total Row -->
             <tr class="fw-bold bg-light border-top border-2">
-              <td colspan="3" class="text-end">Total Neto:</td>
+              <td colspan="3" class="text-end" translate="SALES.LOCAL_SALE.DETAIL.NET_TOTAL"></td>
               <td class="text-end text-success fs-6">${{ localSaleDetail.netGrandTotal | number: '1.2-2' }}</td>
               <td colspan="11"></td>
             </tr>

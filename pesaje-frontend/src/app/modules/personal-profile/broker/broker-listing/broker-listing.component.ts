@@ -23,6 +23,7 @@ import { IReadUserModel } from 'src/app/modules/settings/interfaces/user.interfa
 import { UserService } from 'src/app/modules/settings/services/user.service';
 import { AlertService } from 'src/app/utils/alert.service';
 import { DateUtilsService } from 'src/app/utils/date-utils.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-broker-listing',
@@ -58,7 +59,7 @@ export class BrokerListingComponent
     data: [], // ✅ Ensure default is an empty array
     columns: [
       {
-        title: 'Nombre Completo',
+        title: '',
         data: 'person.names',
         render: function (data, type, full) {
           const colorClasses = ['success', 'info', 'warning', 'danger'];
@@ -94,27 +95,27 @@ export class BrokerListingComponent
         },
       },
       {
-        title: 'Identificación',
+        title: '',
         data: 'person.identification',
         render: function (data) {
           return data ? data : '-';
         },
       },
       {
-        title: 'Teléfono Celular',
+        title: '',
         data: 'person.mobilePhone',
         render: function (data) {
           return data ? data : '-';
         },
       },
       {
-        title: 'Estado',
+        title: '',
         data: 'deletedAt',
-        render: function (data) {
+        render: (data: any) => {
           if (data) {
-            return `<span class="badge bg-warning">Inactivo</span>`;
+            return `<span class="badge bg-warning">${this.translateService.instant('LISTING.STATUS_BADGES.INACTIVE')}</span>`;
           } else {
-            return `<span class="badge bg-success">Activo</span>`;
+            return `<span class="badge bg-success">${this.translateService.instant('LISTING.STATUS_BADGES.ACTIVE')}</span>`;
           }
         },
       },
@@ -141,19 +142,21 @@ export class BrokerListingComponent
     private alertService: AlertService,
     private dateUtils: DateUtilsService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private translateService: TranslateService
   ) {}
 
   ngAfterViewInit(): void {}
 
   ngOnInit(): void {
+    this.initializeDatatableConfig();
     this.isOnlyBuyer = this.authService.isOnlyBuyer;
 
     // Agregar la columna "Comprador" solo si el usuario no es solo Comprador
     if (!this.isOnlyBuyer) {
       this.PERMISSION_ROUTE = PERMISSION_ROUTES.SETTINGS.PEOPLE;
       this.datatableConfig.columns!.push({
-        title: 'Comprador',
+        title: this.translateService.instant('LISTING.TABLE_COLUMNS.BUYER'),
         data: 'buyerItBelongs.fullName',
         render: function (data) {
           return data ? data : '-';
@@ -164,6 +167,42 @@ export class BrokerListingComponent
     }
 
     this.loadBrokers();
+  }
+
+  // 🔹 Initialize DataTable Configuration with Translations
+  initializeDatatableConfig(): void {
+    // Subscribe to language changes and reinitialize datatable config with new translations
+    const langSub = this.translateService.onLangChange.subscribe(() => {
+      this.updateDatatableColumnTitles();
+      this.cdr.detectChanges();
+    });
+    this.unsubscribe.push(langSub);
+
+    this.updateDatatableColumnTitles();
+  }
+
+  // 🔹 Update DataTable Column Titles with Current Language
+  private updateDatatableColumnTitles(): void {
+    if (this.datatableConfig.columns) {
+      this.datatableConfig.columns[0].title = this.translateService.instant(
+        'LISTING.TABLE_COLUMNS.FULL_NAME'
+      );
+      this.datatableConfig.columns[1].title = this.translateService.instant(
+        'LISTING.TABLE_COLUMNS.IDENTIFICATION'
+      );
+      this.datatableConfig.columns[2].title = this.translateService.instant(
+        'LISTING.TABLE_COLUMNS.MOBILE_PHONE'
+      );
+      this.datatableConfig.columns[3].title = this.translateService.instant(
+        'LISTING.TABLE_COLUMNS.STATUS'
+      );
+      // Update the buyer column if it exists (non-buyer only)
+      if (this.datatableConfig.columns.length > 4) {
+        this.datatableConfig.columns[4].title = this.translateService.instant(
+          'LISTING.TABLE_COLUMNS.BUYER'
+        );
+      }
+    }
   }
 
   loadBuyers() {

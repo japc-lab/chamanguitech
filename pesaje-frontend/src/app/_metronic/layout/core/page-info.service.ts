@@ -27,6 +27,18 @@ export class PageInfoService {
 
   constructor() {}
 
+  public setMenuOptions(options: any[]) {
+    // This method is no longer needed as translations are removed
+  }
+
+  /**
+   * ✅ Helper method to find an option and get its translated label
+   */
+  public getTranslatedLabel(title: string, currentLang: string): string {
+    // This method is no longer needed as translations are removed
+    return title;
+  }
+
   public setTitle(_title: string) {
     this.title.next(_title);
   }
@@ -44,7 +56,7 @@ export class PageInfoService {
   public updateDescription(_description: string) {
     setTimeout(() => {
       this.setDescription(_description);
-    }, 1);
+    }, 20);
   }
 
   public setBreadcrumbs(_bs: Array<PageLink>) {

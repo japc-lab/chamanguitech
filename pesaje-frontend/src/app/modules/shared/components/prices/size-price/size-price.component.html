@@ -7,67 +7,61 @@
     <div *ngIf="!isAdding" class="card">
       <div class="card-body">
         <div class="d-flex flex-wrap flex-stack mb-3">
-          <h3 class="fw-bolder my-2">Períodos</h3>
+          <h3 class="fw-bolder my-2" translate="SIZE_PRICE.TITLE"></h3>
         </div>
 
         <div class="d-flex align-items-end justify-content-between">
           <div class="d-flex align-items-end">
             <!-- Company Selector -->
             <div *ngIf="showCompany" class="w-180px me-2 position-relative">
-              <label for="company" class="required fw-semibold fs-6 mb-2">Compañía</label>
+              <label for="company" class="required fw-semibold fs-6 mb-2" translate="SIZE_PRICE.FIELDS.COMPANY"></label>
               <select id="company" name="company" class="form-select form-select-sm" [(ngModel)]="selectedCompany"
                 (change)="onCompanyChange()" required [disabled]="isEditing">
-                <option value="" disabled selected>Seleccione una opción</option>
+                <option value="" disabled selected translate="SIZE_PRICE.PLACEHOLDERS.SELECT_OPTION"></option>
                 <option *ngFor="let company of companies" [value]="company.id">
                   {{ company.name }}
                 </option>
               </select>
-              <small *ngIf="showErrors && !selectedCompany" class="text-danger small mt-1 position-absolute">
-                Debe seleccionar una compañía
+              <small *ngIf="showErrors && !selectedCompany" class="text-danger small mt-1 position-absolute" translate="SIZE_PRICE.VALIDATIONS.COMPANY_REQUIRED">
               </small>
             </div>
 
             <!-- Period Selector -->
             <div class="w-180px me-2 position-relative">
-              <label for="period" class="required fw-semibold fs-6 mb-2">Período</label>
+              <label for="period" class="required fw-semibold fs-6 mb-2" translate="SIZE_PRICE.FIELDS.PERIOD"></label>
               <select id="period" name="period" class="form-select form-select-sm" [(ngModel)]="selectedPeriod"
                 (change)="onPeriodChange()" required [disabled]="isEditing">
-                <option value="" disabled selected>Seleccione una opción</option>
+                <option value="" disabled selected translate="SIZE_PRICE.PLACEHOLDERS.SELECT_OPTION"></option>
                 <option *ngFor="let period of existingPeriods" [value]="period.id">
                   {{ period.name }}
                 </option>
               </select>
-              <small *ngIf="showErrors && !selectedPeriod" class="text-danger small mt-1 position-absolute">
-                Debe seleccionar un mes
+              <small *ngIf="showErrors && !selectedPeriod" class="text-danger small mt-1 position-absolute" translate="SIZE_PRICE.VALIDATIONS.PERIOD_REQUIRED">
               </small>
             </div>
 
             <!-- Search Button -->
-            <button *ngIf="!isEditing" class="btn btn-primary btn-sm px-4" (click)="search()">
-              Buscar
+            <button *ngIf="!isEditing" class="btn btn-primary btn-sm px-4" (click)="search()" translate="COMMON.SEARCH">
             </button>
           </div>
 
           <!-- Buttons Section -->
           <div *ngIf="!isEditing" class="d-flex align-items-end ms-auto">
             <!-- Add Period Button (Nuevo) -->
-            <button *appCanCreate="PERMISSION_ROUTE" class="btn btn-success btn-sm me-2" (click)="toggleAddPeriod()">
-              Nuevo
+            <button *appCanCreate="PERMISSION_ROUTE" class="btn btn-success btn-sm me-2" (click)="toggleAddPeriod()" translate="COMMON.NEW">
             </button>
 
             <!-- Edit Period Button -->
             <div *ngIf="showEditButton">
-              <button *appCanEdit="PERMISSION_ROUTE" class="btn btn-warning btn-sm" (click)="editPeriod()">
-                Editar
+              <button *appCanEdit="PERMISSION_ROUTE" class="btn btn-warning btn-sm" (click)="editPeriod()" translate="BUTTONS.EDIT">
               </button>
             </div>
           </div>
 
           <div *ngIf="isEditing" class="d-flex align-items-end ms-auto">
-            <button class="btn btn-primary btn-sm me-2" (click)="confirmSave()">
-              Guardar
+            <button class="btn btn-primary btn-sm me-2" (click)="confirmSave()" translate="BUTTONS.SAVE">
             </button>
-            <button class="btn btn-danger btn-sm" (click)="cancelEditing()">Cancelar</button>
+            <button class="btn btn-danger btn-sm" (click)="cancelEditing()" translate="BUTTONS.CANCEL"></button>
           </div>
         </div>
       </div>
@@ -78,58 +72,54 @@
     <div *ngIf="isAdding" class="card mt-3">
       <div class="card-body">
         <div class="d-flex flex-wrap flex-stack mb-3">
-          <h3 class="fw-bolder my-2">Nuevo Periodo</h3>
+          <h3 class="fw-bolder my-2" translate="SIZE_PRICE.NEW_PERIOD_TITLE"></h3>
         </div>
 
         <div class="d-flex align-items-end justify-content-between">
           <div class="d-flex justify-content-between">
             <!-- Company Input -->
             <div *ngIf="showCompany" class="w-160px me-2 position-relative">
-              <label for="company" class="required fw-semibold fs-6 mb-2">Compañía</label>
+              <label for="company" class="required fw-semibold fs-6 mb-2" translate="SIZE_PRICE.FIELDS.COMPANY"></label>
               <select id="company" name="company" class="form-select form-select-sm" [(ngModel)]="selectedCompany"
                 (change)="onCompanyChange()" required>
-                <option value="" disabled selected>Seleccione una opción</option>
+                <option value="" disabled selected translate="SIZE_PRICE.PLACEHOLDERS.SELECT_OPTION"></option>
                 <option *ngFor="let company of companies" [value]="company.id">
                   {{ company.name }}
                 </option>
               </select>
-              <small *ngIf="showErrors && !selectedCompany" class="text-danger small mt-1 position-absolute">
-                Debe seleccionar una compañía
+              <small *ngIf="showErrors && !selectedCompany" class="text-danger small mt-1 position-absolute" translate="SIZE_PRICE.VALIDATIONS.COMPANY_REQUIRED">
               </small>
             </div>
 
             <!-- Year Input -->
             <div class="w-160px me-2 position-relative">
-              <label for="year" class="required fw-semibold fs-6 mb-2">Año</label>
+              <label for="year" class="required fw-semibold fs-6 mb-2" translate="SIZE_PRICE.FIELDS.YEAR"></label>
               <select id="year" name="year" class="form-select form-select-sm" [(ngModel)]="selectedYear">
-                <option value="" disabled selected>Seleccione una opción</option>
+                <option value="" disabled selected translate="SIZE_PRICE.PLACEHOLDERS.SELECT_OPTION"></option>
                 <option *ngFor="let year of years" [value]="year">{{ year }}</option>
               </select>
-              <small *ngIf="showErrors && !selectedYear" class="text-danger small mt-1 position-absolute">
-                Debe seleccionar un año
+              <small *ngIf="showErrors && !selectedYear" class="text-danger small mt-1 position-absolute" translate="SIZE_PRICE.VALIDATIONS.YEAR_REQUIRED">
               </small>
             </div>
 
             <!-- Period Number Input -->
             <div class="w-100px me-2 position-relative">
-              <label for="periodNumber" class="required fw-semibold fs-6 mb-2">Periodo</label>
+              <label for="periodNumber" class="required fw-semibold fs-6 mb-2" translate="SIZE_PRICE.FIELDS.PERIOD_NUMBER"></label>
               <input type="text" id="periodNumber" name="periodNumber" [(ngModel)]="periodNumber"
-                class="form-control form-control-sm" required (keypress)="validateNumber($event)" placeholder="0"
+                class="form-control form-control-sm" required (keypress)="validateNumber($event)" [placeholder]="'SIZE_PRICE.PLACEHOLDERS.PERIOD_NUMBER' | translate"
                 required />
-              <small *ngIf="showErrors && !periodNumber" class="text-danger small mt-1 position-absolute">
-                Debe ingresar un periodo
+              <small *ngIf="showErrors && !periodNumber" class="text-danger small mt-1 position-absolute" translate="SIZE_PRICE.VALIDATIONS.PERIOD_NUMBER_REQUIRED">
               </small>
             </div>
           </div>
 
           <div class="d-flex align-items-end ms-auto">
             <!-- Save Button -->
-            <button class="btn btn-primary btn-sm me-2" (click)="confirmSave()">
-              Guardar
+            <button class="btn btn-primary btn-sm me-2" (click)="confirmSave()" translate="BUTTONS.SAVE">
             </button>
 
             <!-- Cancel Button (Aligned with dropdowns) -->
-            <button class="btn btn-danger btn-sm" (click)="toggleAddPeriod()">Cancelar</button>
+            <button class="btn btn-danger btn-sm" (click)="toggleAddPeriod()" translate="BUTTONS.CANCEL"></button>
           </div>
         </div>
       </div>
@@ -150,55 +140,50 @@
 
           <!-- Date Picker -->
           <div class="col-md-12">
-            <label for="receivedDate" class="required fw-semibold fs-6 mb-2">Fecha de recibido</label>
+            <label for="receivedDate" class="required fw-semibold fs-6 mb-2" translate="SIZE_PRICE.FIELDS.RECEIVED_DATE"></label>
             <input type="date" class="form-control form-control-sm" id="receivedDate" name="receivedDate"
               [(ngModel)]="receivedDate" [disabled]="!isEditing && !isAdding" required>
-            <small *ngIf="showErrors && !receivedDate && !isSearching" class="text-danger small">
-              La fecha de recibido es obligatoria.
+            <small *ngIf="showErrors && !receivedDate && !isSearching" class="text-danger small" translate="SIZE_PRICE.VALIDATIONS.RECEIVED_DATE_REQUIRED">
             </small>
           </div>
 
           <!-- Time Picker -->
           <!-- <div class="col-md-6">
-            <label for="receivedTime" class="required fw-semibold fs-6 mb-2">Hora de recibido</label>
+            <label for="receivedTime" class="required fw-semibold fs-6 mb-2" translate="SIZE_PRICE.FIELDS.RECEIVED_TIME"></label>
             <input type="time" class="form-control form-control-sm" [(ngModel)]="receivedTime" id="receivedTime"
               name="receivedTime" [disabled]="!isEditing && !isAdding" required>
-            <small *ngIf="showErrors && !receivedTime && !isSearching" class="text-danger small">
-              La hora de recibido es obligatoria.
+            <small *ngIf="showErrors && !receivedTime && !isSearching" class="text-danger small" translate="SIZE_PRICE.VALIDATIONS.RECEIVED_TIME_REQUIRED">
             </small>
           </div> -->
 
           <!-- Fecha inicio periodo -->
           <div class="col-md-6">
-            <label for="fromDate" class="required fw-semibold fs-6 mb-2">Fecha inicio periodo</label>
+            <label for="fromDate" class="required fw-semibold fs-6 mb-2" translate="SIZE_PRICE.FIELDS.PERIOD_START_DATE"></label>
             <input type="date" class="form-control form-control-sm" id="fromDate" name="fromDate" [(ngModel)]="fromDate"
               [disabled]="!isEditing && !isAdding" required>
-            <small *ngIf="showErrors && !fromDate && !isSearching" class="text-danger small">
-              La fecha de inicio del periodo es obligatoria.
+            <small *ngIf="showErrors && !fromDate && !isSearching" class="text-danger small" translate="SIZE_PRICE.VALIDATIONS.PERIOD_START_DATE_REQUIRED">
             </small>
           </div>
 
           <!-- Fecha inicio periodo -->
           <div class="col-md-6">
-            <label for="toDate" class="required fw-semibold fs-6 mb-2">Fecha fin periodo</label>
+            <label for="toDate" class="required fw-semibold fs-6 mb-2" translate="SIZE_PRICE.FIELDS.PERIOD_END_DATE"></label>
             <input type="date" class="form-control form-control-sm" id="toDate" name="toDate" [(ngModel)]="toDate"
               [disabled]="!isEditing && !isAdding" required>
-            <small *ngIf="showErrors && !toDate && !isSearching" class="text-danger small">
-              La fecha de fin del periodo es obligatoria.
+            <small *ngIf="showErrors && !toDate && !isSearching" class="text-danger small" translate="SIZE_PRICE.VALIDATIONS.PERIOD_END_DATE_REQUIRED">
             </small>
           </div>
 
           <!-- Time of Day Selector -->
           <!-- <div class="col-md-6">
-            <label for="timeOfDay" class="required fw-semibold fs-6 mb-2">Hora del día</label>
+            <label for="timeOfDay" class="required fw-semibold fs-6 mb-2" translate="SIZE_PRICE.FIELDS.TIME_OF_DAY"></label>
             <select id="timeOfDay" name="timeOfDay" class="form-select form-select-sm" [(ngModel)]="timeOfDay"
               [disabled]="!isEditing && !isAdding" required>
-              <option value="" disabled selected>Seleccione una opción</option>
-              <option value="DAY">Día</option>
-              <option value="NIGHT">Noche</option>
+              <option value="" disabled selected translate="SIZE_PRICE.PLACEHOLDERS.SELECT_OPTION"></option>
+              <option value="DAY" translate="SIZE_PRICE.TIME_OPTIONS.DAY"></option>
+              <option value="NIGHT" translate="SIZE_PRICE.TIME_OPTIONS.NIGHT"></option>
             </select>
-            <small *ngIf="showErrors && !timeOfDay && !isSearching" class="text-danger small">
-              La hora del día es obligatoria.
+            <small *ngIf="showErrors && !timeOfDay && !isSearching" class="text-danger small" translate="SIZE_PRICE.VALIDATIONS.TIME_OF_DAY_REQUIRED">
             </small>
           </div> -->
 

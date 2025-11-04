@@ -6,7 +6,7 @@
       <div class="d-flex align-items-center position-relative my-1">
         <app-keenicon name="magnifier" class="fs-3 position-absolute ms-5"></app-keenicon>
         <input type="text" data-action="filter" class="form-control form-control-solid w-250px ps-12"
-          placeholder="Buscar Información de Pago">
+          [placeholder]="'COMMON.SEARCH' | translate">
       </div>
       <!--end::Search-->
     </div>
@@ -18,7 +18,7 @@
       <div class="d-flex justify-content-end">
         <!--begin::Add payment info-->
         <button *appCanEdit="permissionRoute" type="button" class="btn btn-primary" data-action="create">
-          Agregar Información de Pago
+          <span translate="BUTTONS.ADD"></span>
         </button>
         <!--end::Add payment info-->
       </div>
@@ -41,7 +41,7 @@
 <ng-template #formModal let-modal>
   <form #myForm="ngForm" (ngSubmit)="onSubmit($event, myForm)">
     <div class="modal-header">
-      <h4 class="modal-title" id="modal-basic-title">Detalles de Información de Pago</h4>
+      <h4 class="modal-title" id="modal-basic-title" translate="PROFILE.PAYMENT_INFO.MODAL_TITLE"></h4>
       <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
     </div>
     <div class="modal-body">
@@ -61,68 +61,79 @@
         <!--begin::Payment information form-->
         <div class="collapse show">
           <div class="fv-row mb-7">
-            <label class="required fw-semibold fs-6 mb-2">Nombre del Banco</label>
+            <label class="required fw-semibold fs-6 mb-2" translate="PROFILE.PAYMENT_INFO.FORM.BANK_NAME"></label>
             <input type="text" class="form-control form-control-solid" name="bankName"
               [(ngModel)]="paymentInfo.bankName" #bankName="ngModel" required minlength="3" />
             <div *ngIf="myForm.submitted && myForm.invalid"
               class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-              <div *ngIf="bankName.errors?.['required']">El nombre del banco es obligatorio.</div>
-              <div *ngIf="bankName.errors?.['minlength']">Debe tener al menos 3 caracteres.</div>
+              <div *ngIf="bankName.errors?.['required']"
+                translate="PROFILE.PAYMENT_INFO.VALIDATIONS.BANK_NAME_REQUIRED"></div>
+              <div *ngIf="bankName.errors?.['minlength']"
+                translate="PROFILE.PAYMENT_INFO.VALIDATIONS.BANK_NAME_MIN_LENGTH"></div>
             </div>
           </div>
 
           <div class="fv-row mb-7">
-            <label class="required fw-semibold fs-6 mb-2">Nombre de la Cuenta</label>
+            <label class="required fw-semibold fs-6 mb-2" translate="PROFILE.PAYMENT_INFO.FORM.ACCOUNT_NAME"></label>
             <input type="text" class="form-control form-control-solid" name="accountName"
               [(ngModel)]="paymentInfo.accountName" #accountName="ngModel" required minlength="3" />
             <div *ngIf="myForm.submitted && myForm.invalid"
               class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-              <div *ngIf="accountName.errors?.['required']">El nombre de la cuenta es obligatorio.</div>
-              <div *ngIf="accountName.errors?.['minlength']">Debe tener al menos 3 caracteres.</div>
+              <div *ngIf="accountName.errors?.['required']"
+                translate="PROFILE.PAYMENT_INFO.VALIDATIONS.ACCOUNT_NAME_REQUIRED"></div>
+              <div *ngIf="accountName.errors?.['minlength']"
+                translate="PROFILE.PAYMENT_INFO.VALIDATIONS.ACCOUNT_NAME_MIN_LENGTH"></div>
             </div>
           </div>
 
           <div class="fv-row mb-7">
-            <label class="fw-semibold fs-6 mb-2" [ngClass]="{'required': required}">Número de Cuenta</label>
+            <label class="fw-semibold fs-6 mb-2" [ngClass]="{'required': required}"
+              translate="PROFILE.PAYMENT_INFO.FORM.ACCOUNT_NUMBER"></label>
             <input type="text" class="form-control form-control-solid" name="accountNumber"
               [(ngModel)]="paymentInfo.accountNumber" #accountNumber="ngModel" [required]="required" pattern="\d+" />
             <div *ngIf="myForm.submitted && myForm.invalid"
               class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-              <div *ngIf="accountNumber.errors?.['required']">El número de cuenta es obligatorio.</div>
-              <div *ngIf="accountNumber.errors?.['pattern']">El número de cuenta debe contener solo dígitos.</div>
+              <div *ngIf="accountNumber.errors?.['required']"
+                translate="PROFILE.PAYMENT_INFO.VALIDATIONS.ACCOUNT_NUMBER_REQUIRED"></div>
+              <div *ngIf="accountNumber.errors?.['pattern']"
+                translate="PROFILE.PAYMENT_INFO.VALIDATIONS.ACCOUNT_NUMBER_PATTERN"></div>
             </div>
           </div>
 
           <div class="fv-row mb-7">
-            <label class="required fw-semibold fs-6 mb-2">Identificación</label>
+            <label class="required fw-semibold fs-6 mb-2" translate="PROFILE.PAYMENT_INFO.FORM.IDENTIFICATION"></label>
             <input type="text" class="form-control form-control-solid" name="identification"
               [(ngModel)]="paymentInfo.identification" #identification="ngModel" required />
             <div *ngIf="myForm.submitted && myForm.invalid"
               class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-              <div *ngIf="identification.errors?.['required']">La identificación es obligatoria.</div>
+              <div *ngIf="identification.errors?.['required']"
+                translate="PROFILE.PAYMENT_INFO.VALIDATIONS.IDENTIFICATION_REQUIRED"></div>
             </div>
           </div>
 
           <div class="fv-row mb-7">
-            <label class="required fw-semibold fs-6 mb-2">Teléfono Móvil</label>
+            <label class="required fw-semibold fs-6 mb-2" translate="PROFILE.PAYMENT_INFO.FORM.MOBILE_PHONE"></label>
             <input type="text" class="form-control form-control-solid" name="mobilePhone"
               [(ngModel)]="paymentInfo.mobilePhone" #mobilePhone="ngModel" required
               pattern="^\+?[0-9\s\-\(\)]{7,15}$" />
             <div *ngIf="myForm.submitted && myForm.invalid"
               class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-              <div *ngIf="mobilePhone.errors?.['required']">El teléfono móvil es obligatorio.</div>
-              <div *ngIf="mobilePhone.errors?.['pattern']">Ingrese un número de teléfono válido.</div>
+              <div *ngIf="mobilePhone.errors?.['required']"
+                translate="PROFILE.PAYMENT_INFO.VALIDATIONS.MOBILE_PHONE_REQUIRED"></div>
+              <div *ngIf="mobilePhone.errors?.['pattern']"
+                translate="PROFILE.PAYMENT_INFO.VALIDATIONS.MOBILE_PHONE_PATTERN"></div>
             </div>
           </div>
 
           <div class="fv-row mb-7">
-            <label class="fw-semibold fs-6 mb-2" [ngClass]="{'required': required}">Correo Electrónico</label>
+            <label class="fw-semibold fs-6 mb-2" [ngClass]="{'required': required}"
+              translate="PROFILE.PAYMENT_INFO.FORM.EMAIL"></label>
             <input type="email" class="form-control form-control-solid" name="email" [(ngModel)]="paymentInfo.email"
               #email="ngModel" [required]="required" />
             <div *ngIf="myForm.submitted && myForm.invalid"
               class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-              <div *ngIf="email.errors?.['required']">El correo electrónico es obligatorio.</div>
-              <div *ngIf="email.errors?.['pattern']">Debe ingresar un correo válido.</div>
+              <div *ngIf="email.errors?.['required']" translate="PROFILE.PAYMENT_INFO.VALIDATIONS.EMAIL_REQUIRED"></div>
+              <div *ngIf="email.errors?.['pattern']" translate="PROFILE.PAYMENT_INFO.VALIDATIONS.EMAIL_PATTERN"></div>
             </div>
           </div>
         </div>
@@ -131,12 +142,13 @@
     </div>
     <div class="modal-footer flex-center">
       <button type="reset" class="btn btn-light me-3" (click)="modal.dismiss('cancel')">
-        Cancelar
+        <span translate="BUTTONS.CANCEL"></span>
       </button>
       <button type="submit" class="btn btn-primary" [attr.data-kt-indicator]="isLoading ? 'on' : 'off'">
-        <span class="indicator-label">Guardar</span>
+        <span class="indicator-label" translate="BUTTONS.SAVE"></span>
         <span class="indicator-progress">
-          Por favor, espera... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+          <span translate="BUTTONS.PLEASE_WAIT"></span> <span
+            class="spinner-border spinner-border-sm align-middle ms-2"></span>
         </span>
       </button>
     </div>

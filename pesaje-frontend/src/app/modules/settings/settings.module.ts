@@ -19,6 +19,7 @@ import {
 } from '@ng-bootstrap/ng-bootstrap';
 import { SharedModule } from '../shared/shared.module';
 import { SettingsRoutingModule } from './settings-routing.module';
+import { TranslationModule } from '../i18n/translation.module';
 
 @NgModule({
   declarations: [],
@@ -39,6 +40,7 @@ import { SettingsRoutingModule } from './settings-routing.module';
     NgbDropdownModule,
     NgbCollapseModule,
     NgbTooltipModule,
+    TranslationModule,
   ],
 })
 export class SettingsModule {}

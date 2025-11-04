@@ -5,6 +5,7 @@ import {
   EventEmitter,
   OnInit,
   OnChanges,
+  OnDestroy,
   SimpleChanges,
 } from '@angular/core';
 import { ILogisticsItemModel } from '../../interfaces/logistics-item.interface';
@@ -13,43 +14,68 @@ import { IPaymentMethodModel } from '../../../shared/interfaces/payment-method.i
 import { ILogisticsPaymentModel } from '../../interfaces/logistics-payment.interface';
 import { PaymentMethodService } from '../../../shared/services/payment-method.service';
 import { DateUtilsService } from '../../../../utils/date-utils.service';
+import { TranslateService } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-logistics-payments-tracking',
   templateUrl: './logistics-payments-tracking.component.html',
   styleUrls: ['./logistics-payments-tracking.component.scss'],
 })
-export class LogisticsPaymentsTrackingComponent implements OnInit, OnChanges {
+export class LogisticsPaymentsTrackingComponent implements OnInit, OnChanges, OnDestroy {
   @Input() logisticsItems: ILogisticsItemModel[] = [];
   @Input() logisticsPayments: ILogisticsPaymentModel[] = [];
   @Input() isEditMode: boolean = false;
   @Input() showValidationErrors: boolean = false;
   @Output() logisticsPaymentsChange = new EventEmitter<ILogisticsPaymentModel[]>();
 
-  title: string = 'Resumen de Logística';
+  title: string = '';
 
-  paymentStatuses = [
-    { value: 'NO_PAYMENT', label: 'Sin pagos' },
-    { value: 'PENDING', label: 'Pendiente' },
-    { value: 'PAID', label: 'Pagado' },
-  ];
-
+  paymentStatuses: { value: string; label: string }[] = [];
   paymentMethods: IPaymentMethodModel[] = [];
+  invoiceOptions: { value: string; label: string }[] = [];
 
-  invoiceOptions = [
-    { value: 'yes', label: 'SÍ' },
-    { value: 'no', label: 'NO' },
-    { value: 'not-applicable', label: 'N/A' },
-  ];
+  private langChangeSubscription?: Subscription;
 
   constructor(
     private paymentMethodService: PaymentMethodService,
-    private dateUtils: DateUtilsService
+    private dateUtils: DateUtilsService,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {
+    this.initializeTranslations();
     this.loadPaymentMethods();
     this.initializePaymentsForCategories();
+    this.subscribeToLanguageChanges();
+  }
+
+  ngOnDestroy(): void {
+    if (this.langChangeSubscription) {
+      this.langChangeSubscription.unsubscribe();
+    }
+  }
+
+  subscribeToLanguageChanges(): void {
+    this.langChangeSubscription = this.translate.onLangChange.subscribe(() => {
+      this.initializeTranslations();
+    });
+  }
+
+  initializeTranslations(): void {
+    this.title = this.translate.instant('LOGISTICS.PAYMENTS.TITLE');
+
+    this.paymentStatuses = [
+      { value: 'NO_PAYMENT', label: this.translate.instant('LOGISTICS.PAYMENTS.PAYMENT_STATUS_OPTIONS.NO_PAYMENT') },
+      { value: 'PENDING', label: this.translate.instant('LOGISTICS.PAYMENTS.PAYMENT_STATUS_OPTIONS.PENDING') },
+      { value: 'PAID', label: this.translate.instant('LOGISTICS.PAYMENTS.PAYMENT_STATUS_OPTIONS.PAID') },
+    ];
+
+    this.invoiceOptions = [
+      { value: 'yes', label: this.translate.instant('LOGISTICS.PAYMENTS.INVOICE_OPTIONS.YES') },
+      { value: 'no', label: this.translate.instant('LOGISTICS.PAYMENTS.INVOICE_OPTIONS.NO') },
+      { value: 'not-applicable', label: this.translate.instant('LOGISTICS.PAYMENTS.INVOICE_OPTIONS.NOT_APPLICABLE') },
+    ];
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -215,7 +241,7 @@ export class LogisticsPaymentsTrackingComponent implements OnInit, OnChanges {
 
   getPaymentMethodLabel(methodId: string): string {
     const method = this.paymentMethods.find((m) => m.id === methodId);
-    return method ? method.name : 'Seleccionar';
+    return method ? method.name : this.translate.instant('LOGISTICS.PAYMENTS.SELECT_PAYMENT_METHOD');
   }
 
   getInvoiceLabel(value: string): string {
@@ -254,13 +280,13 @@ export class LogisticsPaymentsTrackingComponent implements OnInit, OnChanges {
   getDescriptionForCategory(financeCategory: string): string {
     switch (financeCategory) {
       case 'INVOICE':
-        return 'Subtotal logística a pagar con factura';
+        return this.translate.instant('LOGISTICS.PAYMENTS.CATEGORY_DESCRIPTIONS.INVOICE');
       case 'PETTY_CASH':
-        return 'Subtotal logística a pagar con caja chica';
+        return this.translate.instant('LOGISTICS.PAYMENTS.CATEGORY_DESCRIPTIONS.PETTY_CASH');
       case 'ADDITIONAL':
-        return 'Subtotal logística adicional';
+        return this.translate.instant('LOGISTICS.PAYMENTS.CATEGORY_DESCRIPTIONS.ADDITIONAL');
       default:
-        return 'Subtotal logística';
+        return this.translate.instant('LOGISTICS.PAYMENTS.CATEGORY_DESCRIPTIONS.DEFAULT');
     }
   }
 
@@ -322,19 +348,19 @@ export class LogisticsPaymentsTrackingComponent implements OnInit, OnChanges {
     const errors: string[] = [];
 
     if (!this.isPaymentDateValid(payment)) {
-      errors.push('Fecha de pago es requerida');
+      errors.push(this.translate.instant('LOGISTICS.VALIDATIONS.PAYMENT_DATE_REQUIRED'));
     }
     if (!this.isPaymentMethodValid(payment)) {
-      errors.push('Método de pago es requerido');
+      errors.push(this.translate.instant('LOGISTICS.VALIDATIONS.PAYMENT_METHOD_REQUIRED'));
     }
     if (!this.isPersonInChargeValid(payment)) {
-      errors.push('Persona encargada es requerida');
+      errors.push(this.translate.instant('LOGISTICS.VALIDATIONS.PERSON_IN_CHARGE_REQUIRED'));
     }
     if (!this.isInvoiceNumberValid(payment)) {
-      errors.push('Número de factura es requerido');
+      errors.push(this.translate.instant('LOGISTICS.VALIDATIONS.INVOICE_NUMBER_REQUIRED'));
     }
     if (!this.isInvoiceNameValid(payment)) {
-      errors.push('Nombre de factura es requerido');
+      errors.push(this.translate.instant('LOGISTICS.VALIDATIONS.INVOICE_NAME_REQUIRED'));
     }
 
     return errors;

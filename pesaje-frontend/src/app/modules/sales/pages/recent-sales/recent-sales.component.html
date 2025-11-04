@@ -1,7 +1,7 @@
 <div class="card">
   <div class="card-body">
     <div class="d-flex flex-wrap flex-stack mb-3">
-      <h3 class="fw-bolder my-2">Buscar por número de control</h3>
+      <h3 class="fw-bolder my-2">{{ 'SALES.RECENT_SALES.TITLE' | translate }}</h3>
     </div>
 
     <div class="row g-3">
@@ -14,10 +14,10 @@
 
         <!-- Search Button -->
         <button class="btn btn-primary btn-sm d-flex align-items-center gap-2" (click)="loadRecentSales()">
-          <i class="bi bi-search"></i> Buscar
+          <i class="bi bi-search"></i> {{ 'SALES.RECENT_SALES.BUTTONS.SEARCH' | translate }}
         </button>
 
-        <button class="btn btn-secondary btn-sm px-4" (click)="clearFilters()">Limpiar Filtros</button>
+        <button class="btn btn-secondary btn-sm px-4" (click)="clearFilters()">{{ 'SALES.RECENT_SALES.BUTTONS.CLEAR_FILTERS' | translate }}</button>
       </div>
 
     </div>

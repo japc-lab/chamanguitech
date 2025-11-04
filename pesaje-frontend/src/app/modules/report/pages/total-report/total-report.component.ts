@@ -314,7 +314,12 @@ export class TotalReportComponent implements OnInit, OnDestroy {
   }
 
   confirmSave(): void {
-    this.alertService.confirm().then((result) => {
+    this.alertService.confirmTranslated({
+      titleKey: 'MESSAGES.CONFIRM_TITLE',
+      messageKey: 'MESSAGES.CONFIRM_SAVE',
+      confirmKey: 'BUTTONS.CONFIRM',
+      cancelKey: 'BUTTONS.CANCEL',
+    }).then((result) => {
       if (result.isConfirmed) {
         this.saveTotalReport();
       }

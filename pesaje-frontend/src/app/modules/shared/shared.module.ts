@@ -17,6 +17,7 @@ import { ResidualTableComponent } from './components/prices/residual-table/resid
 import { BestPricesTableComponent } from './components/prices/best-prices-table/best-prices-table.component';
 import { SizePriceComponent } from './components/prices/size-price/size-price.component';
 import { CompanyBestPricesComponent } from '../settings/companies/company-best-prices/company-best-prices.component';
+import { TranslationModule } from '../i18n/translation.module';
 
 @NgModule({
   declarations: [
@@ -41,6 +42,7 @@ import { CompanyBestPricesComponent } from '../settings/companies/company-best-p
     ReactiveFormsModule,
     SharedModuleMetronic,
     SweetAlert2Module.forChild(),
+    TranslationModule,
   ],
   exports: [
     PaymentInformationComponent,
@@ -55,6 +57,7 @@ import { CompanyBestPricesComponent } from '../settings/companies/company-best-p
     SizePriceComponent,
     BestPricesTableComponent,
     CompanyBestPricesComponent,
+    TranslationModule,
   ], // ✅ Export so all modules can use them
 })
 export class SharedModule {}

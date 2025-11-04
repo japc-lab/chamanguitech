@@ -18,6 +18,7 @@ import { CompanySaleTailDetailComponent } from './widgets/company-sale-tail-deta
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { CompanySaleUnitsConversionComponent } from './widgets/company-sale-units-conversion/company-sale-units-conversion.component';
 import { CompanySaleSummaryComponent } from './widgets/company-sale-summary/company-sale-summary.component';
+import { TranslationModule } from '../i18n/translation.module';
 
 @NgModule({
   declarations: [
@@ -43,6 +44,7 @@ import { CompanySaleSummaryComponent } from './widgets/company-sale-summary/comp
     SharedModule,
     NgbModule,
     MatDatepickerModule,
+    TranslationModule,
   ],
   providers: [NgbActiveModal],
 })

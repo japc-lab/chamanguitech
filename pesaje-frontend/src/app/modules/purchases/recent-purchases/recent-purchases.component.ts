@@ -22,6 +22,7 @@ import { ClientService } from '../../shared/services/client.service';
 import { AlertService } from 'src/app/utils/alert.service';
 import { ICompany } from '../../settings/interfaces/company.interfaces';
 import { CompanyService } from '../../settings/services/company.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-recent-purchases',
@@ -56,7 +57,8 @@ export class RecentPurchasesComponent implements OnInit {
     private clientService: ClientService,
     private alertService: AlertService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -65,66 +67,91 @@ export class RecentPurchasesComponent implements OnInit {
     this.loadCompanies();
     this.loadClients();
     this.loadRecentPurchases();
+
+    // Subscribe to language changes and reinitialize datatable config with new translations
+    const langSub = this.translate.onLangChange.subscribe(() => {
+      this.initiliazeDatatable();
+      this.reloadEvent.emit(true);
+      this.cdr.detectChanges();
+    });
+    this.unsubscribe.push(langSub);
   }
 
   initiliazeDatatable() {
+    // Preserve existing data when reinitializing (e.g., during language change)
+    const currentData = this.datatableConfig?.data || [];
+
+    // Get translations for status badges
+    const statusDraft = this.translate.instant('PURCHASES.STATUS.DRAFT');
+    const statusNoPayments = this.translate.instant('PURCHASES.STATUS.NO_PAYMENTS');
+    const statusInProgress = this.translate.instant('PURCHASES.STATUS.IN_PROGRESS');
+    const statusPaymentComplete = this.translate.instant('PURCHASES.STATUS.PAYMENT_COMPLETE');
+    const statusInformationComplete = this.translate.instant('PURCHASES.STATUS.INFORMATION_COMPLETE');
+    const statusClosed = this.translate.instant('PURCHASES.STATUS.CLOSED');
+    const statusUnknown = this.translate.instant('PURCHASES.STATUS.UNKNOWN');
+
+    // Get translations for invoice options
+    const optionYes = this.translate.instant('PURCHASES.OPTIONS.YES');
+    const optionNo = this.translate.instant('PURCHASES.OPTIONS.NO');
+    const optionNotApplicable = this.translate.instant('PURCHASES.OPTIONS.NOT_APPLICABLE');
+
     this.datatableConfig = {
       serverSide: false,
       paging: true,
       pageLength: 10,
-      data: [],
+      data: currentData,
       order: [[1, 'asc']],
       columns: [
         {
-          title: 'Numero de Control',
+          title: this.translate.instant('PURCHASES.RECENT_PURCHASES.TABLE.CONTROL_NUMBER'),
           data: 'controlNumber',
           render: function (data) {
             return data ? data : '-';
           },
         },
         {
-          title: 'Estado',
+          title: this.translate.instant('PURCHASES.RECENT_PURCHASES.TABLE.STATUS'),
           data: 'status',
           render: function (data: PurchaseStatusEnum, type: any) {
             if (type === 'sort') {
               switch (data) {
                 case PurchaseStatusEnum.DRAFT:
-                  return 1; // Borrador
+                  return 1;
                 case PurchaseStatusEnum.CREATED:
-                  return 2; // Sin pagos
+                  return 2;
                 case PurchaseStatusEnum.IN_PROGRESS:
-                  return 3; // En progreso
+                  return 3;
                 case PurchaseStatusEnum.COMPLETED:
-                  return 4; // Pago Completo
+                  return 4;
                 case PurchaseStatusEnum.CONFIRMED:
-                  return 5; // Información Completa
+                  return 5;
                 case PurchaseStatusEnum.CLOSED:
-                  return 6; // Cerrado
+                  return 6;
                 default:
                   return 99;
               }
             } else {
               switch (data) {
                 case PurchaseStatusEnum.DRAFT:
-                  return `<span class="badge bg-secondary">Borrador</span>`;
+                  return `<span class="badge bg-secondary">${statusDraft}</span>`;
                 case PurchaseStatusEnum.CREATED:
-                  return `<span class="badge bg-info text-light">Sin pagos</span>`;
+                  return `<span class="badge bg-info text-light">${statusNoPayments}</span>`;
                 case PurchaseStatusEnum.IN_PROGRESS:
-                  return `<span class="badge bg-warning text-dark">En progreso</span>`;
+                  return `<span class="badge bg-warning text-dark">${statusInProgress}</span>`;
                 case PurchaseStatusEnum.COMPLETED:
-                  return `<span class="badge bg-success">Pago Completo</span>`;
+                  return `<span class="badge bg-success">${statusPaymentComplete}</span>`;
                 case PurchaseStatusEnum.CONFIRMED:
-                  return `<span class="badge bg-primary text-light">Información Completa</span>`;
+                  return `<span class="badge bg-primary text-light">${statusInformationComplete}</span>`;
                 case PurchaseStatusEnum.CLOSED:
-                  return `<span class="badge bg-danger">Cerrado</span>`;
+                  return `<span class="badge bg-danger">${statusClosed}</span>`;
                 default:
-                  return `<span class="badge bg-light text-dark">Desconocido</span>`;
+                  return `<span class="badge bg-light text-dark">${statusUnknown}</span>`;
               }
             }
           },
         },
         {
-          title: 'Fecha de Compra',
+          title: this.translate.instant('PURCHASES.RECENT_PURCHASES.TABLE.PURCHASE_DATE'),
           data: 'purchaseDate',
           render: function (data) {
             if (!data) return '-';
@@ -133,7 +160,7 @@ export class RecentPurchasesComponent implements OnInit {
           },
         },
         {
-          title: 'Total',
+          title: this.translate.instant('PURCHASES.RECENT_PURCHASES.TABLE.TOTAL'),
           data: 'grandTotal',
           render: function (data) {
             if (!data && data !== 0) return '-';
@@ -147,7 +174,7 @@ export class RecentPurchasesComponent implements OnInit {
           },
         },
         {
-          title: 'Total Acordado',
+          title: this.translate.instant('PURCHASES.RECENT_PURCHASES.TABLE.TOTAL_AGREED'),
           data: 'totalAgreedToPay',
           render: function (data) {
             if (!data && data !== 0) return '-';
@@ -161,7 +188,7 @@ export class RecentPurchasesComponent implements OnInit {
           },
         },
         {
-          title: 'Total Abonado',
+          title: this.translate.instant('PURCHASES.RECENT_PURCHASES.TABLE.TOTAL_PAID'),
           data: 'totalPaid',
           render: function (data) {
             if (!data || data === 0) return '-';
@@ -175,21 +202,21 @@ export class RecentPurchasesComponent implements OnInit {
           },
         },
         {
-          title: 'Comprador',
+          title: this.translate.instant('PURCHASES.RECENT_PURCHASES.TABLE.BUYER'),
           data: 'buyer.fullName',
           render: function (data) {
             return data ? data : '-';
           },
         },
         {
-          title: 'Cliente',
+          title: this.translate.instant('PURCHASES.RECENT_PURCHASES.TABLE.CLIENT'),
           data: 'client.fullName',
           render: function (data) {
             return data ? data : '-';
           },
         },
         {
-          title: 'Compañía',
+          title: this.translate.instant('PURCHASES.RECENT_PURCHASES.TABLE.COMPANY'),
           data: 'company.name',
           render: function (data, type, full) {
             if (full.localSellCompany) {
@@ -199,7 +226,7 @@ export class RecentPurchasesComponent implements OnInit {
           },
         },
         {
-          title: 'Período',
+          title: this.translate.instant('PURCHASES.RECENT_PURCHASES.TABLE.PERIOD'),
           data: 'period.name',
           render: function (data) {
             return data ? data : '-';
@@ -209,7 +236,7 @@ export class RecentPurchasesComponent implements OnInit {
         // Has to be from the payment with the highest amount payed.
         // Leave empty if the highest amount payer doesn't have name and if no payments have been made.
         {
-          title: 'Nombre de Cuenta Bancaria',
+          title: this.translate.instant('PURCHASES.RECENT_PURCHASES.TABLE.BANK_ACCOUNT_NAME'),
           data: 'payments',
           render: function (data, type, full) {
             const payments: IPurchasePaymentModel[] = Array.isArray(
@@ -237,21 +264,21 @@ export class RecentPurchasesComponent implements OnInit {
           },
         },
         {
-          title: '¿Factura recibida?',
+          title: this.translate.instant('PURCHASES.RECENT_PURCHASES.TABLE.HAS_INVOICE'),
           data: 'hasInvoice',
           render: function (data) {
-            return data === 'yes' ? 'Si' : data === 'no' ? 'No' : 'No aplica';
+            return data === 'yes' ? optionYes : data === 'no' ? optionNo : optionNotApplicable;
           },
         },
         {
-          title: 'Número Factura',
+          title: this.translate.instant('PURCHASES.RECENT_PURCHASES.TABLE.INVOICE_NUMBER'),
           data: 'invoiceNumber',
           render: function (data) {
             return data ? data : '-';
           },
         },
         {
-          title: 'Nombre en Factura',
+          title: this.translate.instant('PURCHASES.RECENT_PURCHASES.TABLE.INVOICE_NAME'),
           data: 'invoiceName',
           render: function (data) {
             return data ? data : '-';

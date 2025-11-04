@@ -15,17 +15,17 @@
       <!-- begin::Table head -->
       <thead>
         <tr class="fw-bold text-muted bg-light-primary">
-          <th class="ps-4 min-w-200px rounded-start">Descripción</th>
-          <th class="min-w-120px text-end">Monto</th>
-          <th class="min-w-120px text-center">Pagos</th>
-          <th class="min-w-120px text-center">Fecha de pago</th>
-          <th class="min-w-150px text-center">Método de pago</th>
-          <th class="min-w-120px text-center">Factura o recibo</th>
-          <th class="min-w-150px text-center">Número de factura o recibo</th>
-          <th class="min-w-150px text-center">Nombre de factura o recibo</th>
-          <th class="min-w-150px text-center">Persona encargada del dinero</th>
-          <th class="min-w-120px text-center">Información completa</th>
-          <th class="min-w-200px text-center rounded-end">Observaciones</th>
+          <th class="ps-4 min-w-200px rounded-start" translate="LOGISTICS.PAYMENTS.TABLE.DESCRIPTION"></th>
+          <th class="min-w-120px text-end" translate="LOGISTICS.PAYMENTS.TABLE.AMOUNT"></th>
+          <th class="min-w-120px text-center" translate="LOGISTICS.PAYMENTS.TABLE.PAYMENT_STATUS"></th>
+          <th class="min-w-120px text-center" translate="LOGISTICS.PAYMENTS.TABLE.PAYMENT_DATE"></th>
+          <th class="min-w-150px text-center" translate="LOGISTICS.PAYMENTS.TABLE.PAYMENT_METHOD"></th>
+          <th class="min-w-120px text-center" translate="LOGISTICS.PAYMENTS.TABLE.HAS_INVOICE"></th>
+          <th class="min-w-150px text-center" translate="LOGISTICS.PAYMENTS.TABLE.INVOICE_NUMBER"></th>
+          <th class="min-w-150px text-center" translate="LOGISTICS.PAYMENTS.TABLE.INVOICE_NAME"></th>
+          <th class="min-w-150px text-center" translate="LOGISTICS.PAYMENTS.TABLE.PERSON_IN_CHARGE"></th>
+          <th class="min-w-120px text-center" translate="LOGISTICS.PAYMENTS.TABLE.COMPLETE_INFO"></th>
+          <th class="min-w-200px text-center rounded-end" translate="LOGISTICS.PAYMENTS.TABLE.OBSERVATIONS"></th>
         </tr>
       </thead>
       <!-- end::Table head -->
@@ -71,7 +71,7 @@
                 (ngModelChange)="onPaymentDateChange(payment, $event)" [disabled]="payment.paymentStatus !== 'PAID'"
                 [class.is-invalid]="showValidationErrors && !isPaymentDateValid(payment)" />
               <div *ngIf="showValidationErrors && !isPaymentDateValid(payment)" class="invalid-feedback d-block small">
-                Fecha de pago es requerida
+                {{ 'LOGISTICS.VALIDATIONS.PAYMENT_DATE_REQUIRED' | translate }}
               </div>
             </td>
 
@@ -80,13 +80,13 @@
               <select class="form-select form-select-sm" [(ngModel)]="payment.paymentMethod"
                 (ngModelChange)="onPaymentMethodChange(payment, $event)" [disabled]="payment.paymentStatus !== 'PAID'"
                 [class.is-invalid]="showValidationErrors && !isPaymentMethodValid(payment)">
-                <option value="">Seleccionar</option>
+                <option value="">{{ 'LOGISTICS.PLACEHOLDERS.SELECT_OPTION' | translate }}</option>
                 <option *ngFor="let method of paymentMethods" [ngValue]="method">
                   {{ method.name }}
                 </option>
               </select>
               <div *ngIf="showValidationErrors && !isPaymentMethodValid(payment)" class="invalid-feedback d-block small">
-                Método de pago es requerido
+                {{ 'LOGISTICS.VALIDATIONS.PAYMENT_METHOD_REQUIRED' | translate }}
               </div>
             </td>
 
@@ -103,57 +103,61 @@
             <!-- Invoice Number -->
             <td class="text-center">
               <input type="text" class="form-control form-control-sm" [(ngModel)]="payment.invoiceNumber"
-                (ngModelChange)="onInvoiceNumberChange(payment, $event)" placeholder="Número"
+                (ngModelChange)="onInvoiceNumberChange(payment, $event)"
+                [placeholder]="'LOGISTICS.PLACEHOLDERS.NUMBER' | translate"
                 [disabled]="payment.hasInvoice !== 'yes'"
                 [class.is-invalid]="showValidationErrors && !isInvoiceNumberValid(payment)" />
               <div *ngIf="showValidationErrors && !isInvoiceNumberValid(payment)" class="invalid-feedback d-block small">
-                Número de factura es requerido
+                {{ 'LOGISTICS.VALIDATIONS.INVOICE_NUMBER_REQUIRED' | translate }}
               </div>
             </td>
 
             <!-- Invoice Name -->
             <td class="text-center">
               <input type="text" class="form-control form-control-sm" [(ngModel)]="payment.invoiceName"
-                (ngModelChange)="onInvoiceNameChange(payment, $event)" placeholder="Nombre"
+                (ngModelChange)="onInvoiceNameChange(payment, $event)"
+                [placeholder]="'LOGISTICS.PLACEHOLDERS.NAME' | translate"
                 [disabled]="payment.hasInvoice !== 'yes'"
                 [class.is-invalid]="showValidationErrors && !isInvoiceNameValid(payment)" />
               <div *ngIf="showValidationErrors && !isInvoiceNameValid(payment)" class="invalid-feedback d-block small">
-                Nombre de factura es requerido
+                {{ 'LOGISTICS.VALIDATIONS.INVOICE_NAME_REQUIRED' | translate }}
               </div>
             </td>
 
             <!-- Person in Charge -->
             <td class="text-center">
               <input type="text" class="form-control form-control-sm" [(ngModel)]="payment.personInCharge"
-                (ngModelChange)="onPersonInChargeChange(payment, $event)" placeholder="Nombre"
+                (ngModelChange)="onPersonInChargeChange(payment, $event)"
+                [placeholder]="'LOGISTICS.PLACEHOLDERS.NAME' | translate"
                 [disabled]="payment.paymentStatus !== 'PAID'"
                 [class.is-invalid]="showValidationErrors && !isPersonInChargeValid(payment)" />
               <div *ngIf="showValidationErrors && !isPersonInChargeValid(payment)" class="invalid-feedback d-block small">
-                Persona encargada es requerida
+                {{ 'LOGISTICS.VALIDATIONS.PERSON_IN_CHARGE_REQUIRED' | translate }}
               </div>
             </td>
 
             <!-- Complete Information -->
             <td class="text-center">
               <span *ngIf="payment.isCompleted" class="badge badge-light-success">
-                <i class="fas fa-check-circle me-1"></i>Completo
+                <i class="fas fa-check-circle me-1"></i><span translate="LOGISTICS.PAYMENTS.COMPLETE_STATUS.COMPLETE"></span>
               </span>
               <span *ngIf="!payment.isCompleted" class="badge badge-light-warning">
-                <i class="fas fa-exclamation-circle me-1"></i>Incompleto
+                <i class="fas fa-exclamation-circle me-1"></i><span translate="LOGISTICS.PAYMENTS.COMPLETE_STATUS.INCOMPLETE"></span>
               </span>
             </td>
 
             <!-- Observations -->
             <td class="text-center">
               <input type="text" class="form-control form-control-sm" [(ngModel)]="payment.observation"
-                (ngModelChange)="onObservationChange(payment, $event)" placeholder="Comentarios" />
+                (ngModelChange)="onObservationChange(payment, $event)"
+                [placeholder]="'LOGISTICS.PLACEHOLDERS.COMMENTS' | translate" />
             </td>
           </tr>
         </ng-container>
 
         <!-- Total General Logistics Row -->
         <tr class="table-light border-top border-primary" *ngIf="logisticsPayments.length > 0">
-          <td class="ps-4 fw-bold fs-5">TOTAL GENERAL LOGÍSTICA</td>
+          <td class="ps-4 fw-bold fs-5" translate="LOGISTICS.PAYMENTS.TOTAL_GENERAL_LOGISTICS"></td>
           <td class="text-end fw-bold fs-5">$ {{ getTotalAmount() | number: '1.2-2' }}</td>
           <td class="text-center">
             <span class="badge" [class.badge-light-success]="getOverallPaymentStatus() === 'PAID'"

@@ -3,14 +3,14 @@
   <div class="card card-xl-stretch mb-6">
     <div class="card-header border-0 pt-5 d-flex justify-content-between align-items-center">
       <div>
-        <h3 class="card-title fw-bolder fs-3 mb-1">Venta Local-Compañía Camarón Sin Cabeza</h3>
+        <h3 class="card-title fw-bolder fs-3 mb-1" translate="SALES.LOCAL_SALE.COMPANY_DETAIL.TITLE"></h3>
       </div>
       <button type="button" class="btn btn-primary btn-sm" (click)="addDetail()" *ngIf="!localCompanySaleDetail">
-        <i class="bi bi-plus-circle me-1"></i> Agregar
+        <i class="bi bi-plus-circle me-1"></i> <span translate="SALES.LOCAL_SALE.COMPANY_DETAIL.ADD"></span>
       </button>
       <button type="button" class="btn btn-outline-danger btn-sm" (click)="cancelAndCollapse()"
         *ngIf="localCompanySaleDetail">
-        <i class="bi bi-x-circle me-1"></i> Eliminar
+        <i class="bi bi-x-circle me-1"></i> <span translate="SALES.LOCAL_SALE.COMPANY_DETAIL.DELETE"></span>
       </button>
     </div>
 
@@ -18,17 +18,17 @@
       <!-- Single Header Table with Company Info (appears only once) -->
       <div class="card border border-primary mb-4">
         <div class="card-header bg-primary text-white d-flex justify-content-start align-items-center py-1">
-          <span class="fw-bold">Detalles</span>
+          <span class="fw-bold" translate="SALES.LOCAL_SALE.COMPANY_DETAIL.DETAILS"></span>
         </div>
 
         <div class="card-body">
           <div class="row g-3">
             <!-- Compania -->
             <div class="col-md-4">
-              <label class="fw-semibold fs-6 mb-2">Compania:</label>
+              <label class="fw-semibold fs-6 mb-2" translate="SALES.LOCAL_SALE.COMPANY_DETAIL.FIELDS.COMPANY"></label>
               <select [value]="getSelectedCompanyId(localCompanySaleDetail)" name="company0"
                 (change)="onCompanyChange(localCompanySaleDetail, $event)" class="form-select form-select-sm">
-                <option value="">Seleccione una compañía</option>
+                <option value="">{{ 'SALES.LOCAL_SALE.COMPANY_DETAIL.PLACEHOLDERS.SELECT_COMPANY' | translate }}</option>
                 <option *ngFor="let company of companies" [value]="company.id">
                   {{ company.name }}
                 </option>
@@ -37,21 +37,21 @@
 
             <!-- Lote -->
             <div class="col-md-4">
-              <label class="fw-semibold fs-6 mb-2">Lote:</label>
+              <label class="fw-semibold fs-6 mb-2" translate="SALES.LOCAL_SALE.COMPANY_DETAIL.FIELDS.BATCH"></label>
               <input type="text" [(ngModel)]="localCompanySaleDetail.batch" name="batch0"
                 (ngModelChange)="emitChanges()" class="form-control form-control-sm" />
             </div>
 
             <!-- Fecha de recepcion -->
             <div class="col-md-4">
-              <label class="fw-semibold fs-6 mb-2">Fecha de recepcion:</label>
+              <label class="fw-semibold fs-6 mb-2" translate="SALES.LOCAL_SALE.COMPANY_DETAIL.FIELDS.RECEIPT_DATE"></label>
               <input type="date" [(ngModel)]="localCompanySaleDetail.receiptDate" name="receiptDate0"
                 (ngModelChange)="emitChanges()" class="form-control form-control-sm" />
             </div>
 
             <!-- Peso guia (lb) -->
             <div class="col-md-4">
-              <label class="fw-semibold fs-6 mb-2">Peso guia (lb):</label>
+              <label class="fw-semibold fs-6 mb-2" translate="SALES.LOCAL_SALE.COMPANY_DETAIL.FIELDS.GUIDE_WEIGHT"></label>
               <input type="number" [(ngModel)]="localCompanySaleDetail.guideWeight" name="guideWeight0"
                 (ngModelChange)="onGuideWeightChange(localCompanySaleDetail)" (keypress)="validateNumber($event)"
                 (blur)="formatDecimal('guideWeight0')" class="form-control form-control-sm" step="0.01" />
@@ -59,22 +59,22 @@
 
             <!-- Chofer o encargado -->
             <div class="col-md-4">
-              <label class="fw-semibold fs-6 mb-2">Chofer o encargado:</label>
+              <label class="fw-semibold fs-6 mb-2" translate="SALES.LOCAL_SALE.COMPANY_DETAIL.FIELDS.PERSON_IN_CHARGE"></label>
               <input type="text" [(ngModel)]="localCompanySaleDetail.personInCharge" name="personInCharge0"
                 (ngModelChange)="emitChanges()" class="form-control form-control-sm"
-                placeholder="Nombre del responsable" />
+                [placeholder]="'SALES.LOCAL_SALE.COMPANY_DETAIL.PLACEHOLDERS.PERSON_NAME' | translate" />
             </div>
 
             <!-- #Guia -->
             <div class="col-md-4">
-              <label class="fw-semibold fs-6 mb-2">#Guia:</label>
+              <label class="fw-semibold fs-6 mb-2" translate="SALES.LOCAL_SALE.COMPANY_DETAIL.FIELDS.GUIDE_NUMBER"></label>
               <input type="text" [(ngModel)]="localCompanySaleDetail.guideNumber" name="guideNumber0"
-                (ngModelChange)="emitChanges()" class="form-control form-control-sm" placeholder="Número de guía" />
+                (ngModelChange)="emitChanges()" class="form-control form-control-sm" [placeholder]="'SALES.LOCAL_SALE.COMPANY_DETAIL.PLACEHOLDERS.GUIDE_NUMBER' | translate" />
             </div>
 
             <!-- Diferencia peso (lb) - Calculated -->
             <div class="col-md-6">
-              <label class="fw-semibold fs-6 mb-2">Diferencia peso (lb):</label>
+              <label class="fw-semibold fs-6 mb-2" translate="SALES.LOCAL_SALE.COMPANY_DETAIL.FIELDS.WEIGHT_DIFFERENCE"></label>
               <div class="form-control form-control-sm bg-light text-end">
                 {{ localCompanySaleDetail.weightDifference | number: '1.2-2' }}
               </div>
@@ -82,7 +82,7 @@
 
             <!-- Peso procesado (lb) - Calculated -->
             <div class="col-md-6">
-              <label class="fw-semibold fs-6 mb-2">Peso procesado (lb):</label>
+              <label class="fw-semibold fs-6 mb-2" translate="SALES.LOCAL_SALE.COMPANY_DETAIL.FIELDS.PROCESSED_WEIGHT"></label>
               <div class="form-control form-control-sm bg-light text-end">
                 {{ localCompanySaleDetail.processedWeight | number: '1.2-2' }}
               </div>
@@ -93,9 +93,9 @@
 
       <!-- Single Items Table -->
       <div class="d-flex justify-content-between align-items-center mb-3">
-        <h6 class="mb-0 fw-bold text-muted">Items de Venta</h6>
+        <h6 class="mb-0 fw-bold text-muted" translate="SALES.LOCAL_SALE.COMPANY_DETAIL.ITEMS_TITLE"></h6>
         <button class="btn btn-outline-success btn-sm" (click)="addItem()">
-          <i class="bi bi-plus-circle"></i> Agregar Item
+          <i class="bi bi-plus-circle"></i> <span translate="SALES.LOCAL_SALE.COMPANY_DETAIL.ADD_ITEM"></span>
         </button>
       </div>
 
@@ -103,19 +103,19 @@
         <table class="table table-bordered align-middle">
           <thead>
             <tr class="bg-light text-muted fw-bold">
-              <th class="text-start">Talla</th>
-              <th class="text-start">Clase</th>
-              <th class="text-end">Libras (lb)</th>
-              <th class="text-end">Precio ($)</th>
-              <th class="text-end">Total ($)</th>
-              <th class="text-center">Acciones</th>
+              <th class="text-start" translate="SALES.LOCAL_SALE.COMPANY_DETAIL.TABLE.SIZE"></th>
+              <th class="text-start" translate="SALES.LOCAL_SALE.COMPANY_DETAIL.TABLE.CLASS"></th>
+              <th class="text-end" translate="SALES.LOCAL_SALE.COMPANY_DETAIL.TABLE.POUNDS"></th>
+              <th class="text-end" translate="SALES.LOCAL_SALE.COMPANY_DETAIL.TABLE.PRICE"></th>
+              <th class="text-end" translate="SALES.LOCAL_SALE.COMPANY_DETAIL.TABLE.TOTAL"></th>
+              <th class="text-center" translate="SALES.LOCAL_SALE.COMPANY_DETAIL.TABLE.ACTIONS"></th>
             </tr>
           </thead>
           <tbody>
             <tr *ngIf="localCompanySaleDetail.items.length === 0">
               <td colspan="6" class="text-center text-muted py-4">
                 <i class="bi bi-inbox fs-1 d-block mb-2"></i>
-                <span>No hay items agregados. Haga clic en "Agregar Item" para comenzar.</span>
+                <span translate="SALES.LOCAL_SALE.COMPANY_DETAIL.EMPTY_ITEMS_MESSAGE"></span>
               </td>
             </tr>
             <tr *ngFor="let item of localCompanySaleDetail.items; let itemIndex = index">
@@ -159,7 +159,7 @@
 
             <!-- Totals Row -->
             <tr class="fw-bold bg-light" *ngIf="localCompanySaleDetail.items.length > 0">
-              <td colspan="2">Subtotal</td>
+              <td colspan="2" translate="SALES.LOCAL_SALE.COMPANY_DETAIL.SUBTOTAL"></td>
               <td class="text-end">{{ localCompanySaleDetail.poundsGrandTotal | number: '1.2-2' }}</td>
               <td></td>
               <td class="text-end">${{ localCompanySaleDetail.grandTotal | number: '1.2-2' }}</td>
@@ -168,7 +168,7 @@
 
             <!-- Retention Percentage Row -->
             <tr class="bg-light" *ngIf="localCompanySaleDetail.items.length > 0">
-              <td colspan="4" class="text-end fw-semibold">Porcentaje de Retención (%):</td>
+              <td colspan="4" class="text-end fw-semibold" translate="SALES.LOCAL_SALE.COMPANY_DETAIL.RETENTION_PERCENTAGE"></td>
               <td>
                 <input type="number" [(ngModel)]="localCompanySaleDetail.retentionPercentage"
                   name="retentionPercentage" #retentionPercentageCtrl="ngModel"
@@ -181,14 +181,14 @@
 
             <!-- Retention Amount Row -->
             <tr class="bg-light" *ngIf="localCompanySaleDetail.items.length > 0">
-              <td colspan="4" class="text-end fw-semibold">Monto de Retención:</td>
+              <td colspan="4" class="text-end fw-semibold" translate="SALES.LOCAL_SALE.COMPANY_DETAIL.RETENTION_AMOUNT"></td>
               <td class="text-end fw-bold">${{ localCompanySaleDetail.retentionAmount | number: '1.2-2' }}</td>
               <td></td>
             </tr>
 
             <!-- Other Penalties Row -->
             <tr class="bg-light" *ngIf="localCompanySaleDetail.items.length > 0">
-              <td colspan="4" class="text-end fw-semibold">Penalidades Adicionales:</td>
+              <td colspan="4" class="text-end fw-semibold" translate="SALES.LOCAL_SALE.COMPANY_DETAIL.ADDITIONAL_PENALTIES"></td>
               <td>
                 <div class="input-group input-group-sm">
                   <span class="input-group-text">$</span>
@@ -203,7 +203,7 @@
 
             <!-- Net Grand Total Row -->
             <tr class="fw-bold bg-light border-top border-2" *ngIf="localCompanySaleDetail.items.length > 0">
-              <td colspan="4" class="text-end">Total Neto:</td>
+              <td colspan="4" class="text-end" translate="SALES.LOCAL_SALE.COMPANY_DETAIL.NET_TOTAL"></td>
               <td class="text-end text-success fs-6">${{ localCompanySaleDetail.netGrandTotal | number: '1.2-2' }}</td>
               <td></td>
             </tr>
@@ -214,7 +214,7 @@
       <!-- Payments Button -->
       <div class="d-flex justify-content-end mt-3" *ngIf="canShowPaymentsButton()">
         <button type="button" class="btn btn-secondary btn-sm" (click)="openPaymentsModal()">
-          <i class="bi bi-cash-stack me-1"></i> Pagos
+          <i class="bi bi-cash-stack me-1"></i> <span translate="BUTTONS.PAYMENTS"></span>
         </button>
       </div>
     </div>
@@ -222,8 +222,8 @@
     <!-- Empty State (when collapsed) -->
     <div class="card-body pt-0 text-center py-5" *ngIf="!localCompanySaleDetail">
       <i class="bi bi-building fs-1 text-muted mb-3 d-block"></i>
-      <h5 class="text-muted mb-2">Venta Local-Compañía</h5>
-      <p class="text-muted mb-3">Haga clic en "Agregar" para comenzar a registrar la venta local-compañía.</p>
+      <h5 class="text-muted mb-2" translate="SALES.LOCAL_SALE.COMPANY_DETAIL.EMPTY_STATE_TITLE"></h5>
+      <p class="text-muted mb-3" translate="SALES.LOCAL_SALE.COMPANY_DETAIL.EMPTY_STATE_MESSAGE"></p>
     </div>
 
   </div>

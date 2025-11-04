@@ -17,7 +17,7 @@
     </span>
 
     <span class="menu-title" [attr.data-link]="option.route">
-      {{ option.name }}
+      {{ getOptionLabel(option) }}
     </span>
   </a>
 
@@ -33,7 +33,7 @@
     </span>
 
     <span class="menu-title" [attr.data-link]="option.route">
-      {{ option.name }}
+      {{ getOptionLabel(option) }}
     </span>
     <span class="menu-arrow" *ngIf="option.suboptions?.length"></span>
   </span>

@@ -2,18 +2,18 @@
 <div class="card card-xl-stretch mb-xl-8">
   <div class="card-header border-0 pt-5 d-flex justify-content-between align-items-center">
     <h4 class="card-title align-items-start flex-column">
-      <span class="card-label fw-bolder fs-3 mb-1">Buscar por número de control</span>
+      <span class="card-label fw-bolder fs-3 mb-1" translate="SALES.LOCAL_SALE.SECTIONS.SEARCH_INFO"></span>
     </h4>
 
     <div class="d-flex gap-2">
       <!-- Back Button -->
       <button *ngIf="saleId" type="button" class="btn btn-light btn-sm" (click)="goBack()">
-        <i class="bi bi-arrow-left me-1"></i> Volver
+        <i class="bi bi-arrow-left me-1"></i> <span translate="SALES.LOCAL_SALE.BUTTONS.BACK"></span>
       </button>
 
       <!-- New Button -->
       <button *ngIf="localSaleId" type="button" class="btn btn-outline-success btn-sm" (click)="handleNewSale()">
-        <i class="bi bi-plus-circle me-1"></i> Nuevo
+        <i class="bi bi-plus-circle me-1"></i> <span translate="SALES.LOCAL_SALE.BUTTONS.NEW"></span>
       </button>
     </div>
   </div>
@@ -22,18 +22,18 @@
       <div class="d-flex align-items-center gap-4">
         <!-- Control Number Input -->
         <input type="text" id="controlNumber" name="controlNumber" class="form-control form-control-sm text-end"
-          placeholder="LC-0" style="max-width: 180px" [disabled]="!!localSaleId" [(ngModel)]="controlNumber" />
+          [placeholder]="'SALES.LOCAL_SALE.PLACEHOLDERS.CONTROL_NUMBER' | translate" style="max-width: 180px" [disabled]="!!localSaleId" [(ngModel)]="controlNumber" />
 
         <!-- Search Button -->
         <button *ngIf="!localSaleId" class="btn btn-outline-primary btn-sm d-flex align-items-center gap-2"
           (click)="searchPurchase()">
-          <i class="bi bi-search"></i> Buscar
+          <i class="bi bi-search"></i> <span translate="SALES.LOCAL_SALE.BUTTONS.SEARCH"></span>
         </button>
       </div>
 
       <!-- Required Message -->
       <div *ngIf="searchSubmitted && !controlNumber" class="text-danger mt-1 ms-1 small">
-        El número de control es obligatorio.
+        {{ 'SALES.LOCAL_SALE.VALIDATIONS.CONTROL_NUMBER_REQUIRED' | translate }}
       </div>
     </div>
 
@@ -47,7 +47,7 @@
   <!-- begin::Header -->
   <div class="card-header border-0 pt-5">
     <h4 class="card-title align-items-start flex-column">
-      <span class="card-label fw-bolder fs-3 mb-1">Información de la Compra</span>
+      <span class="card-label fw-bolder fs-3 mb-1" translate="SALES.LOCAL_SALE.SECTIONS.PURCHASE_INFO"></span>
     </h4>
   </div>
   <!-- end::Header -->
@@ -58,49 +58,49 @@
     <div class="row g-5 g-xl-8">
       <!-- Purchase Date -->
       <div class="col-md-6">
-        <label for="purchaseDate" class="fw-semibold fs-6 mb-2">Fecha de la compra</label>
+        <label for="purchaseDate" class="fw-semibold fs-6 mb-2" translate="SALES.LOCAL_SALE.FIELDS.PURCHASE_DATE"></label>
         <input type="date" class="form-control form-control-sm" id="purchaseDate" name="purchaseDate"
           [(ngModel)]="purchaseDateFormatted" disabled>
       </div>
 
       <!-- Buyer -->
       <div class="col-md-6">
-        <label for="buyer" class="fw-semibold fs-6 mb-2">Comprador Responsable</label>
+        <label for="buyer" class="fw-semibold fs-6 mb-2" translate="SALES.LOCAL_SALE.FIELDS.BUYER"></label>
         <input type="text" id="buyer" name="buyer" class="form-control form-control-sm"
           [(ngModel)]="purchaseModel.buyer.fullName" disabled />
       </div>
 
       <!-- Client -->
       <div class="col-md-6">
-        <label for="company" class="fw-semibold fs-6 mb-2">Propietario de la Piscina</label>
+        <label for="company" class="fw-semibold fs-6 mb-2" translate="SALES.LOCAL_SALE.FIELDS.CLIENT"></label>
         <input type="text" id="company" name="company" class="form-control form-control-sm"
           [(ngModel)]="purchaseModel.client.fullName" disabled />
       </div>
 
       <!-- Shrimp Farm -->
       <div class="col-md-6">
-        <label for="shrimpFarm" class="fw-semibold fs-6 mb-2">Nombre de la Piscina</label>
+        <label for="shrimpFarm" class="fw-semibold fs-6 mb-2" translate="SALES.LOCAL_SALE.FIELDS.SHRIMP_FARM"></label>
         <input type="text" id="shrimpFarm" name="shrimpFarm" class="form-control form-control-sm"
           [(ngModel)]="purchaseModel.shrimpFarm.identifier" disabled />
       </div>
 
       <!-- Farm Place-->
       <div class="col-md-6">
-        <label for="farmPlace" class="fw-semibold fs-6 mb-2">Ubicación de la Piscina</label>
+        <label for="farmPlace" class="fw-semibold fs-6 mb-2" translate="SALES.LOCAL_SALE.FIELDS.FARM_PLACE"></label>
         <input type="text" id="farmPlace" name="farmPlace" class="form-control form-control-sm"
           [(ngModel)]="purchaseModel.shrimpFarm.place" disabled />
       </div>
 
       <!-- Total pounds -->
       <div class="col-md-6">
-        <label for="transportationMethod" class="fw-semibold fs-6 mb-2">Total Lb. compradas</label>
+        <label for="transportationMethod" class="fw-semibold fs-6 mb-2" translate="SALES.LOCAL_SALE.FIELDS.TOTAL_POUNDS_PURCHASED"></label>
         <input type="text" id="transportationMethod" name="transportationMethod" class="form-control form-control-sm"
           [value]="purchaseModel.totalPounds | number: '1.2-2'" disabled />
       </div>
 
       <!-- Weight Sheet Number -->
       <div class="col-md-6">
-        <label for="weightSheetNumber" class="fw-semibold fs-6 mb-2">Número de hoja de peso</label>
+        <label for="weightSheetNumber" class="fw-semibold fs-6 mb-2" translate="SALES.LOCAL_SALE.FIELDS.WEIGHT_SHEET_NUMBER_PURCHASE"></label>
         <input type="text" id="weightSheetNumber" name="weightSheetNumber" class="form-control form-control-sm"
           [(ngModel)]="purchaseModel.weightSheetNumber" disabled />
       </div>
@@ -117,7 +117,7 @@
     <!-- begin::Header -->
     <div class="card-header border-0 pt-8">
       <h4 class="card-title align-items-start flex-column">
-        <span class="card-label fw-bolder fs-3 mb-1">Información de la Venta</span>
+        <span class="card-label fw-bolder fs-3 mb-1" translate="SALES.LOCAL_SALE.SECTIONS.SALE_INFO"></span>
       </h4>
     </div>
     <!-- end::Header -->
@@ -129,85 +129,85 @@
 
         <!-- Sale Date -->
         <div class="col-md-6">
-          <label for="saleDate" class="required fw-semibold fs-6 mb-2">Fecha de venta</label>
+          <label for="saleDate" class="required fw-semibold fs-6 mb-2" translate="SALES.LOCAL_SALE.FIELDS.SALE_DATE"></label>
           <input type="date" class="form-control form-control-sm" id="saleDate" name="saleDate"
             [ngModel]="saleDateFormatted" (ngModelChange)="onDateChange($event)" required #saleDate="ngModel">
           <div *ngIf="(saleForm.submitted || saleDate.dirty || saleDate.touched) && saleDate.errors?.['required']"
             class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-            <div>La fecha de venta es obligatoria.</div>
+            <div>{{ 'SALES.LOCAL_SALE.VALIDATIONS.SALE_DATE_REQUIRED' | translate }}</div>
           </div>
         </div>
 
         <!-- Seller -->
         <div class="col-md-6">
-          <label for="seller" class="required fw-semibold fs-6 mb-2">Vendedor Responsable</label>
+          <label for="seller" class="required fw-semibold fs-6 mb-2" translate="SALES.LOCAL_SALE.FIELDS.SELLER"></label>
           <input type="text" id="seller" name="seller" [(ngModel)]="localSaleModel.seller" #seller="ngModel"
             class="form-control form-control-sm" required />
           <div *ngIf="(saleForm.submitted || seller.dirty || seller.touched) && seller.errors?.['required']"
             class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-            El vendedor es obligatorio.
+            {{ 'SALES.LOCAL_SALE.VALIDATIONS.SELLER_REQUIRED' | translate }}
           </div>
         </div>
 
         <!-- Weight Sheet Number -->
         <div class="col-md-6">
-          <label for="weightSheetNumber" class="required fw-semibold fs-6 mb-2"># Hoja de peso</label>
+          <label for="weightSheetNumber" class="required fw-semibold fs-6 mb-2" translate="SALES.LOCAL_SALE.FIELDS.WEIGHT_SHEET_NUMBER"></label>
           <input type="text" id="weightSheetNumber" name="weightSheetNumber"
             [(ngModel)]="localSaleModel.weightSheetNumber" #weightSheetNumber="ngModel"
             (keypress)="validateNumber($event)" (blur)="formatWeightSheetNumberOnBlur($event)"
             (focus)="onWeightSheetNumberFocus($event)" class="form-control form-control-sm" maxlength="8"
-            placeholder="00000000" required />
+            [placeholder]="'SALES.LOCAL_SALE.PLACEHOLDERS.WEIGHT_SHEET_NUMBER' | translate" required />
           <div
             *ngIf="(saleForm.submitted || weightSheetNumber.dirty || weightSheetNumber.touched) && weightSheetNumber.errors?.['required']"
             class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-            <div>El número de hoja de peso es obligatorio.</div>
+            <div>{{ 'SALES.LOCAL_SALE.VALIDATIONS.WEIGHT_SHEET_NUMBER_REQUIRED' | translate }}</div>
           </div>
         </div>
 
         <!-- Has Invoice Selector & Invoice Number (Second Row) -->
         <div class="col-md-6">
-          <label for="hasInvoice" class="required fw-semibold fs-6 mb-2">¿Factura recibida?</label>
+          <label for="hasInvoice" class="required fw-semibold fs-6 mb-2" translate="SALES.LOCAL_SALE.FIELDS.HAS_INVOICE"></label>
           <select id="hasInvoice" name="hasInvoice" class="form-select form-select-sm"
             [(ngModel)]="localSaleModel.hasInvoice" (ngModelChange)="onHasInvoiceChange($event)" #hasInvoice="ngModel"
             required>
-            <option [ngValue]="undefined" disabled selected>Seleccione una opción</option>
-            <option [ngValue]="'yes'">Si</option>
-            <option [ngValue]="'no'">No</option>
-            <option [ngValue]="'not-applicable'">No aplica</option>
+            <option [ngValue]="undefined" disabled selected>{{ 'SALES.LOCAL_SALE.PLACEHOLDERS.SELECT_OPTION' | translate }}</option>
+            <option [ngValue]="'yes'">{{ 'PURCHASES.OPTIONS.YES' | translate }}</option>
+            <option [ngValue]="'no'">{{ 'PURCHASES.OPTIONS.NO' | translate }}</option>
+            <option [ngValue]="'not-applicable'">{{ 'PURCHASES.OPTIONS.NOT_APPLICABLE' | translate }}</option>
           </select>
           <div *ngIf="(saleForm.submitted || hasInvoice.dirty || hasInvoice.touched) && hasInvoice.errors?.['required']"
             class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-            <div>Debe seleccionar una opción.</div>
+            <div>{{ 'SALES.LOCAL_SALE.VALIDATIONS.HAS_INVOICE_REQUIRED' | translate }}</div>
           </div>
         </div>
 
         <!-- Invoice Number -->
         <div class="col-md-6" *ngIf="localSaleModel.hasInvoice === 'yes'">
-          <label for="invoiceNumber" class="required fw-semibold fs-6 mb-2">Número de factura</label>
+          <label for="invoiceNumber" class="required fw-semibold fs-6 mb-2" translate="SALES.LOCAL_SALE.FIELDS.INVOICE_NUMBER"></label>
           <input type="text" id="invoiceNumber" name="invoiceNumber" [(ngModel)]="localSaleModel.invoiceNumber"
             #invoiceNumber="ngModel" class="form-control form-control-sm" required />
           <div
             *ngIf="(saleForm.submitted || invoiceNumber.dirty || invoiceNumber.touched) && invoiceNumber.errors?.['required']"
             class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-            El número de factura es obligatorio.
+            {{ 'SALES.LOCAL_SALE.VALIDATIONS.INVOICE_NUMBER_REQUIRED' | translate }}
           </div>
         </div>
 
         <!-- Invoice Name -->
         <div class="col-md-6" *ngIf="localSaleModel.hasInvoice === 'yes'">
-          <label for="invoiceName" class="required fw-semibold fs-6 mb-2">Nombre en factura</label>
+          <label for="invoiceName" class="required fw-semibold fs-6 mb-2" translate="SALES.LOCAL_SALE.FIELDS.INVOICE_NAME"></label>
           <input type="text" id="invoiceName" name="invoiceName" [(ngModel)]="localSaleModel.invoiceName"
             #invoiceName="ngModel" class="form-control form-control-sm" required />
           <div
             *ngIf="(saleForm.submitted || invoiceName.dirty || invoiceName.touched) && invoiceName.errors?.['required']"
             class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-            El nombre de la factura es obligatorio.
+            {{ 'SALES.LOCAL_SALE.VALIDATIONS.INVOICE_NAME_REQUIRED' | translate }}
           </div>
         </div>
 
         <!-- wholeRejectedPounds -->
         <div class="col-md-6">
-          <label for="wholeRejectedPounds" class="required fw-semibold fs-6 mb-2">Lb. rechazo (Cabeza)</label>
+          <label for="wholeRejectedPounds" class="required fw-semibold fs-6 mb-2" translate="SALES.LOCAL_SALE.FIELDS.WHOLE_REJECTED_POUNDS"></label>
           <input type="text" id="wholeRejectedPounds" name="wholeRejectedPounds"
             [(ngModel)]="localSaleModel.wholeRejectedPounds" #wholeRejectedPounds="ngModel"
             class="form-control form-control-sm" required (keypress)="validateNumber($event)"
@@ -215,34 +215,33 @@
           <div
             *ngIf="(saleForm.submitted || wholeRejectedPounds.dirty || wholeRejectedPounds.touched) && wholeRejectedPounds.errors?.['required']"
             class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-            El campo es obligatorio.
+            {{ 'SALES.LOCAL_SALE.VALIDATIONS.FIELD_REQUIRED' | translate }}
           </div>
         </div>
 
         <!-- trashPounds -->
         <div class="col-md-6">
-          <label for="trashPounds" class="required fw-semibold fs-6 mb-2">Lb. basura</label>
+          <label for="trashPounds" class="required fw-semibold fs-6 mb-2" translate="SALES.LOCAL_SALE.FIELDS.TRASH_POUNDS"></label>
           <input type="text" id="trashPounds" name="trashPounds" [(ngModel)]="localSaleModel.trashPounds"
             #trashPounds="ngModel" class="form-control form-control-sm" required (keypress)="validateNumber($event)"
             (blur)="formatDecimal('trashPounds')" />
           <div
             *ngIf="(saleForm.submitted || trashPounds.dirty || trashPounds.touched) && trashPounds.errors?.['required']"
             class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-            El campo es obligatorio.
+            {{ 'SALES.LOCAL_SALE.VALIDATIONS.FIELD_REQUIRED' | translate }}
           </div>
         </div>
 
         <!-- wholeTotalPounds -->
         <div class="col-md-6">
-          <label for="wholeTotalPounds" class="fw-semibold fs-6 mb-2">Total Lb. Camarón con cabeza</label>
+          <label for="wholeTotalPounds" class="fw-semibold fs-6 mb-2" translate="SALES.LOCAL_SALE.FIELDS.WHOLE_TOTAL_POUNDS"></label>
           <input type="text" id="wholeTotalPounds" name="wholeTotalPounds" class="form-control form-control-sm text-end"
             [value]="localSaleModel.wholeTotalPounds | number: '1.2-2'" disabled />
         </div>
 
         <!-- moneyIncomeForRejectedHeads -->
         <div class="col-md-6">
-          <label for="moneyIncomeForRejectedHeads" class="fw-semibold fs-6 mb-2">Ingreso de dinero por rechazo de
-            cabezas</label>
+          <label for="moneyIncomeForRejectedHeads" class="fw-semibold fs-6 mb-2" translate="SALES.LOCAL_SALE.FIELDS.MONEY_INCOME_FOR_REJECTED_HEADS"></label>
           <span class="input-group">
             <span class="input-group-text">$</span>
             <input type="text" id="moneyIncomeForRejectedHeads" name="moneyIncomeForRejectedHeads"
@@ -254,16 +253,14 @@
 
         <!-- totalProcessedPounds -->
         <div class="col-md-6">
-          <label for="totalProcessedPounds" class="fw-semibold fs-6 mb-2">Total Lb. Procesadas</label>
+          <label for="totalProcessedPounds" class="fw-semibold fs-6 mb-2" translate="SALES.LOCAL_SALE.FIELDS.TOTAL_PROCESSED_POUNDS"></label>
           <input type="text" id="totalProcessedPounds" name="totalProcessedPounds"
             class="form-control form-control-sm text-end" [value]="totalProcessedPounds | number: '1.2-2'" disabled />
         </div>
 
         <!-- processedRatio -->
         <div class="col-md-6">
-          <label for="processedRatio" class="fw-semibold fs-6 mb-2">
-            (%) lb. Procesadas/lb compradas
-          </label>
+          <label for="processedRatio" class="fw-semibold fs-6 mb-2" translate="SALES.LOCAL_SALE.FIELDS.PROCESSED_RATIO"></label>
           <input type="text" id="processedRatio" name="processedRatio" class="form-control form-control-sm text-end"
             [value]="processedRatioDisplay" disabled />
         </div>
@@ -309,7 +306,7 @@
   <div class="card-footer d-flex justify-content-end py-6 px-9">
     <!-- Submit Button -->
     <button type="button" class="btn btn-primary" [disabled]="canSaveLocalSale()" (click)="confirmSave()">
-      Guardar
+      {{ 'BUTTONS.SAVE' | translate }}
     </button>
   </div>
 </div>

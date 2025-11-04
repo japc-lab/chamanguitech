@@ -8,7 +8,7 @@
   <div class="row g-0">
     <div class="col-md-4 company-list-section">
       <div class="card-header card-header-stretch">
-        <h4 class="card-title mb-3">Compañías</h4>
+        <h4 class="card-title mb-3">{{ 'COMPANIES.LIST_DETAILS.COMPANIES_TITLE' | translate }}</h4>
       </div>
       <div class="company-list px-2 pb-2">
         <div *ngFor="let company of companies" (click)="selectCompany(company)"
@@ -17,11 +17,12 @@
           <span>
             {{ company.code ? (company.code + ' - ') : '' }}{{ company.name }}
           </span>
-          <i class="bi bi-trash text-muted ms-2" (click)="deleteCompany(company, $event)" title="Eliminar"></i>
+          <i class="bi bi-trash text-muted ms-2" (click)="deleteCompany(company, $event)"
+            [title]="'COMPANIES.LIST_DETAILS.DELETE_BUTTON_TITLE' | translate"></i>
         </div>
         <!-- Show a message if no companies are available -->
         <div *ngIf="!companies.length" class="text-muted text-center py-4">
-          No hay compañías registradas.
+          {{ 'COMPANIES.LIST_DETAILS.NO_COMPANIES' | translate }}
         </div>
       </div>
     </div>
@@ -30,117 +31,117 @@
       <ng-container *ngIf="selectedCompany; else noCompanySelected">
         <div class="w-100">
           <div class="card-header card-header-stretch overflow-auto">
-            <h3 class="card-title">{{ selectedCompany.name || 'Detalles de la Compañía' }}</h3>
+            <h3 class="card-title">{{ selectedCompany.name || ('COMPANIES.LIST_DETAILS.COMPANY_DETAILS_TITLE' | translate) }}</h3>
           </div>
           <div class="card-body">
             <form #companyForm="ngForm" (ngSubmit)="onSubmit(companyForm)" class="company-form">
               <!-- Información por Compañía section -->
               <div class="mb-4">
-                <h5 class="mb-3 fw-bold">Información por Compañía</h5>
+                <h5 class="mb-3 fw-bold">{{ 'COMPANIES.LIST_DETAILS.SECTIONS.COMPANY_INFO' | translate }}</h5>
                 <div class="row">
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label required">Nombre</label>
+                    <label class="form-label required">{{ 'COMPANIES.LIST_DETAILS.FIELDS.NAME' | translate }}</label>
                     <input name="name" class="form-control" [(ngModel)]="selectedCompany.name" required #name="ngModel"
                       [ngClass]="{'is-invalid': name.invalid && name.touched}" />
                     <div class="invalid-feedback" *ngIf="name.invalid && name.touched">
-                      El nombre es requerido.
+                      {{ 'COMPANIES.LIST_DETAILS.VALIDATIONS.NAME_REQUIRED' | translate }}
                     </div>
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label required">Código</label>
+                    <label class="form-label required">{{ 'COMPANIES.LIST_DETAILS.FIELDS.CODE' | translate }}</label>
                     <input type="text" name="code" class="form-control" [(ngModel)]="selectedCompany.code" required
                       #code="ngModel" [ngClass]="{'is-invalid': code.invalid && code.touched}"
                       (keypress)="validateWholeNumber($event)" />
                     <div class="invalid-feedback" *ngIf="code.invalid && code.touched">
-                      El código es requerido.
+                      {{ 'COMPANIES.LIST_DETAILS.VALIDATIONS.CODE_REQUIRED' | translate }}
                     </div>
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label ">Dirección</label>
+                    <label class="form-label">{{ 'COMPANIES.LIST_DETAILS.FIELDS.ADDRESS' | translate }}</label>
                     <input name="address" class="form-control" [(ngModel)]="selectedCompany.address" />
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label required">Ciudad</label>
+                    <label class="form-label required">{{ 'COMPANIES.LIST_DETAILS.FIELDS.CITY' | translate }}</label>
                     <input name="city" class="form-control" [(ngModel)]="selectedCompany.city" required #city="ngModel"
                       [ngClass]="{'is-invalid': city.invalid && city.touched}" />
                     <div class="invalid-feedback" *ngIf="city.invalid && city.touched">
-                      La ciudad es requerida.
+                      {{ 'COMPANIES.LIST_DETAILS.VALIDATIONS.CITY_REQUIRED' | translate }}
                     </div>
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label required">Teléfono principal</label>
+                    <label class="form-label required">{{ 'COMPANIES.LIST_DETAILS.FIELDS.MAIN_TELEPHONE' | translate }}</label>
                     <input name="mainTelephone" class="form-control" [(ngModel)]="selectedCompany.mainTelephone"
                       required #mainTelephone="ngModel"
                       [ngClass]="{'is-invalid': mainTelephone.invalid && mainTelephone.touched}" />
                     <div class="invalid-feedback" *ngIf="mainTelephone.invalid && mainTelephone.touched">
-                      El teléfono principal es requerido.
+                      {{ 'COMPANIES.LIST_DETAILS.VALIDATIONS.MAIN_TELEPHONE_REQUIRED' | translate }}
                     </div>
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Email de facturación</label>
+                    <label class="form-label">{{ 'COMPANIES.LIST_DETAILS.FIELDS.INVOICE_EMAIL' | translate }}</label>
                     <input name="invoiceEmail" class="form-control" [(ngModel)]="selectedCompany.invoiceEmail" />
                   </div>
                 </div>
               </div>
               <!-- Información Personal section -->
               <div class="mb-4">
-                <h5 class="mb-3 fw-bold">Información Personal</h5>
+                <h5 class="mb-3 fw-bold">{{ 'COMPANIES.LIST_DETAILS.SECTIONS.PERSONAL_INFO' | translate }}</h5>
                 <div class="row">
 
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label required">Persona principal</label>
+                    <label class="form-label required">{{ 'COMPANIES.LIST_DETAILS.FIELDS.MAIN_PERSON_NAME' | translate }}</label>
                     <input name="mainPersonName" class="form-control" [(ngModel)]="selectedCompany.mainPersonName"
                       required #mainPersonName="ngModel"
                       [ngClass]="{'is-invalid': mainPersonName.invalid && mainPersonName.touched}" />
                     <div class="invalid-feedback" *ngIf="mainPersonName.invalid && mainPersonName.touched">
-                      La persona principal es requerida.
+                      {{ 'COMPANIES.LIST_DETAILS.VALIDATIONS.MAIN_PERSON_NAME_REQUIRED' | translate }}
                     </div>
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Nombre del gerente</label>
+                    <label class="form-label">{{ 'COMPANIES.LIST_DETAILS.FIELDS.MANAGER_NAME' | translate }}</label>
                     <input name="managerName" class="form-control" [(ngModel)]="selectedCompany.managerName" />
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Teléfono celular del gerente</label>
+                    <label class="form-label">{{ 'COMPANIES.LIST_DETAILS.FIELDS.MANAGER_CELL_PHONE' | translate }}</label>
                     <input name="managerCellPhone" class="form-control"
                       [(ngModel)]="selectedCompany.managerCellPhone" />
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Email del gerente</label>
+                    <label class="form-label">{{ 'COMPANIES.LIST_DETAILS.FIELDS.MANAGER_EMAIL' | translate }}</label>
                     <input name="managerEmail" class="form-control" [(ngModel)]="selectedCompany.managerEmail" />
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Nombre del asesor comercial</label>
+                    <label class="form-label">{{ 'COMPANIES.LIST_DETAILS.FIELDS.COMMERCIAL_ADVISOR_NAME' | translate }}</label>
                     <input name="commercialAdvisorName" class="form-control"
                       [(ngModel)]="selectedCompany.commercialAdvisorName" />
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Teléfono celular del asesor comercial</label>
+                    <label class="form-label">{{ 'COMPANIES.LIST_DETAILS.FIELDS.COMMERCIAL_ADVISOR_CELL_PHONE' | translate }}</label>
                     <input name="commercialAdvisorCellPhone" class="form-control"
                       [(ngModel)]="selectedCompany.commercialAdvisorCellPhone" />
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Email del asesor comercial</label>
+                    <label class="form-label">{{ 'COMPANIES.LIST_DETAILS.FIELDS.COMMERCIAL_ADVISOR_EMAIL' | translate }}</label>
                     <input name="commercialAdvisorEmail" class="form-control"
                       [(ngModel)]="selectedCompany.commercialAdvisorEmail" />
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Nombre del personal adicional</label>
+                    <label class="form-label">{{ 'COMPANIES.LIST_DETAILS.FIELDS.ADDITIONAL_STAFF_NAME' | translate }}</label>
                     <input name="aditionalStaffName" class="form-control"
                       [(ngModel)]="selectedCompany.aditionalStaffName" />
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Posición en la empresa</label>
+                    <label class="form-label">{{ 'COMPANIES.LIST_DETAILS.FIELDS.POSITION_IN_COMPANY' | translate }}</label>
                     <input name="positionInCompany" class="form-control"
                       [(ngModel)]="selectedCompany.positionInCompany" />
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Teléfono celular del personal adicional</label>
+                    <label class="form-label">{{ 'COMPANIES.LIST_DETAILS.FIELDS.ADDITIONAL_STAFF_CELL_PHONE' | translate }}</label>
                     <input name="aditionalStaffCellPhone" class="form-control"
                       [(ngModel)]="selectedCompany.aditionalStaffCellPhone" />
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Email del personal adicional</label>
+                    <label class="form-label">{{ 'COMPANIES.LIST_DETAILS.FIELDS.ADDITIONAL_STAFF_EMAIL' | translate }}</label>
                     <input name="aditionalStaffEmail" class="form-control"
                       [(ngModel)]="selectedCompany.aditionalStaffEmail" />
                   </div>
@@ -148,31 +149,31 @@
               </div>
               <!-- Información Camarón section -->
               <div class="mb-4">
-                <h5 class="mb-3 fw-bold">Información Camarón</h5>
+                <h5 class="mb-3 fw-bold">{{ 'COMPANIES.LIST_DETAILS.SECTIONS.SHRIMP_INFO' | translate }}</h5>
                 <div class="row">
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Lista de precios por email</label>
+                    <label class="form-label">{{ 'COMPANIES.LIST_DETAILS.FIELDS.PRICE_LIST_BY_EMAIL' | translate }}</label>
                     <div class="form-check">
                       <input type="checkbox" name="priceListByEmail" class="form-check-input"
                         [(ngModel)]="selectedCompany.priceListByEmail" />
                     </div>
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Lista de precios por mensajes o WhatsApp</label>
+                    <label class="form-label">{{ 'COMPANIES.LIST_DETAILS.FIELDS.PRICE_LIST_BY_MESSAGES' | translate }}</label>
                     <div class="form-check">
                       <input type="checkbox" name="priceListByMessagesOrWhatsApp" class="form-check-input"
                         [(ngModel)]="selectedCompany.priceListByMessagesOrWhatsApp" />
                     </div>
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Recibe camarones enteros</label>
+                    <label class="form-label">{{ 'COMPANIES.LIST_DETAILS.FIELDS.RECEIVES_WHOLE_SHRIMP' | translate }}</label>
                     <div class="form-check">
                       <input type="checkbox" name="receivesWholeShrimp" class="form-check-input"
                         [(ngModel)]="selectedCompany.receivesWholeShrimp" />
                     </div>
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Recibe camarones cola</label>
+                    <label class="form-label">{{ 'COMPANIES.LIST_DETAILS.FIELDS.RECEIVES_SHRIMP_TAILS' | translate }}</label>
                     <div class="form-check">
                       <input type="checkbox" name="receivesShrimpTails" class="form-check-input"
                         [(ngModel)]="selectedCompany.receivesShrimpTails" />
@@ -181,7 +182,7 @@
 
                   <!-- Especificaciones de Producto section -->
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Porcentaje máximo de sabor permitido en camarones enteros</label>
+                    <label class="form-label">{{ 'COMPANIES.LIST_DETAILS.FIELDS.MAX_FLAVOR_PERCENT' | translate }}</label>
                     <div class="input-group input-group-sm">
                       <input type="text" id="maxFlavorPercentReceived" name="maxFlavorPercentReceived"
                         [(ngModel)]="selectedCompany.maxFlavorPercentReceived" #maxFlavorPercentReceived="ngModel"
@@ -191,7 +192,7 @@
                     </div>
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Porcentaje máximo de muda y suavidad permitido</label>
+                    <label class="form-label">{{ 'COMPANIES.LIST_DETAILS.FIELDS.MAX_MOULTING_SOFTNESS_PERCENT' | translate }}</label>
                     <div class="input-group input-group-sm">
                       <input type="text" id="maxMoultingAndSoftnessPercentReceived"
                         name="maxMoultingAndSoftnessPercentReceived"
@@ -203,21 +204,21 @@
                     </div>
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Peso promedio del empaque de camarones enteros (Kg)</label>
+                    <label class="form-label">{{ 'COMPANIES.LIST_DETAILS.FIELDS.AVG_WHOLE_SHRIMP_PACKAGING_WEIGHT' | translate }}</label>
                     <input type="text" name="avgWholeShrimpPackagingWeight"
                       [(ngModel)]="selectedCompany.avgWholeShrimpPackagingWeight"
                       #avgWholeShrimpPackagingWeight="ngModel" class="form-control" (keypress)="validateNumber($event)"
                       (blur)="formatDecimal('avgWholeShrimpPackagingWeight')" />
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Peso promedio del empaque de colas de camarón (Kg)</label>
+                    <label class="form-label">{{ 'COMPANIES.LIST_DETAILS.FIELDS.AVG_SHRIMP_TAIL_PACKAGING_WEIGHT' | translate }}</label>
                     <input type="text" name="avgShrimpTailPackagingWeight"
                       [(ngModel)]="selectedCompany.avgShrimpTailPackagingWeight" #avgShrimpTailPackagingWeight="ngModel"
                       class="form-control" (keypress)="validateNumber($event)"
                       (blur)="formatDecimal('avgShrimpTailPackagingWeight')" />
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Porcentaje máximo de sabor ligero permitido en camarones enteros</label>
+                    <label class="form-label">{{ 'COMPANIES.LIST_DETAILS.FIELDS.MAX_LIGHT_FLAVOR_PERCENT' | translate }}</label>
                     <div class="input-group input-group-sm">
                       <input type="text" id="maxLightFlavorPercentAllowedInWholeShrimp"
                         name="maxLightFlavorPercentAllowedInWholeShrimp"
@@ -229,68 +230,68 @@
                     </div>
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Cupo máximo y mínimo por aguage a recibir (lb)</label>
+                    <label class="form-label">{{ 'COMPANIES.LIST_DETAILS.FIELDS.MAX_AND_MIN_TIDE_QUOTA' | translate }}</label>
                     <input type="text" name="maxTideQuota" [(ngModel)]="selectedCompany.maxAndMinTideQuotaReceived!.max"
-                      placeholder="Máx" #maxTideQuota="ngModel" class="form-control" (keypress)="validateNumber($event)"
+                      [placeholder]="'COMPANIES.LIST_DETAILS.FIELDS.MAX_LABEL' | translate" #maxTideQuota="ngModel" class="form-control" (keypress)="validateNumber($event)"
                       (blur)="formatDecimal('maxTideQuota')" />
                     <input type="text" name="minTideQuota" [(ngModel)]="selectedCompany.maxAndMinTideQuotaReceived!.min"
-                      placeholder="Mín" #minTideQuota="ngModel" class="form-control" (keypress)="validateNumber($event)"
+                      [placeholder]="'COMPANIES.LIST_DETAILS.FIELDS.MIN_LABEL' | translate" #minTideQuota="ngModel" class="form-control" (keypress)="validateNumber($event)"
                       (blur)="formatDecimal('minTideQuota')" />
                   </div>
                 </div>
               </div>
               <!-- Información de Pago section -->
               <div class="mb-4">
-                <h5 class="mb-3 fw-bold">Información de Pago</h5>
+                <h5 class="mb-3 fw-bold">{{ 'COMPANIES.LIST_DETAILS.SECTIONS.PAYMENT_INFO' | translate }}</h5>
                 <div class="row">
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Método de pago 1</label>
+                    <label class="form-label">{{ 'COMPANIES.LIST_DETAILS.FIELDS.PAYMENT_METHOD_1' | translate }}</label>
                     <input name="paymentMethod1" class="form-control" [(ngModel)]="selectedCompany.paymentMethod1" />
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Método de pago 2</label>
+                    <label class="form-label">{{ 'COMPANIES.LIST_DETAILS.FIELDS.PAYMENT_METHOD_2' | translate }}</label>
                     <input name="paymentMethod2" class="form-control" [(ngModel)]="selectedCompany.paymentMethod2" />
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Banco 1</label>
+                    <label class="form-label">{{ 'COMPANIES.LIST_DETAILS.FIELDS.BANK_1' | translate }}</label>
                     <input name="bank1" class="form-control" [(ngModel)]="selectedCompany.bank1" />
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Banco 2</label>
+                    <label class="form-label">{{ 'COMPANIES.LIST_DETAILS.FIELDS.BANK_2' | translate }}</label>
                     <input name="bank2" class="form-control" [(ngModel)]="selectedCompany.bank2" />
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Porcentaje del primer pago</label>
+                    <label class="form-label">{{ 'COMPANIES.LIST_DETAILS.FIELDS.FIRST_PAYMENT_PERCENT' | translate }}</label>
                     <input type="number" name="firstPaymentPercent" class="form-control"
                       [(ngModel)]="selectedCompany.firstPaymentPercent" />
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Días hasta el primer pago</label>
+                    <label class="form-label">{{ 'COMPANIES.LIST_DETAILS.FIELDS.DAYS_UNTIL_FIRST_PAYMENT' | translate }}</label>
                     <input type="number" name="daysUntilFirstPayment" class="form-control"
                       [(ngModel)]="selectedCompany.daysUntilFirstPayment" />
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Porcentaje del segundo pago</label>
+                    <label class="form-label">{{ 'COMPANIES.LIST_DETAILS.FIELDS.SECOND_PAYMENT_PERCENT' | translate }}</label>
                     <input type="number" name="secondPaymentPercent" class="form-control"
                       [(ngModel)]="selectedCompany.secondPaymentPercent" />
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Días hasta el segundo pago</label>
+                    <label class="form-label">{{ 'COMPANIES.LIST_DETAILS.FIELDS.DAYS_UNTIL_SECOND_PAYMENT' | translate }}</label>
                     <input type="number" name="daysUntilSecondPayment" class="form-control"
                       [(ngModel)]="selectedCompany.daysUntilSecondPayment" />
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Porcentaje del tercer pago</label>
+                    <label class="form-label">{{ 'COMPANIES.LIST_DETAILS.FIELDS.THIRD_PAYMENT_PERCENT' | translate }}</label>
                     <input type="number" name="thirdPaymentPercent" class="form-control"
                       [(ngModel)]="selectedCompany.thirdPaymentPercent" />
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Días hasta el tercer pago</label>
+                    <label class="form-label">{{ 'COMPANIES.LIST_DETAILS.FIELDS.DAYS_UNTIL_THIRD_PAYMENT' | translate }}</label>
                     <input type="number" name="daysUntilThirdPayment" class="form-control"
                       [(ngModel)]="selectedCompany.daysUntilThirdPayment" />
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Porcentaje de fiabilidad en el pago</label>
+                    <label class="form-label">{{ 'COMPANIES.LIST_DETAILS.FIELDS.PAYMENT_RELIABILITY_PERCENT' | translate }}</label>
                     <input type="number" name="paymentReliabilityPercent" class="form-control"
                       [(ngModel)]="selectedCompany.paymentReliabilityPercent" />
                   </div>
@@ -298,69 +299,69 @@
               </div>
               <!-- Información de Pesca section -->
               <div class="mb-4">
-                <h5 class="mb-3 fw-bold">Información de Pesca</h5>
+                <h5 class="mb-3 fw-bold">{{ 'COMPANIES.LIST_DETAILS.SECTIONS.FISHING_INFO' | translate }}</h5>
                 <div class="row">
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">¿Se envía logística?</label>
+                    <label class="form-label">{{ 'COMPANIES.LIST_DETAILS.FIELDS.IS_LOGISTICS_SENT' | translate }}</label>
                     <div class="form-check">
                       <input type="checkbox" class="form-check-input" id="isLogisticsSent"
                         [(ngModel)]="selectedCompany.isLogisticsSent" name="isLogisticsSent" />
                       <label class="form-check-label ms-2" for="isLogisticsSent">
-                        {{ selectedCompany.isLogisticsSent ? 'Sí' : 'No' }}
+                        {{ selectedCompany.isLogisticsSent ? ('COMPANIES.LIST_DETAILS.FIELDS.YES' | translate) : ('COMPANIES.LIST_DETAILS.FIELDS.NO' | translate) }}
                       </label>
                     </div>
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Cantidad mínima recibida (lb)</label>
+                    <label class="form-label">{{ 'COMPANIES.LIST_DETAILS.FIELDS.MINIMUM_QUANTITY_RECEIVED' | translate }}</label>
                     <input type="number" name="minimumQuantityReceivedLb" class="form-control"
                       [(ngModel)]="selectedCompany.minimumQuantityReceivedLb" />
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Custodia cubierta</label>
+                    <label class="form-label">{{ 'COMPANIES.LIST_DETAILS.FIELDS.CUSTODY_COVERED' | translate }}</label>
                     <div class="form-check">
                       <input type="checkbox" name="custodyCovered" class="form-check-input"
                         [(ngModel)]="selectedCompany.custodyCovered" />
                     </div>
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Seguro de pesca cubierto</label>
+                    <label class="form-label">{{ 'COMPANIES.LIST_DETAILS.FIELDS.FISHING_INSURANCE_COVERED' | translate }}</label>
                     <div class="form-check">
                       <input type="checkbox" name="fishingInsuranceCovered" class="form-check-input"
                         [(ngModel)]="selectedCompany.fishingInsuranceCovered" />
                     </div>
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Clasificador de empresa conocido</label>
+                    <label class="form-label">{{ 'COMPANIES.LIST_DETAILS.FIELDS.COMPANY_CLASSIFIER_KNOWN' | translate }}</label>
                     <div class="form-check">
                       <input type="checkbox" name="companyClassifierKnown" class="form-check-input"
                         [(ngModel)]="selectedCompany.companyClassifierKnown" />
                     </div>
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Persona puede ser enviada para clasificación</label>
+                    <label class="form-label">{{ 'COMPANIES.LIST_DETAILS.FIELDS.PERSON_CAN_BE_SENT_FOR_CLASSIFICATION' | translate }}</label>
                     <div class="form-check">
                       <input type="checkbox" name="personCanBeSentForClassification" class="form-check-input"
                         [(ngModel)]="selectedCompany.personCanBeSentForClassification" />
                     </div>
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Información Extra</label>
+                    <label class="form-label">{{ 'COMPANIES.LIST_DETAILS.FIELDS.EXTRA_INFORMATION' | translate }}</label>
                     <input name="bank2" class="form-control" [(ngModel)]="selectedCompany.extraInformation" />
                   </div>
 
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">¿Se paga logística?</label>
+                    <label class="form-label">{{ 'COMPANIES.LIST_DETAILS.FIELDS.IS_LOGISTICS_PAYED' | translate }}</label>
                     <div class="form-check">
                       <input type="checkbox" class="form-check-input" id="isLogisticsPayed"
                         [(ngModel)]="selectedCompany.isLogisticsPayed" name="isLogisticsPayed"
                         (change)="onLogisticsPayedChange()" />
                       <label class="form-check-label ms-2" for="isLogisticsPayed">
-                        {{ selectedCompany.isLogisticsPayed ? 'Sí' : 'No' }}
+                        {{ selectedCompany.isLogisticsPayed ? ('COMPANIES.LIST_DETAILS.FIELDS.YES' | translate) : ('COMPANIES.LIST_DETAILS.FIELDS.NO' | translate) }}
                       </label>
                     </div>
                   </div>
                   <div class="col-md-6 mb-3 form-row" *ngIf="selectedCompany.isLogisticsPayed">
-                    <label class="form-label required">Monto a pagar por entero</label>
+                    <label class="form-label required">{{ 'COMPANIES.LIST_DETAILS.FIELDS.WHOLE_AMOUNT_TO_PAY' | translate }}</label>
                     <div class="input-group">
                       <span class="input-group-text">$</span>
                       <input type="text" id="wholeAmountToPay" name="wholeAmountToPay"
@@ -369,12 +370,12 @@
                         class="form-control form-control-sm text-end" required (keypress)="validateNumber($event)"
                         (blur)="formatDecimal('wholeAmountToPay')" />
                       <div class="invalid-feedback" *ngIf="wholeAmountToPay.invalid && wholeAmountToPay.touched">
-                        El monto es requerido.
+                        {{ 'COMPANIES.LIST_DETAILS.VALIDATIONS.WHOLE_AMOUNT_TO_PAY_REQUIRED' | translate }}
                       </div>
                     </div>
                   </div>
                   <div class="col-md-6 mb-3 form-row" *ngIf="selectedCompany.isLogisticsPayed">
-                    <label class="form-label required">Monto a pagar por cola</label>
+                    <label class="form-label required">{{ 'COMPANIES.LIST_DETAILS.FIELDS.TAIL_AMOUNT_TO_PAY' | translate }}</label>
                     <div class="input-group">
                       <span class="input-group-text">$</span>
                       <input type="text" id="tailAmountToPay" name="tailAmountToPay"
@@ -383,7 +384,7 @@
                         class="form-control form-control-sm text-end" required (keypress)="validateNumber($event)"
                         (blur)="formatDecimal('tailAmountToPay')" />
                       <div class="invalid-feedback" *ngIf="tailAmountToPay.invalid && tailAmountToPay.touched">
-                        El monto es requerido.
+                        {{ 'COMPANIES.LIST_DETAILS.VALIDATIONS.TAIL_AMOUNT_TO_PAY_REQUIRED' | translate }}
                       </div>
                     </div>
                   </div>
@@ -392,37 +393,37 @@
 
               <!-- Detalles Adicionales de la Empresa section -->
               <div class="mb-4">
-                <h5 class="mb-3 fw-bold">Detalles Adicionales de la Empresa</h5>
+                <h5 class="mb-3 fw-bold">{{ 'COMPANIES.LIST_DETAILS.SECTIONS.ADDITIONAL_DETAILS' | translate }}</h5>
                 <div class="row">
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Calidad de Clasificación</label>
+                    <label class="form-label">{{ 'COMPANIES.LIST_DETAILS.FIELDS.CLASSIFICATION_QUALITY' | translate }}</label>
                     <select name="classificationQuality" class="form-control"
                       [(ngModel)]="selectedCompany.classificationQuality">
-                      <option [ngValue]="undefined">Seleccione una opción</option>
-                      <option value="BAD">MALA</option>
-                      <option value="GOOD">BUENA</option>
-                      <option value="EXCELLENT">EXCELENTE</option>
+                      <option [ngValue]="undefined">{{ 'COMPANIES.LIST_DETAILS.VALIDATIONS.SELECT_OPTION' | translate }}</option>
+                      <option value="BAD">{{ 'COMPANIES.LIST_DETAILS.FIELDS.CLASSIFICATION_QUALITY_BAD' | translate }}</option>
+                      <option value="GOOD">{{ 'COMPANIES.LIST_DETAILS.FIELDS.CLASSIFICATION_QUALITY_GOOD' | translate }}</option>
+                      <option value="EXCELLENT">{{ 'COMPANIES.LIST_DETAILS.FIELDS.CLASSIFICATION_QUALITY_EXCELLENT' | translate }}</option>
                     </select>
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">¿Pagos al día?</label>
+                    <label class="form-label">{{ 'COMPANIES.LIST_DETAILS.FIELDS.ARE_PAYMENTS_ON_TIME' | translate }}</label>
                     <input type="checkbox" name="arePaymentsOnTime" class="form-check-input ms-2"
                       [(ngModel)]="selectedCompany.arePaymentsOnTime" />
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Observación 1</label>
+                    <label class="form-label">{{ 'COMPANIES.LIST_DETAILS.FIELDS.OBSERVATION_1' | translate }}</label>
                     <input name="observation1" class="form-control" [(ngModel)]="selectedCompany.observation1" />
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Observación 2</label>
+                    <label class="form-label">{{ 'COMPANIES.LIST_DETAILS.FIELDS.OBSERVATION_2' | translate }}</label>
                     <input name="observation2" class="form-control" [(ngModel)]="selectedCompany.observation2" />
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Observación 3</label>
+                    <label class="form-label">{{ 'COMPANIES.LIST_DETAILS.FIELDS.OBSERVATION_3' | translate }}</label>
                     <input name="observation3" class="form-control" [(ngModel)]="selectedCompany.observation3" />
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Observación 4</label>
+                    <label class="form-label">{{ 'COMPANIES.LIST_DETAILS.FIELDS.OBSERVATION_4' | translate }}</label>
                     <input name="observation4" class="form-control" [(ngModel)]="selectedCompany.observation4" />
                   </div>
                 </div>
@@ -433,7 +434,7 @@
                   <div class="col-12">
                     <div class="d-flex justify-content-end">
                       <button type="submit" class="btn btn-primary" [disabled]="companyForm.invalid">
-                        Guardar
+                        {{ 'BUTTONS.SAVE' | translate }}
                       </button>
                     </div>
                   </div>
@@ -446,7 +447,7 @@
       <ng-template #noCompanySelected>
         <div class="w-100 text-center text-muted py-5 no-company-selected-message">
           <i class="bi bi-building" style="font-size: 2rem;"></i>
-          <div class="mt-3">Selecciona una compañía para ver o editar sus detalles.</div>
+          <div class="mt-3">{{ 'COMPANIES.LIST_DETAILS.SELECT_COMPANY_MESSAGE' | translate }}</div>
         </div>
       </ng-template>
     </div>

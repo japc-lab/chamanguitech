@@ -1,6 +1,10 @@
 export interface IPermissionModel {
   id: string;
   name: string;
+  translations?: {
+    en?: string;
+    es?: string;
+  };
   parentOption?: string;
   route?: string;
   icon?: string;

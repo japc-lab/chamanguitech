@@ -82,21 +82,21 @@ interface LanguageFlag {
 }
 
 const languages = [
-  // {
-  //   lang: 'en',
-  //   name: 'English',
-  //   flag: './assets/media/flags/united-states.svg',
-  // },
-  // {
-  //   lang: 'zh',
-  //   name: 'Mandarin',
-  //   flag: './assets/media/flags/china.svg',
-  // },
   {
     lang: 'es',
     name: 'Spanish',
     flag: './assets/media/flags/spain.svg',
   },
+  {
+    lang: 'en',
+    name: 'English',
+    flag: './assets/media/flags/united-states.svg',
+  },
+  // {
+  //   lang: 'zh',
+  //   name: 'Mandarin',
+  //   flag: './assets/media/flags/china.svg',
+  // },
   // {
   //   lang: 'ja',
   //   name: 'Japanese',

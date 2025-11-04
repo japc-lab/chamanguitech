@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { SizeTypeEnum } from '../../../interfaces/size.interface';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-best-prices-table',
@@ -9,6 +10,8 @@ import { SizeTypeEnum } from '../../../interfaces/size.interface';
 export class BestPricesTableComponent implements OnInit {
   @Input() typeSize: any;
   processedData: any[] = [];
+
+  constructor(private translate: TranslateService) {}
 
   ngOnInit(): void {
     this.processData();
@@ -74,11 +77,11 @@ export class BestPricesTableComponent implements OnInit {
   getGroupTypeLabel(type: string): string {
     switch (type) {
       case SizeTypeEnum['TAIL-A']:
-        return 'COLA A';
+        return this.translate.instant('SIZE_PRICE.TABLES.SIZE_TYPES.TAIL_A');
       case SizeTypeEnum['TAIL-A-']:
-        return 'COLA A-';
+        return this.translate.instant('SIZE_PRICE.TABLES.SIZE_TYPES.TAIL_A_MINUS');
       case SizeTypeEnum['TAIL-B']:
-        return 'COLA B';
+        return this.translate.instant('SIZE_PRICE.TABLES.SIZE_TYPES.TAIL_B');
       default:
         return type;
     }

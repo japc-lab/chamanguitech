@@ -6,6 +6,14 @@ const OptionSchema = Schema({
         type: String,
         required: true
     },
+    translations: {
+        en: {
+            type: String,
+        },
+        es: {
+            type: String,
+        }
+    },
     route: {
         type: String,
     },

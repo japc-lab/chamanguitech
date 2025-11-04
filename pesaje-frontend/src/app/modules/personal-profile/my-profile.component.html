@@ -3,12 +3,12 @@
     <div class="d-flex flex-wrap flex-sm-nowrap mb-3">
       <div class="me-7 mb-4">
         <div class="symbol symbol-100px symbol-lg-160px symbol-fixed position-relative">
-          <img [src]="photoUrl" alt="Foto de perfil" class="rounded profile-image" />
+          <img [src]="photoUrl" [alt]="'PROFILE.SHARED.PHOTO' | translate" class="rounded profile-image" />
 
           <!-- ✅ Upload Button -->
           <label
             class="position-absolute bottom-0 end-0 mb-6 me-1 btn btn-sm btn-icon btn-active-color-primary bg-white shadow"
-            title="Cambiar foto de perfil">
+            [title]="'PROFILE.MY_PROFILE.CHANGE_PHOTO' | translate">
             <i class="bi bi-pencil-fill fs-7"></i>
             <input type="file" hidden (change)="onPhotoSelected($event)" accept="image/*" />
           </label>
@@ -70,13 +70,13 @@
         <li class="nav-item">
           <a class="nav-link text-active-primary me-6" routerLink="/personal-profile/my-profile/personal-information"
             routerLinkActive="active">
-            Información Personal
+            <span translate="PROFILE.MY_PROFILE.TABS.PERSONAL_INFO"></span>
           </a>
         </li>
         <li class="nav-item">
           <a class="nav-link text-active-primary me-6" routerLink="/personal-profile/my-profile/payment-information"
             routerLinkActive="active">
-            Información de Pago
+            <span translate="PROFILE.MY_PROFILE.TABS.PAYMENT_INFO"></span>
           </a>
         </li>
       </ul>

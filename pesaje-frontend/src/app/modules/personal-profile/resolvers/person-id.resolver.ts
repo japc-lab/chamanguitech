@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Resolve } from '@angular/router';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { UserService } from '../../settings/services/user.service';
 import { AuthService } from '../../auth';
@@ -9,10 +9,20 @@ import { AuthService } from '../../auth';
   providedIn: 'root',
 })
 export class PersonIdResolver implements Resolve<string | null> {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private userService: UserService
+  ) {}
 
   resolve(): Observable<string | null> {
-    return this.authService.currentUser$.pipe(
+    const currentUser = this.authService.currentUserValue;
+
+    if (!currentUser?.id) {
+      return of(null);
+    }
+
+    // Fetch the full user data including person object
+    return this.userService.getUserById(currentUser.id).pipe(
       map((user) => user?.person?.id || null)
     );
   }

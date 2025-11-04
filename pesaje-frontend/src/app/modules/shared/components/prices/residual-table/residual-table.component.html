@@ -1,7 +1,7 @@
 <!-- begin::Header -->
 <div class="card-header border-0 pt-5">
   <h3 class="card-title align-items-start flex-column">
-    <span class="card-label fw-bolder fs-3 mb-1">Residual</span>
+    <span class="card-label fw-bolder fs-3 mb-1" translate="SIZE_PRICE.TABLES.RESIDUAL"></span>
   </h3>
 </div>
 <!-- end::Header -->
@@ -9,7 +9,7 @@
 <!-- Loading Spinner -->
 <div *ngIf="isLoading$ | async" class="text-center py-5">
   <div class="spinner-border text-primary" role="status">
-    <span class="visually-hidden">Loading...</span>
+    <span class="visually-hidden" translate="COMMON.LOADING"></span>
   </div>
 </div>
 
@@ -22,11 +22,9 @@
       <table class="table align-middle gs-0 gy-3">
         <thead>
           <tr class="border-bottom border-gray-300">
-            <th class="p-3 text-start text-muted fw-semibold text-uppercase fs-7 pb-2 min-w-100px">
-              Talla
+            <th class="p-3 text-start text-muted fw-semibold text-uppercase fs-7 pb-2 min-w-100px" translate="SIZE_PRICE.TABLES.COLUMNS.SIZE">
             </th>
-            <th class="p-3 text-end text-muted fw-semibold text-uppercase fs-7 pb-2 min-w-100px">
-              Precio ($)
+            <th class="p-3 text-end text-muted fw-semibold text-uppercase fs-7 pb-2 min-w-100px" translate="SIZE_PRICE.TABLES.COLUMNS.PRICE">
             </th>
           </tr>
         </thead>
@@ -39,12 +37,11 @@
               <div class="input-group">
                 <span class="input-group-text">$</span>
                 <input type="text" class="form-control form-control-sm text-end" [formControlName]="size.id"
-                  (blur)="formatPrice(size.id)" (keypress)="validateNumber($event)" placeholder="0.00" />
+                  (blur)="formatPrice(size.id)" (keypress)="validateNumber($event)" [placeholder]="'SIZE_PRICE.TABLES.PLACEHOLDERS.PRICE' | translate" />
               </div>
               <!-- Show validation error -->
               <div *ngIf="form.controls[size.id]?.invalid && form.controls[size.id]?.touched"
-                class="text-danger small mt-1">
-                Ingrese un número válido
+                class="text-danger small mt-1" translate="SIZE_PRICE.TABLES.VALIDATIONS.INVALID_NUMBER">
               </div>
             </td>
           </tr>

@@ -126,17 +126,16 @@ const cleanDatabase = async (keepTxData) => {
         await LogisticsItem.deleteMany({});
         await LogisticsPayment.deleteMany({});
         await Logistics.deleteMany({});
+        await Sale.deleteMany({});
+        await CompanySale.deleteMany({});
+        await CompanySaleItem.deleteMany({});
+        await LocalSale.deleteMany({});
+        await LocalSaleDetail.deleteMany({});
+        await LocalSaleDetailItem.deleteMany({});
+        await LocalCompanySaleDetail.deleteMany({});
+        await LocalCompanySaleDetailItem.deleteMany({});
+        await LocalCompanySaleDetailPayment.deleteMany({});
     }
-
-    await Sale.deleteMany({});
-    await CompanySale.deleteMany({});
-    await CompanySaleItem.deleteMany({});
-    await LocalSale.deleteMany({});
-    await LocalSaleDetail.deleteMany({});
-    await LocalSaleDetailItem.deleteMany({});
-    await LocalCompanySaleDetail.deleteMany({});
-    await LocalCompanySaleDetailItem.deleteMany({});
-    await LocalCompanySaleDetailPayment.deleteMany({});
 
     await Size.deleteMany({});
     await Option.deleteMany({});
@@ -188,33 +187,33 @@ const seedOptions = async () => {
     try {
         const options = [
             // { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f01"), name: 'Principal', route: '/home', icon: 'element-11' },
-            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f02"), name: 'Perfil Personal', icon: 'profile-circle' },
-            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f03"), name: 'Clientes', route: '/clients', icon: 'people' },
-            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f04"), name: 'Precios', icon: 'price-tag' },
-            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f05"), name: 'Compras', icon: 'receipt-square' },
-            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f06"), name: 'Logística', icon: 'parcel-tracking' },
-            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f07"), name: 'Ventas', icon: 'tag' },
-            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f08"), name: 'Reportes', icon: 'file-sheet' },
-            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f09"), name: 'Administración', icon: 'gear' }
+            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f02"), name: 'Perfil Personal', icon: 'profile-circle', translations: { en: 'Personal Profile', es: 'Perfil Personal' } },
+            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f03"), name: 'Clientes', route: '/clients', icon: 'people', translations: { en: 'Clients', es: 'Clientes' } },
+            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f04"), name: 'Precios', icon: 'price-tag', translations: { en: 'Prices', es: 'Precios' } },
+            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f05"), name: 'Compras', icon: 'receipt-square', translations: { en: 'Purchases', es: 'Compras' } },
+            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f06"), name: 'Logística', icon: 'parcel-tracking', translations: { en: 'Logistics', es: 'Logística' } },
+            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f07"), name: 'Ventas', icon: 'tag', translations: { en: 'Sales', es: 'Ventas' } },
+            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f08"), name: 'Reportes', icon: 'file-sheet', translations: { en: 'Reports', es: 'Reportes' } },
+            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f09"), name: 'Administración', icon: 'gear', translations: { en: 'Administration', es: 'Administración' } }
         ];
 
         const childOptions = [
-            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f10"), name: 'Mi Perfil', route: '/personal-profile/my-profile', parentName: 'Perfil Personal' },
-            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f11"), name: 'Brokers', route: '/personal-profile/brokers', parentName: 'Perfil Personal' },
-            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f12"), name: 'Gestionar Compra', route: '/purchases/form', parentName: 'Compras' },
-            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f13"), name: 'Compras Recientes', route: '/purchases/list', parentName: 'Compras' },
-            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f14"), name: 'Gestionar Logística', route: '/logistics/form', parentName: 'Logística' },
-            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f15"), name: 'Logísticas Recientes', route: '/logistics/list', parentName: 'Logística' },
-            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f16"), name: 'Compañía', route: '/sales/company', parentName: 'Ventas' },
-            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f17"), name: 'Local', route: '/sales/local', parentName: 'Ventas' },
-            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f18"), name: 'Ventas Recientes', route: '/sales/list', parentName: 'Ventas' },
-            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f19"), name: 'Gestionar Personas', route: '/settings/people', parentName: 'Administración' },
-            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f20"), name: 'Gestionar Compañías', route: '/settings/companies', parentName: 'Administración' },
-            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f21"), name: 'Gestionar Activos', route: '/settings/assets', parentName: 'Administración' },
-            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f22"), name: 'Reporte Económico', route: '/reports/economic', parentName: 'Reportes' },
-            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f23"), name: 'Reporte Total', route: '/reports/total', parentName: 'Reportes' },
-            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f24"), name: 'Precios por Compañía', route: '/prices/by-company', parentName: 'Precios' },
-            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f25"), name: 'Mejores Precios', route: '/prices/best-prices', parentName: 'Precios' },
+            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f10"), name: 'Mi Perfil', route: '/personal-profile/my-profile', parentName: 'Perfil Personal', translations: { en: 'My Profile', es: 'Mi Perfil' } },
+            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f11"), name: 'Brokers', route: '/personal-profile/brokers', parentName: 'Perfil Personal', translations: { en: 'Brokers', es: 'Brokers' } },
+            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f12"), name: 'Gestionar Compra', route: '/purchases/form', parentName: 'Compras', translations: { en: 'Manage Purchase', es: 'Gestionar Compra' } },
+            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f13"), name: 'Compras Recientes', route: '/purchases/list', parentName: 'Compras', translations: { en: 'Recent Purchases', es: 'Compras Recientes' } },
+            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f14"), name: 'Gestionar Logística', route: '/logistics/form', parentName: 'Logística', translations: { en: 'Manage Logistics', es: 'Gestionar Logística' } },
+            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f15"), name: 'Logísticas Recientes', route: '/logistics/list', parentName: 'Logística', translations: { en: 'Recent Logistics', es: 'Logísticas Recientes' } },
+            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f16"), name: 'Compañía', route: '/sales/company', parentName: 'Ventas', translations: { en: 'Company', es: 'Compañía' } },
+            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f17"), name: 'Local', route: '/sales/local', parentName: 'Ventas', translations: { en: 'Local', es: 'Local' } },
+            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f18"), name: 'Ventas Recientes', route: '/sales/list', parentName: 'Ventas', translations: { en: 'Recent Sales', es: 'Ventas Recientes' } },
+            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f19"), name: 'Gestionar Personas', route: '/settings/people', parentName: 'Administración', translations: { en: 'Manage People', es: 'Gestionar Personas' } },
+            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f20"), name: 'Gestionar Compañías', route: '/settings/companies', parentName: 'Administración', translations: { en: 'Manage Companies', es: 'Gestionar Compañías' } },
+            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f21"), name: 'Gestionar Activos', route: '/settings/assets', parentName: 'Administración', translations: { en: 'Manage Assets', es: 'Gestionar Activos' } },
+            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f22"), name: 'Reporte Económico', route: '/reports/economic', parentName: 'Reportes', translations: { en: 'Economic Report', es: 'Reporte Económico' } },
+            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f23"), name: 'Reporte Total', route: '/reports/total', parentName: 'Reportes', translations: { en: 'Total Report', es: 'Reporte Total' } },
+            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f24"), name: 'Precios por Compañía', route: '/prices/by-company', parentName: 'Precios', translations: { en: 'Prices by Company', es: 'Precios por Compañía' } },
+            { _id: new mongoose.Types.ObjectId("60f8a7b2c8b3f10ffc2e4f25"), name: 'Mejores Precios', route: '/prices/best-prices', parentName: 'Precios', translations: { en: 'Best Prices', es: 'Mejores Precios' } },
         ];
 
         // Fetch existing options in one query
