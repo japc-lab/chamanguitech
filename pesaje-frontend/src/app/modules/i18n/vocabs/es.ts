@@ -1211,6 +1211,30 @@ export const locale = {
       COMPANY_LIST: 'Lista de Compañías',
       PRICE_LIST: 'Lista de Precios',
       BEST_PRICES: 'Mejores Precios',
+      FORM: {
+        TITLE: 'Crear Nueva Compañía',
+        FIELDS: {
+          NAME: 'Nombre de Compañía',
+          CITY: 'Ciudad',
+          MAIN_PERSON_NAME: 'Persona Principal',
+          MAIN_TELEPHONE: 'Teléfono Principal',
+        },
+        PLACEHOLDERS: {
+          NAME: 'Ingrese el nombre de la compañía',
+          CITY: 'Ingrese la ciudad',
+          MAIN_PERSON_NAME: 'Ingrese el nombre de la persona principal',
+          MAIN_TELEPHONE: 'Ingrese el teléfono principal',
+        },
+      },
+      VALIDATIONS: {
+        NAME_REQUIRED: 'El nombre de la compañía es requerido.',
+        CITY_REQUIRED: 'La ciudad es requerida.',
+        MAIN_PERSON_NAME_REQUIRED: 'La persona principal es requerida.',
+        MAIN_TELEPHONE_REQUIRED: 'El teléfono principal es requerido.',
+      },
+      BUTTONS: {
+        SAVE: 'Guardar',
+      },
     },
   },
 };

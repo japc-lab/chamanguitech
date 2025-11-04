@@ -1197,6 +1197,30 @@ export const locale = {
       COMPANY_LIST: 'Companies',
       PRICE_LIST: 'Price List',
       BEST_PRICES: 'Best Prices',
+      FORM: {
+        TITLE: 'Create New Company',
+        FIELDS: {
+          NAME: 'Company Name',
+          CITY: 'City',
+          MAIN_PERSON_NAME: 'Main Contact Person',
+          MAIN_TELEPHONE: 'Main Phone',
+        },
+        PLACEHOLDERS: {
+          NAME: 'Enter the company name',
+          CITY: 'Enter the city',
+          MAIN_PERSON_NAME: 'Enter the name of the main contact person',
+          MAIN_TELEPHONE: 'Enter the main phone',
+        },
+      },
+      VALIDATIONS: {
+        NAME_REQUIRED: 'Company name is required.',
+        CITY_REQUIRED: 'City is required.',
+        MAIN_PERSON_NAME_REQUIRED: 'Main contact person is required.',
+        MAIN_TELEPHONE_REQUIRED: 'Main phone is required.',
+      },
+      BUTTONS: {
+        SAVE: 'Save',
+      },
     },
   },
 };

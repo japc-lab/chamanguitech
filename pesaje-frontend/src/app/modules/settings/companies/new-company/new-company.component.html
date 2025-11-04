@@ -6,51 +6,51 @@
 
 <div *ngIf="!(isLoading$ | async)" class="card card-custom mb-5 mb-xl-10">
   <div class="card-header card-header-stretch overflow-auto">
-    <h3 class="card-title">Crear Nueva Compañía</h3>
+    <h3 class="card-title">{{ 'COMPANIES.FORM.TITLE' | translate }}</h3>
   </div>
   <div class="card-body">
     <form #companyForm="ngForm" (ngSubmit)="onSubmit(companyForm)" autocomplete="off">
       <div class="row mb-5">
         <div class="col-md-6 mb-3">
-          <label class="form-label required">Nombre de compañía</label>
+          <label class="form-label required" [translate]="'COMPANIES.FORM.FIELDS.NAME'"></label>
           <input type="text" class="form-control" name="name" required [(ngModel)]="company.name" #name="ngModel"
-            [ngClass]="{'is-invalid': name.invalid && name.touched}" placeholder="Ingrese el nombre de la compañía" />
+            [ngClass]="{'is-invalid': name.invalid && name.touched}" [placeholder]="'COMPANIES.FORM.PLACEHOLDERS.NAME' | translate" />
           <div class="invalid-feedback" *ngIf="name.invalid && name.touched">
-            El nombre de la compañía es requerido.
+            {{ 'COMPANIES.VALIDATIONS.NAME_REQUIRED' | translate }}
           </div>
         </div>
         <div class="col-md-6 mb-3">
-          <label class="form-label required">Ciudad</label>
+          <label class="form-label required" [translate]="'COMPANIES.FORM.FIELDS.CITY'"></label>
           <input type="text" class="form-control" name="city" required [(ngModel)]="company.city" #city="ngModel"
-            [ngClass]="{'is-invalid': city.invalid && city.touched}" placeholder="Ingrese la ciudad" />
+            [ngClass]="{'is-invalid': city.invalid && city.touched}" [placeholder]="'COMPANIES.FORM.PLACEHOLDERS.CITY' | translate" />
           <div class="invalid-feedback" *ngIf="city.invalid && city.touched">
-            La ciudad es requerida.
+            {{ 'COMPANIES.VALIDATIONS.CITY_REQUIRED' | translate }}
           </div>
         </div>
       </div>
       <div class="row mb-5">
         <div class="col-md-6 mb-3">
-          <label class="form-label required">Persona principal</label>
+          <label class="form-label required" [translate]="'COMPANIES.FORM.FIELDS.MAIN_PERSON_NAME'"></label>
           <input type="text" class="form-control" name="mainPersonName" required [(ngModel)]="company.mainPersonName"
             #mainPersonName="ngModel" [ngClass]="{'is-invalid': mainPersonName.invalid && mainPersonName.touched}"
-            placeholder="Ingrese el nombre de la persona principal" />
+            [placeholder]="'COMPANIES.FORM.PLACEHOLDERS.MAIN_PERSON_NAME' | translate" />
           <div class="invalid-feedback" *ngIf="mainPersonName.invalid && mainPersonName.touched">
-            La persona principal es requerida.
+            {{ 'COMPANIES.VALIDATIONS.MAIN_PERSON_NAME_REQUIRED' | translate }}
           </div>
         </div>
         <div class="col-md-6 mb-3">
-          <label class="form-label required">Teléfono principal</label>
+          <label class="form-label required" [translate]="'COMPANIES.FORM.FIELDS.MAIN_TELEPHONE'"></label>
           <input type="tel" class="form-control" name="mainTelephone" required [(ngModel)]="company.mainTelephone"
             #mainTelephone="ngModel" [ngClass]="{'is-invalid': mainTelephone.invalid && mainTelephone.touched}"
-            placeholder="Ingrese el teléfono principal" />
+            [placeholder]="'COMPANIES.FORM.PLACEHOLDERS.MAIN_TELEPHONE' | translate" />
           <div class="invalid-feedback" *ngIf="mainTelephone.invalid && mainTelephone.touched">
-            El teléfono principal es requerido.
+            {{ 'COMPANIES.VALIDATIONS.MAIN_TELEPHONE_REQUIRED' | translate }}
           </div>
         </div>
       </div>
       <div class="text-end">
         <button type="submit" class="btn btn-primary" [disabled]="companyForm.invalid || (isLoading$ | async)">
-          Guardar
+          {{ 'COMPANIES.BUTTONS.SAVE' | translate }}
         </button>
       </div>
     </form>
