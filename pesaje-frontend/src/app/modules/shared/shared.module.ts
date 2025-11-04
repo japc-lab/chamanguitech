@@ -57,6 +57,7 @@ import { TranslationModule } from '../i18n/translation.module';
     SizePriceComponent,
     BestPricesTableComponent,
     CompanyBestPricesComponent,
+    TranslationModule,
   ], // ✅ Export so all modules can use them
 })
 export class SharedModule {}

@@ -11,6 +11,7 @@ import { PurchaseStatusEnum } from 'src/app/modules/purchases/interfaces/purchas
 import { DateUtilsService } from 'src/app/utils/date-utils.service';
 import { AlertService } from 'src/app/utils/alert.service';
 import { AuthService } from 'src/app/modules/auth';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-economic-report',
@@ -40,7 +41,8 @@ export class EconomicReportComponent implements OnInit, OnDestroy {
     private dateUtils: DateUtilsService,
     private alertService: AlertService,
     private authService: AuthService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private translateService: TranslateService
   ) {}
 
   get logisticsArray(): ILogisticsDetailsModel[] {
@@ -109,12 +111,12 @@ export class EconomicReportComponent implements OnInit, OnDestroy {
 
           // Map purchase status
           const statusMap = {
-            [PurchaseStatusEnum.DRAFT]: 'Borrador',
-            [PurchaseStatusEnum.CREATED]: 'Sin pagos',
-            [PurchaseStatusEnum.IN_PROGRESS]: 'En progreso',
-            [PurchaseStatusEnum.COMPLETED]: 'Pago Completo',
-            [PurchaseStatusEnum.CONFIRMED]: 'Información Completa',
-            [PurchaseStatusEnum.CLOSED]: 'Cerrado',
+            [PurchaseStatusEnum.DRAFT]: this.translateService.instant('PURCHASES.STATUS.DRAFT'),
+            [PurchaseStatusEnum.CREATED]: this.translateService.instant('PURCHASES.STATUS.NO_PAYMENTS'),
+            [PurchaseStatusEnum.IN_PROGRESS]: this.translateService.instant('PURCHASES.STATUS.IN_PROGRESS'),
+            [PurchaseStatusEnum.COMPLETED]: this.translateService.instant('PURCHASES.STATUS.PAYMENT_COMPLETE'),
+            [PurchaseStatusEnum.CONFIRMED]: this.translateService.instant('PURCHASES.STATUS.INFORMATION_COMPLETE'),
+            [PurchaseStatusEnum.CLOSED]: this.translateService.instant('PURCHASES.STATUS.CLOSED'),
           };
           this.purchaseStatus =
             statusMap[this.economicReportModel.purchase?.status] || '-';
@@ -182,10 +184,10 @@ export class EconomicReportComponent implements OnInit, OnDestroy {
     switch (type) {
       case 'SHIPMENT':
         if (this.economicReportModel?.purchase.companyName !== 'Local')
-          return 'Envío Compañía';
-        else return 'Envío Local';
+          return this.translateService.instant('REPORTS.ECONOMIC.LOGISTICS_TYPES.SHIPMENT_COMPANY');
+        else return this.translateService.instant('REPORTS.ECONOMIC.LOGISTICS_TYPES.SHIPMENT_LOCAL');
       case 'LOCAL_PROCESSING':
-        return 'Procesamiento Local';
+        return this.translateService.instant('REPORTS.ECONOMIC.LOGISTICS_TYPES.LOCAL_PROCESSING');
       default:
         return type;
     }

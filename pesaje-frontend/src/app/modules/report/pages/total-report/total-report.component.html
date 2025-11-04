@@ -2,7 +2,7 @@
 <div class="card card-xl-stretch mb-xl-8">
   <div class="card-header border-0 pt-5">
     <h4 class="card-title align-items-start flex-column">
-      <span class="card-label fw-bolder fs-3 mb-1">Buscar por número de control</span>
+      <span class="card-label fw-bolder fs-3 mb-1">{{ 'REPORTS.TOTAL.SEARCH_BY_CONTROL_NUMBER' | translate }}</span>
     </h4>
   </div>
 
@@ -11,19 +11,19 @@
       <div class="d-flex align-items-center gap-4">
         <!-- Control Number Input -->
         <input type="text" id="controlNumber" name="controlNumber" class="form-control form-control-sm text-end"
-          placeholder="CO-0" style="max-width: 180px" [(ngModel)]="controlNumber" />
+          [placeholder]="'REPORTS.TOTAL.CONTROL_NUMBER_PLACEHOLDER' | translate" style="max-width: 180px" [(ngModel)]="controlNumber" />
 
         <!-- Search Button -->
         <button class="btn btn-outline-primary btn-sm d-flex align-items-center gap-2" (click)="searchControlNumber()">
-          <i class="bi bi-search"></i> Buscar
+          <i class="bi bi-search"></i> {{ 'REPORTS.TOTAL.SEARCH_BUTTON' | translate }}
         </button>
 
-        <button class="btn btn-secondary btn-sm px-4" (click)="clearFilters()">Limpiar Filtros</button>
+        <button class="btn btn-secondary btn-sm px-4" (click)="clearFilters()">{{ 'REPORTS.TOTAL.CLEAR_FILTERS' | translate }}</button>
       </div>
 
       <!-- Required Message -->
       <div *ngIf="searchSubmitted && !controlNumber" class="text-danger mt-1 ms-1 small">
-        El número de control es obligatorio.
+        {{ 'REPORTS.TOTAL.CONTROL_NUMBER_REQUIRED' | translate }}
       </div>
     </div>
 
@@ -36,7 +36,7 @@
 <div *ngIf="totalReportModel" class="card card-xl-stretch mb-xl-8 mt-2">
   <!-- Card Header -->
   <div class="card-header border-0 pt-5">
-    <h3 class="card-title fw-bolder fs-2 mb-1">REPORTE TOTAL</h3>
+    <h3 class="card-title fw-bolder fs-2 mb-1">{{ 'REPORTS.TOTAL.TITLE' | translate }}</h3>
   </div>
 
   <!-- Card Body -->
@@ -47,38 +47,37 @@
         <tbody>
           <!-- Buyer, Broker, Date, Client -->
           <tr>
-            <td class="bg-light fw-bold">Comprador Responsable</td>
+            <td class="bg-light fw-bold">{{ 'REPORTS.TOTAL.PURCHASE_INFO.RESPONSIBLE_BUYER' | translate }}</td>
             <td>{{ totalReportModel.purchase.responsibleBuyer }}</td>
           </tr>
           <tr>
-            <td class="bg-light fw-bold">Bróker</td>
+            <td class="bg-light fw-bold">{{ 'REPORTS.TOTAL.PURCHASE_INFO.BROKER' | translate }}</td>
             <td>{{ totalReportModel.purchase.brokerName }}</td>
           </tr>
           <tr>
-            <td class="bg-light fw-bold">Fecha de compra</td>
+            <td class="bg-light fw-bold">{{ 'REPORTS.TOTAL.PURCHASE_INFO.PURCHASE_DATE' | translate }}</td>
             <td>{{ totalReportModel.purchase.purchaseDate | date: 'dd/MM/yyyy' }}</td>
           </tr>
           <tr>
-            <td class="bg-light fw-bold">Cliente</td>
+            <td class="bg-light fw-bold">{{ 'REPORTS.TOTAL.PURCHASE_INFO.CLIENT' | translate }}</td>
             <td>{{ totalReportModel.purchase.clientName }}</td>
           </tr>
 
           <!-- Average grams and Purchase price info -->
           <tr>
-            <td class="bg-light fw-bold">Promedio de gramos de camarón (g)</td>
+            <td class="bg-light fw-bold">{{ 'REPORTS.TOTAL.PURCHASE_INFO.AVERAGE_GRAMS' | translate }}</td>
             <td>{{ totalReportModel.purchase.averageGram | number:'1.2-2' }}</td>
           </tr>
           <tr>
-            <td class="bg-light fw-bold">Precio de compra del camarón ($)</td>
+            <td class="bg-light fw-bold">{{ 'REPORTS.TOTAL.PURCHASE_INFO.PURCHASE_PRICE' | translate }}</td>
             <td class="text-end">{{ totalReportModel.purchase.price | number:'1.2-2' }}</td>
           </tr>
           <tr>
-            <td class="bg-light fw-bold">Libras de camarones compradas (lb)
-            </td>
+            <td class="bg-light fw-bold">{{ 'REPORTS.TOTAL.PURCHASE_INFO.POUNDS_PURCHASED' | translate }}</td>
             <td>{{ totalReportModel.purchase.pounds | number:'1.2-2' }}</td>
           </tr>
           <tr>
-            <td class="bg-light fw-bold">Total a pagar ($)</td>
+            <td class="bg-light fw-bold">{{ 'REPORTS.TOTAL.PURCHASE_INFO.TOTAL_TO_PAY' | translate }}</td>
             <td class="text-end">{{ totalReportModel.purchase.totalToPay | number:'1.2-2' }}</td>
           </tr>
 
@@ -88,11 +87,11 @@
 
           <!-- Sale averages -->
           <tr>
-            <td class="bg-light fw-bold">Promedio de gramos de camarón (g)</td>
+            <td class="bg-light fw-bold">{{ 'REPORTS.TOTAL.SALE_INFO.AVERAGE_GRAMS' | translate }}</td>
             <td>{{ totalReportModel.sale.averageBatchGrams | number:'1.2-2' }}</td>
           </tr>
           <tr>
-            <td class="bg-light fw-bold">Precio de compra del camarón ($)</td>
+            <td class="bg-light fw-bold">{{ 'REPORTS.TOTAL.SALE_INFO.SALE_PRICE' | translate }}</td>
             <td class="text-end">{{ tempPrice | number:'1.2-2' }}</td>
             <!-- <td>
               <input type="number" class="form-control form-control-sm bg-warning text-end"
@@ -100,7 +99,7 @@
             </td> -->
           </tr>
           <tr>
-            <td class="bg-light fw-bold">Total de libras recibidas en la empresa (lb)</td>
+            <td class="bg-light fw-bold">{{ 'REPORTS.TOTAL.SALE_INFO.TOTAL_POUNDS_RECEIVED' | translate }}</td>
             <td>{{ totalReportModel.sale.wholePoundsReceived | number:'1.2-2' }}</td>
             <!-- <td>
               <input type="number" class="form-control form-control-sm bg-warning text-end"
@@ -110,15 +109,13 @@
 
           <!-- Difference -->
           <tr>
-            <td class="bg-light fw-bold">Diferencia en libras (lb)
-            </td>
+            <td class="bg-light fw-bold">{{ 'REPORTS.TOTAL.SALE_INFO.DIFFERENCE_POUNDS' | translate }}</td>
             <td>{{ diffPounds | number:'1.2-2' }}</td>
           </tr>
 
           <!-- Balance -->
           <tr>
-            <td class="bg-light fw-bold">Saldo pagado por la empresa ($)
-            </td>
+            <td class="bg-light fw-bold">{{ 'REPORTS.TOTAL.SALE_INFO.BALANCE_PAID' | translate }}</td>
             <td class="text-end">{{ totalReportModel.sale.totalToReceive | number:'1.2-2' }}</td>
             <!-- <td>
               <input type="number" class="form-control form-control-sm bg-warning text-end"
@@ -126,18 +123,17 @@
             </td> -->
           </tr>
           <tr>
-            <td class="bg-light fw-bold">Saldo neto anterior obtenido ($)
-            </td>
+            <td class="bg-light fw-bold">{{ 'REPORTS.TOTAL.SALE_INFO.PREVIOUS_NET_BALANCE' | translate }}</td>
             <td class="text-end">{{ balanceNet | number:'1.2-2' }}</td>
           </tr>
 
           <!-- Logistics & Retention -->
           <tr>
-            <td class="bg-light fw-bold">Logística ($)</td>
+            <td class="bg-light fw-bold">{{ 'REPORTS.TOTAL.LOGISTICS_RETENTION.LOGISTICS' | translate }}</td>
             <td class="text-end">{{ totalReportModel.logistics.totalToPay | number:'1.2-2' }}</td>
           </tr>
           <tr class="taxes">
-            <td class="fw-bold">Retención ($)</td>
+            <td class="fw-bold">{{ 'REPORTS.TOTAL.LOGISTICS_RETENTION.RETENTION' | translate }}</td>
             <td class="text-end">{{ retention | number:'1.2-2' }}</td>
             <td>
               <div class="input-group input-group-sm">
@@ -150,7 +146,7 @@
 
           <!-- Subtotal Gross Profit -->
           <tr class="totals">
-            <td>SUBTOTAL Ganancia bruta OP ($)</td>
+            <td>{{ 'REPORTS.TOTAL.GROSS_PROFIT.SUBTOTAL' | translate }}</td>
             <td class="text-end">{{ subtotalGrossProfit | number:'1.2-2' }}</td>
             <td></td>
           </tr>
@@ -161,7 +157,7 @@
 
           <!-- Pay Broker & Qualifier -->
           <tr>
-            <td class="bg-light fw-bold">Total a pagar Bróker ($)</td>
+            <td class="bg-light fw-bold">{{ 'REPORTS.TOTAL.DISTRIBUTION.BROKER_PAYMENT' | translate }}</td>
             <td class="text-end">{{ totalToPayBroker | number:'1.2-2' }}</td>
             <td>
               <div class="input-group input-group-sm">
@@ -172,7 +168,7 @@
             </td>
           </tr>
           <tr>
-            <td class="bg-light fw-bold">Total a pagar Clasificador ($)</td>
+            <td class="bg-light fw-bold">{{ 'REPORTS.TOTAL.DISTRIBUTION.QUALIFIER_PAYMENT' | translate }}</td>
             <td class="text-end">{{ totalToPayQualifier | number:'1.2-2' }}</td>
             <td>
               <div class="input-group input-group-sm">
@@ -183,7 +179,7 @@
             </td>
           </tr>
           <tr class="taxes">
-            <td class="fw-bold">Impuestos ($)</td>
+            <td class="fw-bold">{{ 'REPORTS.TOTAL.DISTRIBUTION.TAXES' | translate }}</td>
             <td class="text-end">{{ taxes | number:'1.2-2' }}</td>
             <td>
               <div class="input-group input-group-sm">
@@ -196,7 +192,7 @@
 
           <!-- Total Gross Profit -->
           <tr class="totals">
-            <td>TOTAL Ganancia bruta OP ($)</td>
+            <td>{{ 'REPORTS.TOTAL.GROSS_PROFIT.TOTAL' | translate }}</td>
             <td class="text-end">{{ totalGrossProfit | number:'1.2-2' }}</td>
             <td></td>
           </tr>
@@ -207,7 +203,7 @@
 
           <!-- Distribution -->
           <tr>
-            <td class="bg-light fw-bold">Comisión del comprador responsable ($)</td>
+            <td class="bg-light fw-bold">{{ 'REPORTS.TOTAL.DISTRIBUTION.BUYER_COMMISSION' | translate }}</td>
             <td class="text-end">{{ responsibleBuyerProfit | number:'1.2-2' }}</td>
             <td>
               <div class="input-group input-group-sm">
@@ -218,7 +214,7 @@
             </td>
           </tr>
           <tr>
-            <td class="bg-light fw-bold">Secretaria ($)</td>
+            <td class="bg-light fw-bold">{{ 'REPORTS.TOTAL.DISTRIBUTION.SECRETARY' | translate }}</td>
             <td class="text-end">{{ secretaryProfit | number:'1.2-2' }}</td>
             <td>
               <div class="input-group input-group-sm">
@@ -230,7 +226,7 @@
           </tr>
 
           <tr>
-            <td class="bg-light fw-bold">Salario CEO ($)</td>
+            <td class="bg-light fw-bold">{{ 'REPORTS.TOTAL.DISTRIBUTION.CEO_SALARY' | translate }}</td>
             <td class="text-end">{{ ceoProfit | number:'1.2-2' }}</td>
             <td>
               <div class="input-group input-group-sm">
@@ -242,7 +238,7 @@
           </tr>
 
           <tr>
-            <td class="bg-light fw-bold">Tech, legal ($)</td>
+            <td class="bg-light fw-bold">{{ 'REPORTS.TOTAL.DISTRIBUTION.TECH_LEGAL' | translate }}</td>
             <td class="text-end">{{ techLegalProfit | number:'1.2-2' }}</td>
             <td>
               <div class="input-group input-group-sm">
@@ -254,7 +250,7 @@
           </tr>
 
           <tr>
-            <td class="bg-light fw-bold">Invest, capital ($)</td>
+            <td class="bg-light fw-bold">{{ 'REPORTS.TOTAL.DISTRIBUTION.INVEST_CAPITAL' | translate }}</td>
             <td class="text-end">{{ investCapitalProfit | number:'1.2-2' }}</td>
             <td>
               <div class="input-group input-group-sm">
@@ -267,7 +263,7 @@
           </tr>
 
           <tr>
-            <td class="bg-light fw-bold">Ganancia ($)</td>
+            <td class="bg-light fw-bold">{{ 'REPORTS.TOTAL.DISTRIBUTION.PROFIT' | translate }}</td>
             <td class="text-end">{{ profit | number:'1.2-2' }}</td>
             <td>
               <div class="input-group input-group-sm">
@@ -295,7 +291,7 @@
   <div *ngIf="!isHistory" class="card-footer d-flex justify-content-end py-6 px-9">
     <!-- Submit Button -->
     <button type="button" class="btn btn-primary" (click)="confirmSave()">
-      Guardar
+      {{ 'REPORTS.TOTAL.SAVE_BUTTON' | translate }}
     </button>
   </div>
 
