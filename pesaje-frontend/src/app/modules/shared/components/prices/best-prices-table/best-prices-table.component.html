@@ -1,10 +1,10 @@
 <div *ngIf="processedData.length > 0">
   <div class="mt-4 mb-5">
-    <h5 class="fw-bold border-bottom border-gray-400 pb-2">{{typeSize.type}}</h5>
+    <h5 class="fw-bold border-bottom border-gray-400 pb-2">{{typeSize.translationKey | translate}}</h5>
   </div>
 
   <div *ngFor="let group of processedData" class="mb-5">
-    <h6 *ngIf="typeSize.type === 'COLA'" class="fw-semibold mb-3">
+    <h6 *ngIf="(typeSize.translationKey === 'SIZE_PRICE.TABLES.SIZE_TYPES.COLA')" class="fw-semibold mb-3">
       {{ getGroupTypeLabel(group.type) }}</h6>
 
     <div class="table-responsive">

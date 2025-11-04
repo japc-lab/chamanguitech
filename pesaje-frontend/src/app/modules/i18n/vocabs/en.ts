@@ -378,6 +378,14 @@ export const locale = {
         VALIDATIONS: {
           INVALID_NUMBER: 'Enter a valid number',
         },
+        SIZE_TYPES: {
+          ENTERO: 'Whole',
+          COLA: 'Tail',
+          RESIDUAL: 'Residual',
+          TAIL_A: 'Tail A',
+          TAIL_A_MINUS: 'Tail A-',
+          TAIL_B: 'Tail B',
+        },
       },
     },
     PROFILE: {

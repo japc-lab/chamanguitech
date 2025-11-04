@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { ICompany } from '../../interfaces/company.interfaces';
 import { Observable } from 'rxjs';
 import { PeriodService } from 'src/app/modules/shared/services/period.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-company-best-prices',
@@ -21,7 +22,10 @@ export class CompanyBestPricesComponent {
 
   isLoading$: Observable<boolean>;
 
-  constructor(private periodService: PeriodService) {
+  constructor(
+    private periodService: PeriodService,
+    private translate: TranslateService
+  ) {
     this.isLoading$ = this.periodService.isLoading$;
   }
 
@@ -52,13 +56,15 @@ export class CompanyBestPricesComponent {
         this.typeSizeData = prices;
         this.groupedSizes = [
           {
-            type: 'ENTERO',
+            type: this.translate.instant('SIZE_PRICE.TABLES.SIZE_TYPES.ENTERO'),
+            translationKey: 'SIZE_PRICE.TABLES.SIZE_TYPES.ENTERO',
             sizes: this.typeSizeData.filter((size: any) =>
               size.type.includes('WHOLE')
             ),
           },
           {
-            type: 'COLA',
+            type: this.translate.instant('SIZE_PRICE.TABLES.SIZE_TYPES.COLA'),
+            translationKey: 'SIZE_PRICE.TABLES.SIZE_TYPES.COLA',
             sizes: this.typeSizeData
               .filter((size: any) => size.type.includes('TAIL'))
               .sort((a: any, b: any) => {
@@ -74,7 +80,8 @@ export class CompanyBestPricesComponent {
               }),
           },
           {
-            type: 'RESIDUAL',
+            type: this.translate.instant('SIZE_PRICE.TABLES.SIZE_TYPES.RESIDUAL'),
+            translationKey: 'SIZE_PRICE.TABLES.SIZE_TYPES.RESIDUAL',
             sizes: this.typeSizeData.filter((size: any) =>
               size.type.includes('RESIDUAL')
             ),
