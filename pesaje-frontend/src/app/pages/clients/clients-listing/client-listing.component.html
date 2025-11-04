@@ -6,7 +6,7 @@
       <div class="d-flex align-items-center position-relative my-1">
         <app-keenicon name="magnifier" class="fs-3 position-absolute ms-5"></app-keenicon>
         <input type="text" data-action="filter" class="form-control form-control-solid w-250px ps-12"
-          placeholder="Buscar Clientes">
+          [placeholder]="'COMMON.SEARCH' | translate">
       </div>
       <!--end::Search-->
     </div>
@@ -19,7 +19,7 @@
         <!--begin::Add client-->
         <button *appCanCreate="PERMISSION_ROUTE" type="button" class="btn btn-primary" data-action="create"
           (click)="create()">
-          Agregar Cliente
+          <span [translate]="'BUTTONS.ADD'"></span>
         </button>
         <!--end::Add bróker-->
       </div>
@@ -38,8 +38,8 @@
 <ng-template #formModal let-modal>
   <form #myForm="ngForm" (ngSubmit)="onSubmit($event, myForm)">
     <div class="modal-header">
-      <h4 class="modal-title" id="modal-basic-title">Detalles del Cliente</h4>
-      <button type="button" class="btn-close" aria-label="Cerrar" (click)="modal.dismiss('Cross click')"></button>
+      <h4 class="modal-title" id="modal-basic-title">{{ 'CLIENTS.MODAL_TITLE' | translate }}</h4>
+      <button type="button" class="btn-close" [attr.aria-label]="'USERS.MODAL_CLOSE' | translate" (click)="modal.dismiss('Cross click')"></button>
     </div>
     <div class="modal-body">
       <div class="d-flex flex-column scroll-y me-n7 pe-7 mw-650px">
@@ -47,86 +47,86 @@
         <div class="collapse show">
           <!-- Nombres -->
           <div class="mb-3">
-            <label for="names" class="required fw-semibold fs-6 mb-2">Nombres</label>
+            <label for="names" class="required fw-semibold fs-6 mb-2">{{ 'CLIENTS.FIELDS.NAMES' | translate }}</label>
             <input type="text" class="form-control" id="names" name="names" [(ngModel)]="createClientModel.person.names"
               required #names="ngModel" minlength="3">
             <div *ngIf="(myForm.submitted || names.dirty || names.touched) && names.errors?.['required']"
               class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-              <div>El nombre es obligatorio.</div>
+              <div>{{ 'CLIENTS.VALIDATIONS.NAMES_REQUIRED' | translate }}</div>
             </div>
             <div *ngIf="(myForm.submitted || names.dirty || names.touched) && names.errors?.['minlength']"
               class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-              <div>Debe tener al menos 3 caracteres.</div>
+              <div>{{ 'CLIENTS.VALIDATIONS.NAMES_MIN_LENGTH' | translate }}</div>
             </div>
           </div>
 
           <!-- Apellidos -->
           <div class="mb-3">
-            <label for="lastNames" class="required fw-semibold fs-6 mb-2">Apellidos</label>
+            <label for="lastNames" class="required fw-semibold fs-6 mb-2">{{ 'CLIENTS.FIELDS.LAST_NAMES' | translate }}</label>
             <input type="text" class="form-control" id="lastNames" name="lastNames"
               [(ngModel)]="createClientModel.person.lastNames" required #lastNames="ngModel">
             <div *ngIf="(myForm.submitted || lastNames.dirty || lastNames.touched) && lastNames.errors?.['required']"
               class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-              <div>Los apellidos son obligatorios.</div>
+              <div>{{ 'CLIENTS.VALIDATIONS.LAST_NAMES_REQUIRED' | translate }}</div>
             </div>
           </div>
 
           <!-- Identificación -->
           <div class="mb-3">
-            <label for="identification" class="required fw-semibold fs-6 mb-2">Identificación</label>
+            <label for="identification" class="required fw-semibold fs-6 mb-2">{{ 'CLIENTS.FIELDS.IDENTIFICATION' | translate }}</label>
             <input type="text" class="form-control" id="identification" name="identification"
               [(ngModel)]="createClientModel.person.identification" required #identification="ngModel">
             <div
               *ngIf="(myForm.submitted || identification.dirty || identification.touched) && identification.errors?.['required']"
               class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-              <div>La identificación es obligatoria.</div>
+              <div>{{ 'CLIENTS.VALIDATIONS.IDENTIFICATION_REQUIRED' | translate }}</div>
             </div>
           </div>
 
           <!-- Dirección -->
           <div class="mb-3">
-            <label for="address" class="required fw-semibold fs-6 mb-2">Dirección</label>
+            <label for="address" class="required fw-semibold fs-6 mb-2">{{ 'CLIENTS.FIELDS.ADDRESS' | translate }}</label>
             <input type="text" class="form-control" id="address" name="address"
               [(ngModel)]="createClientModel.person.address" required #address="ngModel">
             <div *ngIf="(myForm.submitted || address.dirty || address.touched) && address.errors?.['required']"
               class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-              <div>La dirección es obligatoria.</div>
+              <div>{{ 'CLIENTS.VALIDATIONS.ADDRESS_REQUIRED' | translate }}</div>
             </div>
           </div>
 
           <!--Celular -->
           <div class="mb-3">
-            <label for="mobilePhone" class="required fw-semibold fs-6 mb-2">Celular</label>
+            <label for="mobilePhone" class="required fw-semibold fs-6 mb-2">{{ 'CLIENTS.FIELDS.MOBILE_PHONE' | translate }}</label>
             <input type="text" class="form-control" id="mobilePhone" name="mobilePhone"
               [(ngModel)]="createClientModel.person.mobilePhone" required #mobilePhone="ngModel">
             <div
               *ngIf="(myForm.submitted || mobilePhone.dirty || mobilePhone.touched) && mobilePhone.errors?.['required']"
               class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-              <div>El teléfono celular es obligatorio.</div>
+              <div>{{ 'CLIENTS.VALIDATIONS.MOBILE_PHONE_REQUIRED' | translate }}</div>
             </div>
           </div>
 
           <!-- Correo Electrónico -->
           <div class="mb-3">
-            <label for="email" class="fw-semibold fs-6 mb-2">Correo Electrónico</label>
+            <label for="email" class="fw-semibold fs-6 mb-2">{{ 'CLIENTS.FIELDS.EMAIL' | translate }}</label>
             <input type="email" class="form-control" id="email" name="email"
               [(ngModel)]="createClientModel.person.email" #email="ngModel">
             <div *ngIf="(myForm.submitted || email.dirty || email.touched) && email.errors?.['email']"
               class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-              <div>El correo electrónico no es válido.</div>
+              <div>{{ 'CLIENTS.VALIDATIONS.EMAIL_PATTERN' | translate }}</div>
             </div>
           </div>
 
           <!-- Descripción -->
           <div class="mb-3">
-            <label for="description" class="fw-semibold fs-6 mb-2">Descripción</label>
+            <label for="description" class="fw-semibold fs-6 mb-2">{{ 'CLIENTS.FIELDS.DESCRIPTION' | translate }}</label>
             <textarea class="form-control" id="description" name="description" rows="3"
               [(ngModel)]="createClientModel.description" #description="ngModel"></textarea>
           </div>
 
           <!-- Multi-select de Compradores -->
           <div *ngIf="!isOnlyBuyer" class="mb-3">
-            <label for="compradores" class="required fw-semibold fs-6 mb-2">Compradores Asociados</label>
+            <label for="compradores" class="required fw-semibold fs-6 mb-2">{{ 'CLIENTS.FIELDS.ASSOCIATED_BUYERS' | translate }}</label>
 
             <!-- Wrapper to make it look like an input -->
             <div class="form-control p-0 border rounded"
@@ -146,7 +146,7 @@
             <!-- Required Validation Message -->
             <div *ngIf="(myForm.submitted || compradores.touched) && compradores.errors?.['required']"
               class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-              <div>Debe seleccionar al menos un comprador.</div>
+              <div>{{ 'CLIENTS.VALIDATIONS.BUYERS_REQUIRED' | translate }}</div>
             </div>
           </div>
 
@@ -156,12 +156,12 @@
     </div>
     <div class="modal-footer flex-center">
       <button type="reset" class="btn btn-light me-3" (click)="modal.dismiss('cancel')">
-        Cancelar
+        {{ 'BUTTONS.CANCEL' | translate }}
       </button>
       <button type="submit" class="btn btn-primary" [attr.data-kt-indicator]="isLoading ? 'on' : 'off'">
-        <span class="indicator-label">Guardar</span>
+        <span class="indicator-label">{{ 'BUTTONS.SAVE' | translate }}</span>
         <span class="indicator-progress">
-          Por favor, espera... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+          {{ 'USERS.MESSAGES.PLEASE_WAIT' | translate }} <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
         </span>
       </button>
     </div>
