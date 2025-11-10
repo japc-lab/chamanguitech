@@ -30,11 +30,11 @@
             <td colspan="2" class="fw-semibold" translate="SALES.LOCAL_SALE.SUMMARY.STATUS"></td>
             <td class="text-center">
               <span class="badge" [ngClass]="{
-                'badge-danger': localSaleStatus === 'SIN PAGOS',
-                'badge-success': localSaleStatus === 'PAGADO',
-                'badge-warning': localSaleStatus === 'PENDIENTE'
+                'badge-danger': localSaleStatus === 'NO_PAYMENTS',
+                'badge-success': localSaleStatus === 'COMPLETED',
+                'badge-warning': localSaleStatus === 'IN_PROGRESS'
               }">
-                {{ localSaleStatus }}
+                {{ ('SALES.STATUS.' + localSaleStatus) | translate }}
               </span>
             </td>
           </tr>
@@ -73,31 +73,31 @@
             <td class="fw-semibold orange-color" translate="SALES.LOCAL_SALE.SUMMARY.STATUS"></td>
             <td class="text-center orange-color">
               <span class="badge" [ngClass]="{
-                'badge-danger': wholeStatus === 'SIN PAGOS',
-                'badge-success': wholeStatus === 'PAGADO',
-                'badge-warning': wholeStatus === 'PENDIENTE'
+                'badge-danger': wholeStatus === 'NO_PAYMENTS',
+                'badge-success': wholeStatus === 'COMPLETED',
+                'badge-warning': wholeStatus === 'IN_PROGRESS'
               }">
-                {{ wholeStatus }}
+                {{ ('SALES.STATUS.' + wholeStatus) | translate }}
               </span>
             </td>
             <td class="fw-semibold blue-color" translate="SALES.LOCAL_SALE.SUMMARY.STATUS"></td>
             <td class="text-center blue-color">
               <span class="badge" [ngClass]="{
-                'badge-danger': tailStatus === 'SIN PAGOS',
-                'badge-success': tailStatus === 'PAGADO',
-                'badge-warning': tailStatus === 'PENDIENTE'
+                'badge-danger': tailStatus === 'NO_PAYMENTS',
+                'badge-success': tailStatus === 'COMPLETED',
+                'badge-warning': tailStatus === 'IN_PROGRESS'
               }">
-                {{ tailStatus }}
+                {{ ('SALES.STATUS.' + tailStatus) | translate }}
               </span>
             </td>
             <td class="fw-semibold green-color" translate="SALES.LOCAL_SALE.SUMMARY.STATUS"></td>
             <td class="text-center green-color">
               <span class="badge" [ngClass]="{
-                'badge-danger': companyStatus === 'SIN PAGOS',
-                'badge-success': companyStatus === 'PAGADO',
-                'badge-warning': companyStatus === 'PENDIENTE'
+                'badge-danger': companyStatus === 'NO_PAYMENTS',
+                'badge-success': companyStatus === 'COMPLETED',
+                'badge-warning': companyStatus === 'IN_PROGRESS'
               }">
-                {{ companyStatus }}
+                {{ ('SALES.STATUS.' + companyStatus) | translate }}
               </span>
             </td>
           </tr>

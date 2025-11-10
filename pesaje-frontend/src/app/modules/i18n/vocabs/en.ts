@@ -162,6 +162,9 @@ export const locale = {
       PLEASE_WAIT: 'Please wait...',
       BACK: 'Back',
       PAYMENTS: 'Payments',
+      DETAILS: 'Details',
+      PAYMENTS_INFO: 'Payments Info',
+      SHRIMP_FARMS: 'Shrimp Farms',
     },
     TABLE: {
       ACTIONS: 'Actions',

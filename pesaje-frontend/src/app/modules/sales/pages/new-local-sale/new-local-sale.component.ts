@@ -95,13 +95,16 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
         .getPaymentsByLocalCompanySaleDetailId(this.localCompanySaleDetail.id)
         .subscribe({
           next: (payments) => {
-            this.companyPaymentTotal = payments.reduce((sum, payment) => sum + (payment.amount || 0), 0);
+            this.companyPaymentTotal = payments.reduce(
+              (sum, payment) => sum + (payment.amount || 0),
+              0
+            );
             this.cdr.detectChanges(); // Trigger change detection to update the summary
           },
           error: (error) => {
             console.error('Error fetching company payments:', error);
             this.companyPaymentTotal = 0;
-          }
+          },
         });
 
       this.unsubscribe.push(paymentSub);
@@ -214,9 +217,7 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
               (detail) => detail.style === SaleStyleEnum.TAIL
             );
 
-            this.localSaleWholeDetail = wholeDetail
-              ? { ...wholeDetail }
-              : null;
+            this.localSaleWholeDetail = wholeDetail ? { ...wholeDetail } : null;
             this.localSaleTailDetail = tailDetail ? { ...tailDetail } : null;
           }
 
@@ -556,7 +557,8 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
     this.localSaleModel.localSaleDetails = details;
 
     // Update localCompanySaleDetail (convert null to undefined)
-    this.localSaleModel.localCompanySaleDetail = this.localCompanySaleDetail || undefined;
+    this.localSaleModel.localCompanySaleDetail =
+      this.localCompanySaleDetail || undefined;
   }
 
   calculateWholeTotalPounds(): void {

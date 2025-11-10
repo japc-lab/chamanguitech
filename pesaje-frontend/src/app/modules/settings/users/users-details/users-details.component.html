@@ -18,20 +18,20 @@
       <!-- 🔹 Back Button Tab -->
       <li class="nav-item">
         <a class="nav-link cursor-pointer" (click)="goBack()">
-          <i class="bi bi-arrow-left me-2"></i> Volver
+          <i class="bi bi-arrow-left me-2"></i> {{ 'BUTTONS.BACK' | translate }}
         </a>
       </li>
 
       <li class="nav-item">
         <a class="nav-link cursor-pointer" [ngClass]="{ active: activeTab === 'Details' }"
           (click)="setActiveTab('Details')" role="tab">
-          Detalles
+          {{ 'BUTTONS.DETAILS' | translate }}
         </a>
       </li>
       <li class="nav-item">
         <a class="nav-link cursor-pointer" [ngClass]="{ active: activeTab === 'Payment Info' }"
           (click)="setActiveTab('Payment Info')" role="tab">
-          Informaciòn de pago
+          {{ 'BUTTONS.PAYMENTS_INFO' | translate }}
         </a>
       </li>
     </ul>
@@ -173,7 +173,8 @@
                     <input type="email" class="form-control form-control-lg form-control-solid"
                       placeholder="Correo electrónico" name="email" [(ngModel)]="userData.person.email"
                       (ngModelChange)="onChangeEmail($event)" #email="ngModel">
-                    <div *ngIf="(userForm.submitted || email.dirty || email.touched) && userData.person.email && !isValidEmail(userData.person.email)"
+                    <div
+                      *ngIf="(userForm.submitted || email.dirty || email.touched) && userData.person.email && !isValidEmail(userData.person.email)"
                       class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
                       <div>Debe ingresar un correo válido.</div>
                     </div>

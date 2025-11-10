@@ -163,6 +163,9 @@ export const locale = {
       PLEASE_WAIT: 'Por favor, espere...',
       BACK: 'Volver',
       PAYMENTS: 'Pagos',
+      DETAILS: 'Detalles',
+      PAYMENTS_INFO: 'Información de Pago',
+      SHRIMP_FARMS: 'Camaroneras',
     },
     TABLE: {
       ACTIONS: 'Acciones',

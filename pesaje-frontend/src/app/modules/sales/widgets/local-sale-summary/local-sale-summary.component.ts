@@ -49,11 +49,11 @@ export class LocalSaleSummaryComponent implements OnChanges, DoCheck {
   companyFinalSubtotal = 0;
   netAmountToReceive = 0;
 
-  // Status
-  localSaleStatus = 'CREATED';
-  wholeStatus = 'PENDIENTE';
-  tailStatus = 'PENDIENTE';
-  companyStatus = 'PENDIENTE';
+  // Status (using translation keys)
+  localSaleStatus = 'NO_PAYMENTS';
+  wholeStatus = 'NO_PAYMENTS';
+  tailStatus = 'NO_PAYMENTS';
+  companyStatus = 'NO_PAYMENTS';
 
   ngOnChanges(changes: SimpleChanges): void {
     this.calculateSummary();
@@ -160,29 +160,29 @@ export class LocalSaleSummaryComponent implements OnChanges, DoCheck {
     const status = (this.localSaleModel as any)?.status;
 
     if (!status) {
-      this.localSaleStatus = 'SIN PAGOS';
+      this.localSaleStatus = 'NO_PAYMENTS';
       return;
     }
 
     switch (status) {
       case 'CREATED':
-        this.localSaleStatus = 'SIN PAGOS';
+        this.localSaleStatus = 'NO_PAYMENTS';
         break;
       case 'IN_PROGRESS':
-        this.localSaleStatus = 'PENDIENTE';
+        this.localSaleStatus = 'IN_PROGRESS';
         break;
       case 'COMPLETED':
-        this.localSaleStatus = 'PAGADO';
+        this.localSaleStatus = 'COMPLETED';
         break;
       default:
-        this.localSaleStatus = 'SIN PAGOS';
+        this.localSaleStatus = 'NO_PAYMENTS';
     }
   }
 
   private calculateWholeStatus(): void {
     const wholeDetail = this.getWholeDetail();
     if (!wholeDetail || !wholeDetail.items || wholeDetail.items.length === 0) {
-      this.wholeStatus = 'SIN PAGOS';
+      this.wholeStatus = 'NO_PAYMENTS';
       return;
     }
 
@@ -194,18 +194,18 @@ export class LocalSaleSummaryComponent implements OnChanges, DoCheck {
     );
 
     if (allPaid) {
-      this.wholeStatus = 'PAGADO';
+      this.wholeStatus = 'COMPLETED';
     } else if (anyPaid) {
-      this.wholeStatus = 'PENDIENTE';
+      this.wholeStatus = 'IN_PROGRESS';
     } else {
-      this.wholeStatus = 'SIN PAGOS';
+      this.wholeStatus = 'NO_PAYMENTS';
     }
   }
 
   private calculateTailStatus(): void {
     const tailDetail = this.getTailDetail();
     if (!tailDetail || !tailDetail.items || tailDetail.items.length === 0) {
-      this.tailStatus = 'SIN PAGOS';
+      this.tailStatus = 'NO_PAYMENTS';
       return;
     }
 
@@ -217,11 +217,11 @@ export class LocalSaleSummaryComponent implements OnChanges, DoCheck {
     );
 
     if (allPaid) {
-      this.tailStatus = 'PAGADO';
+      this.tailStatus = 'COMPLETED';
     } else if (anyPaid) {
-      this.tailStatus = 'PENDIENTE';
+      this.tailStatus = 'IN_PROGRESS';
     } else {
-      this.tailStatus = 'SIN PAGOS';
+      this.tailStatus = 'NO_PAYMENTS';
     }
   }
 
@@ -232,7 +232,7 @@ export class LocalSaleSummaryComponent implements OnChanges, DoCheck {
       !companyDetail.items ||
       companyDetail.items.length === 0
     ) {
-      this.companyStatus = 'SIN PAGOS';
+      this.companyStatus = 'NO_PAYMENTS';
       return;
     }
 
@@ -240,17 +240,17 @@ export class LocalSaleSummaryComponent implements OnChanges, DoCheck {
     const totalPaid = Number(this.companyPaymentTotal) || 0;
 
     if (netGrandTotal <= 0) {
-      this.companyStatus = 'SIN PAGOS';
+      this.companyStatus = 'NO_PAYMENTS';
       return;
     }
 
     // Check if payments cover the netGrandTotal (with small tolerance for rounding)
     if (totalPaid >= netGrandTotal - 0.01) {
-      this.companyStatus = 'PAGADO';
+      this.companyStatus = 'COMPLETED';
     } else if (totalPaid > 0) {
-      this.companyStatus = 'PENDIENTE';
+      this.companyStatus = 'IN_PROGRESS';
     } else {
-      this.companyStatus = 'SIN PAGOS';
+      this.companyStatus = 'NO_PAYMENTS';
     }
   }
 
