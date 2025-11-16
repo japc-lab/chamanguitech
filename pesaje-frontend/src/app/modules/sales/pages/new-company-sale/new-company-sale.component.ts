@@ -57,6 +57,8 @@ export class NewCompanySaleComponent
 {
   PERMISSION_ROUTE = PERMISSION_ROUTES.SALES.COMPANY_SALE_FORM;
 
+  CompanySaleStatusEnum = CompanySaleStatusEnum;
+
   private modalRef: NgbModalRef | null = null;
 
   @ViewChild('saleForm') saleForm!: NgForm;
@@ -80,8 +82,16 @@ export class NewCompanySaleComponent
 
   saleId: string | undefined;
   companySaleId: string | undefined;
+  isEditMode = false;
 
+  /** Stores all active subscriptions */
   private unsubscribe: Subscription[] = [];
+
+  /** Stores the form changes subscription */
+  private formChangesSubscription?: Subscription;
+
+  /** Stores the timeout for delayed logging */
+  private logTimeout?: any;
 
   constructor(
     public activeModal: NgbActiveModal,
@@ -148,20 +158,36 @@ export class NewCompanySaleComponent
             // Initialize summary values if they exist
             this.initializeSummary();
 
+            this.isEditMode = !!this.companySaleId;
+
             this.cdr.detectChanges();
+
+            // Initialize autosave if in draft status
+            if (this.companySaleModel.status === CompanySaleStatusEnum.DRAFT) {
+              setTimeout(() => {
+                this.initializeAutosave();
+              }, 0);
+            }
           },
           error: (error) => {
-            console.error('Error fetching logistics:', error);
+            console.error('Error fetching company sale:', error);
             this.alertService.showTranslatedAlert({ alertType: 'error' });
           },
         });
 
       this.unsubscribe.push(companySaleSub);
+    } else {
+      // Initialize autosave for new company sale (draft mode)
+      setTimeout(() => {
+        this.initializeAutosave();
+      }, 0);
     }
   }
 
   initializeModels() {
-    this.companySaleModel = {} as ICreateUpdateCompanySaleModel;
+    this.companySaleModel = {
+      status: CompanySaleStatusEnum.DRAFT,
+    } as ICreateUpdateCompanySaleModel;
 
     this.purchaseModel = {} as IReducedDetailedPurchaseModel;
     this.purchaseModel.period = {} as IReducedPeriodModel;
@@ -172,8 +198,120 @@ export class NewCompanySaleComponent
     this.purchaseModel.company = {} as ICompany;
   }
 
+  /**
+   * Initializes autosave to monitor field changes
+   */
+  private initializeAutosave(): void {
+    if (this.saleForm) {
+      // Subscribe to form value changes
+      this.formChangesSubscription = this.saleForm.valueChanges?.subscribe(
+        (formValue) => {
+          this.autosaveFormFieldChanges(formValue);
+        }
+      );
+    }
+  }
+
+  /**
+   * Auto save form changes with a 5-second delay to debounce rapid changes
+   * @param formValue - The entire form value object
+   */
+  private autosaveFormFieldChanges(formValue: any): void {
+    // Clear existing timeout if it exists
+    if (this.logTimeout) {
+      clearTimeout(this.logTimeout);
+    }
+
+    // Set a new timeout for 5 seconds
+    this.logTimeout = setTimeout(() => {
+      // Only allow draft saving when it's a new company sale or when editing company sale is in draft status
+      if (this.canSaveAsDraft()) {
+        this.companySaleModel.purchase = this.purchaseModel.id;
+
+        // Update dates if provided
+        if (formValue.receptionDate) {
+          this.companySaleModel.receptionDate = formValue.receptionDate;
+        }
+        if (formValue.settleDate) {
+          this.companySaleModel.settleDate = formValue.settleDate;
+        }
+
+        if (this.companySaleId) {
+          // ✅ Update CompanySale if ID exists
+          this.companySaleService
+            .updateCompanySale(this.companySaleId, {
+              ...this.companySaleModel,
+              status: CompanySaleStatusEnum.DRAFT,
+            })
+            .subscribe({
+              next: (response) => {
+                this.companySaleModel.status = response.status;
+                this.cdr.detectChanges();
+              },
+              error: (error) => {
+                console.error('Error updating company sale:', error);
+              },
+            });
+        } else {
+          // ✅ Create New CompanySale if ID does NOT exist
+          this.companySaleService
+            .createCompanySale({
+              ...this.companySaleModel,
+              status: CompanySaleStatusEnum.DRAFT,
+            })
+            .subscribe({
+              next: (response) => {
+                this.companySaleId = response.id; // ✅ Store the new ID for future updates
+                this.companySaleModel.status = response.status;
+                this.isEditMode = true;
+
+                // Navigate to edit URL after first draft save
+                if (response.sale) {
+                  this.saleId = response.sale;
+                  this.router.navigate(['/sales/company', this.saleId]);
+                } else {
+                  // If no sale created (DRAFT status), navigate with companySaleId
+                  this.router.navigate([
+                    '/sales/company/draft',
+                    this.companySaleId,
+                  ]);
+                }
+
+                this.cdr.detectChanges();
+              },
+              error: (error) => {
+                console.error('Error creating company sale:', error);
+              },
+            });
+        }
+      }
+    }, 5000);
+  }
+
+  /**
+   * Determines if the company sale can be saved as draft
+   */
+  private canSaveAsDraft(): boolean {
+    // Allow draft saving for new company sale
+    if (!this.companySaleId) {
+      return true;
+    }
+
+    // Allow draft saving only if current status is DRAFT
+    if (this.companySaleModel.status === CompanySaleStatusEnum.DRAFT) {
+      return true;
+    }
+
+    return false;
+  }
+
   confirmSave() {
-    if (this.saleForm && this.saleForm.invalid) {
+    // Only validate form if status is not DRAFT
+    if (
+      this.saleForm &&
+      this.companySaleModel.status !== CompanySaleStatusEnum.DRAFT &&
+      this.saleForm.invalid
+    ) {
       // Mark all controls as touched to trigger validation messages
       Object.values(this.saleForm.controls).forEach((control) => {
         control.markAsTouched();
@@ -219,6 +357,11 @@ export class NewCompanySaleComponent
 
     this.alertService.confirm().then((result) => {
       if (result.isConfirmed) {
+        // Unsubscribe from form changes BEFORE making API call to prevent autosave trigger
+        if (this.formChangesSubscription) {
+          this.formChangesSubscription.unsubscribe();
+        }
+
         this.submitCompanySaleForm();
       }
     });
@@ -301,24 +444,16 @@ export class NewCompanySaleComponent
     this.companySaleModel.grandTotal = netAmountToReceive;
     this.companySaleModel.percentageTotal = 100; // Always 100% for combined details
 
-    if (this.companySaleId) {
-      this.companySaleService
-        .updateCompanySale(this.companySaleId, this.companySaleModel)
-        .subscribe({
-          next: (response) => {
-            this.alertService.showTranslatedAlert({ alertType: 'success' });
-          },
-          error: (error) => {
-            console.error('Error updating company sale:', error);
-            this.alertService.showTranslatedAlert({ alertType: 'error' });
-          },
-        });
-    } else {
+    // ✅ Update CompanySale (draft is already created via autosave)
+    // If companySaleId doesn't exist yet, create it first
+    if (!this.companySaleId) {
+      // Create new company sale
       this.companySaleService
         .createCompanySale(this.companySaleModel)
         .subscribe({
           next: (response) => {
-            this.companySaleId = response.id; // ✅ Store the new ID for future updates
+            this.companySaleId = response.id;
+            this.companySaleModel.status = response.status;
 
             // Navigate to edit URL with saleId to enable subsequent updates and payments
             if (response.sale) {
@@ -327,9 +462,38 @@ export class NewCompanySaleComponent
             }
 
             this.alertService.showTranslatedAlert({ alertType: 'success' });
+            this.cdr.detectChanges();
           },
           error: (error) => {
             console.error('Error creating company sale:', error);
+            this.alertService.showTranslatedAlert({ alertType: 'error' });
+          },
+        });
+    } else {
+      // When explicitly saving, transition from DRAFT to CREATED (or keep existing non-draft status)
+      const nextStatus =
+        this.companySaleModel.status === CompanySaleStatusEnum.DRAFT
+          ? CompanySaleStatusEnum.CREATED
+          : this.companySaleModel.status;
+
+      const updateData: ICreateUpdateCompanySaleModel = {
+        ...(this.companySaleModel as ICreateUpdateCompanySaleModel),
+        status: nextStatus,
+      };
+
+      this.companySaleService
+        .updateCompanySale(
+          this.companySaleId,
+          updateData
+        )
+        .subscribe({
+          next: (response) => {
+            this.companySaleModel.status = response.status;
+            this.alertService.showTranslatedAlert({ alertType: 'success' });
+            this.cdr.detectChanges();
+          },
+          error: (error) => {
+            console.error('Error updating company sale:', error);
             this.alertService.showTranslatedAlert({ alertType: 'error' });
           },
         });
@@ -352,6 +516,10 @@ export class NewCompanySaleComponent
   }
 
   canAddPayments(): boolean {
+    if (this.companySaleModel.status === CompanySaleStatusEnum.DRAFT) {
+      return false;
+    }
+
     if (this.saleId) {
       if (this.isOnlyBuyer) {
         return (
@@ -537,5 +705,15 @@ export class NewCompanySaleComponent
 
   ngOnDestroy(): void {
     this.unsubscribe.forEach((sub) => sub.unsubscribe());
+
+    // Unsubscribe from form changes subscription
+    if (this.formChangesSubscription) {
+      this.formChangesSubscription.unsubscribe();
+    }
+
+    // Clear any pending timeout
+    if (this.logTimeout) {
+      clearTimeout(this.logTimeout);
+    }
   }
 }

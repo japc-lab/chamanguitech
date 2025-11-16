@@ -162,6 +162,9 @@ export const locale = {
       PLEASE_WAIT: 'Please wait...',
       BACK: 'Back',
       PAYMENTS: 'Payments',
+      DETAILS: 'Details',
+      PAYMENTS_INFO: 'Payments Info',
+      SHRIMP_FARMS: 'Shrimp Farms',
     },
     TABLE: {
       ACTIONS: 'Actions',
@@ -605,6 +608,7 @@ export const locale = {
     SALES: {
       TITLE: 'Sales',
       STATUS: {
+        DRAFT: 'Draft',
         NO_PAYMENTS: 'No payments',
         IN_PROGRESS: 'Pending',
         COMPLETED: 'Paid',
@@ -751,7 +755,7 @@ export const locale = {
           GRAND_TOTAL: 'Grand Total',
         },
         UNITS_CONVERSION: {
-          TITLE: 'Summary by Class and Size',
+          TITLE: 'Units Conversion Table',
           TABLE: {
             CLASS: 'Class',
             SIZE: 'Size',
@@ -870,6 +874,11 @@ export const locale = {
             MERCHANT_ID: 'Merchant ID',
             SELECT: 'Select',
             NUMBER: 'Number',
+          },
+          PAYMENT_STATUS_OPTIONS: {
+            NO_PAYMENT: 'No payments',
+            PENDING: 'Pending',
+            PAID: 'Paid',
           },
           VALIDATIONS: {
             PAYMENT_METHOD_REQUIRED: 'Payment method required',
@@ -1365,10 +1374,14 @@ export const locale = {
           UPDATE_ERROR: 'Error updating asset.',
         },
         HELP: {
-          TOTAL_COST: 'This field is automatically calculated: Unit Cost × Units',
-          PAYMENT_STATUS: 'This field is automatically calculated based on paid amount vs total cost',
-          PENDING_AMOUNT: 'This field is automatically calculated: Total Cost - Paid Amount',
-          ACTIVE_STATUS: 'Check this option to activate the asset, uncheck to deactivate it',
+          TOTAL_COST:
+            'This field is automatically calculated: Unit Cost × Units',
+          PAYMENT_STATUS:
+            'This field is automatically calculated based on paid amount vs total cost',
+          PENDING_AMOUNT:
+            'This field is automatically calculated: Total Cost - Paid Amount',
+          ACTIVE_STATUS:
+            'Check this option to activate the asset, uncheck to deactivate it',
         },
         VALIDATIONS: {
           NAME_REQUIRED: 'Asset name is required.',

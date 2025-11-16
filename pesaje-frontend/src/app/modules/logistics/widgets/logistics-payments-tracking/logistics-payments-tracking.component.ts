@@ -22,12 +22,16 @@ import { Subscription } from 'rxjs';
   templateUrl: './logistics-payments-tracking.component.html',
   styleUrls: ['./logistics-payments-tracking.component.scss'],
 })
-export class LogisticsPaymentsTrackingComponent implements OnInit, OnChanges, OnDestroy {
+export class LogisticsPaymentsTrackingComponent
+  implements OnInit, OnChanges, OnDestroy
+{
   @Input() logisticsItems: ILogisticsItemModel[] = [];
   @Input() logisticsPayments: ILogisticsPaymentModel[] = [];
   @Input() isEditMode: boolean = false;
   @Input() showValidationErrors: boolean = false;
-  @Output() logisticsPaymentsChange = new EventEmitter<ILogisticsPaymentModel[]>();
+  @Output() logisticsPaymentsChange = new EventEmitter<
+    ILogisticsPaymentModel[]
+  >();
 
   title: string = '';
 
@@ -66,15 +70,41 @@ export class LogisticsPaymentsTrackingComponent implements OnInit, OnChanges, On
     this.title = this.translate.instant('LOGISTICS.PAYMENTS.TITLE');
 
     this.paymentStatuses = [
-      { value: 'NO_PAYMENT', label: this.translate.instant('LOGISTICS.PAYMENTS.PAYMENT_STATUS_OPTIONS.NO_PAYMENT') },
-      { value: 'PENDING', label: this.translate.instant('LOGISTICS.PAYMENTS.PAYMENT_STATUS_OPTIONS.PENDING') },
-      { value: 'PAID', label: this.translate.instant('LOGISTICS.PAYMENTS.PAYMENT_STATUS_OPTIONS.PAID') },
+      {
+        value: 'NO_PAYMENT',
+        label: this.translate.instant(
+          'LOGISTICS.PAYMENTS.PAYMENT_STATUS_OPTIONS.NO_PAYMENT'
+        ),
+      },
+      {
+        value: 'PENDING',
+        label: this.translate.instant(
+          'LOGISTICS.PAYMENTS.PAYMENT_STATUS_OPTIONS.PENDING'
+        ),
+      },
+      {
+        value: 'PAID',
+        label: this.translate.instant(
+          'LOGISTICS.PAYMENTS.PAYMENT_STATUS_OPTIONS.PAID'
+        ),
+      },
     ];
 
     this.invoiceOptions = [
-      { value: 'yes', label: this.translate.instant('LOGISTICS.PAYMENTS.INVOICE_OPTIONS.YES') },
-      { value: 'no', label: this.translate.instant('LOGISTICS.PAYMENTS.INVOICE_OPTIONS.NO') },
-      { value: 'not-applicable', label: this.translate.instant('LOGISTICS.PAYMENTS.INVOICE_OPTIONS.NOT_APPLICABLE') },
+      {
+        value: 'yes',
+        label: this.translate.instant('LOGISTICS.PAYMENTS.INVOICE_OPTIONS.YES'),
+      },
+      {
+        value: 'no',
+        label: this.translate.instant('LOGISTICS.PAYMENTS.INVOICE_OPTIONS.NO'),
+      },
+      {
+        value: 'not-applicable',
+        label: this.translate.instant(
+          'LOGISTICS.PAYMENTS.INVOICE_OPTIONS.NOT_APPLICABLE'
+        ),
+      },
     ];
   }
 
@@ -116,24 +146,31 @@ export class LogisticsPaymentsTrackingComponent implements OnInit, OnChanges, On
 
     categoryTotals.forEach((total, category) => {
       // Check if we have an existing payment for this category
-      const existingPayment = this.logisticsPayments.find(p => p.financeCategory === category);
+      const existingPayment = this.logisticsPayments.find(
+        (p) => p.financeCategory === category
+      );
 
       if (existingPayment && this.isEditMode) {
         // In edit mode: preserve existing payment data, only update amount and format date
         const updatedPayment = {
           ...existingPayment,
           amount: total,
-          paymentDate: existingPayment.paymentDate ? this.dateUtils.formatISOToDateInput(existingPayment.paymentDate) : undefined
+          paymentDate: existingPayment.paymentDate
+            ? this.dateUtils.formatISOToDateInput(existingPayment.paymentDate)
+            : undefined,
         };
 
         // Ensure payment method is properly set for dropdown
         if (existingPayment.paymentMethod && this.paymentMethods.length > 0) {
           // Find the matching payment method object from the loaded methods
-          const paymentMethodId = typeof existingPayment.paymentMethod === 'string'
-            ? existingPayment.paymentMethod
-            : existingPayment.paymentMethod?.id;
+          const paymentMethodId =
+            typeof existingPayment.paymentMethod === 'string'
+              ? existingPayment.paymentMethod
+              : existingPayment.paymentMethod?.id;
 
-          const matchingMethod = this.paymentMethods.find(method => method.id === paymentMethodId);
+          const matchingMethod = this.paymentMethods.find(
+            (method) => method.id === paymentMethodId
+          );
           if (matchingMethod) {
             updatedPayment.paymentMethod = matchingMethod;
           }
@@ -158,8 +195,6 @@ export class LogisticsPaymentsTrackingComponent implements OnInit, OnChanges, On
     this.emitChanges();
   }
 
-
-
   // Event handlers for payments
   onPaymentStatusChange(payment: ILogisticsPaymentModel, value: string): void {
     payment.paymentStatus = value as 'NO_PAYMENT' | 'PENDING' | 'PAID';
@@ -173,7 +208,10 @@ export class LogisticsPaymentsTrackingComponent implements OnInit, OnChanges, On
     this.emitChanges();
   }
 
-  onPaymentMethodChange(payment: ILogisticsPaymentModel, method: IPaymentMethodModel): void {
+  onPaymentMethodChange(
+    payment: ILogisticsPaymentModel,
+    method: IPaymentMethodModel
+  ): void {
     payment.paymentMethod = method;
     this.updatePaymentCompleteness(payment);
     this.emitChanges();
@@ -241,7 +279,9 @@ export class LogisticsPaymentsTrackingComponent implements OnInit, OnChanges, On
 
   getPaymentMethodLabel(methodId: string): string {
     const method = this.paymentMethods.find((m) => m.id === methodId);
-    return method ? method.name : this.translate.instant('LOGISTICS.PAYMENTS.SELECT_PAYMENT_METHOD');
+    return method
+      ? this.getPaymentMethodName(method)
+      : this.translate.instant('LOGISTICS.PAYMENTS.SELECT_PAYMENT_METHOD');
   }
 
   getInvoiceLabel(value: string): string {
@@ -280,13 +320,21 @@ export class LogisticsPaymentsTrackingComponent implements OnInit, OnChanges, On
   getDescriptionForCategory(financeCategory: string): string {
     switch (financeCategory) {
       case 'INVOICE':
-        return this.translate.instant('LOGISTICS.PAYMENTS.CATEGORY_DESCRIPTIONS.INVOICE');
+        return this.translate.instant(
+          'LOGISTICS.PAYMENTS.CATEGORY_DESCRIPTIONS.INVOICE'
+        );
       case 'PETTY_CASH':
-        return this.translate.instant('LOGISTICS.PAYMENTS.CATEGORY_DESCRIPTIONS.PETTY_CASH');
+        return this.translate.instant(
+          'LOGISTICS.PAYMENTS.CATEGORY_DESCRIPTIONS.PETTY_CASH'
+        );
       case 'ADDITIONAL':
-        return this.translate.instant('LOGISTICS.PAYMENTS.CATEGORY_DESCRIPTIONS.ADDITIONAL');
+        return this.translate.instant(
+          'LOGISTICS.PAYMENTS.CATEGORY_DESCRIPTIONS.ADDITIONAL'
+        );
       default:
-        return this.translate.instant('LOGISTICS.PAYMENTS.CATEGORY_DESCRIPTIONS.DEFAULT');
+        return this.translate.instant(
+          'LOGISTICS.PAYMENTS.CATEGORY_DESCRIPTIONS.DEFAULT'
+        );
     }
   }
 
@@ -337,32 +385,62 @@ export class LogisticsPaymentsTrackingComponent implements OnInit, OnChanges, On
   }
 
   hasValidationErrors(payment: ILogisticsPaymentModel): boolean {
-    return !this.isPaymentDateValid(payment) ||
-           !this.isPaymentMethodValid(payment) ||
-           !this.isPersonInChargeValid(payment) ||
-           !this.isInvoiceNumberValid(payment) ||
-           !this.isInvoiceNameValid(payment);
+    return (
+      !this.isPaymentDateValid(payment) ||
+      !this.isPaymentMethodValid(payment) ||
+      !this.isPersonInChargeValid(payment) ||
+      !this.isInvoiceNumberValid(payment) ||
+      !this.isInvoiceNameValid(payment)
+    );
   }
 
   getValidationErrors(payment: ILogisticsPaymentModel): string[] {
     const errors: string[] = [];
 
     if (!this.isPaymentDateValid(payment)) {
-      errors.push(this.translate.instant('LOGISTICS.VALIDATIONS.PAYMENT_DATE_REQUIRED'));
+      errors.push(
+        this.translate.instant('LOGISTICS.VALIDATIONS.PAYMENT_DATE_REQUIRED')
+      );
     }
     if (!this.isPaymentMethodValid(payment)) {
-      errors.push(this.translate.instant('LOGISTICS.VALIDATIONS.PAYMENT_METHOD_REQUIRED'));
+      errors.push(
+        this.translate.instant('LOGISTICS.VALIDATIONS.PAYMENT_METHOD_REQUIRED')
+      );
     }
     if (!this.isPersonInChargeValid(payment)) {
-      errors.push(this.translate.instant('LOGISTICS.VALIDATIONS.PERSON_IN_CHARGE_REQUIRED'));
+      errors.push(
+        this.translate.instant(
+          'LOGISTICS.VALIDATIONS.PERSON_IN_CHARGE_REQUIRED'
+        )
+      );
     }
     if (!this.isInvoiceNumberValid(payment)) {
-      errors.push(this.translate.instant('LOGISTICS.VALIDATIONS.INVOICE_NUMBER_REQUIRED'));
+      errors.push(
+        this.translate.instant('LOGISTICS.VALIDATIONS.INVOICE_NUMBER_REQUIRED')
+      );
     }
     if (!this.isInvoiceNameValid(payment)) {
-      errors.push(this.translate.instant('LOGISTICS.VALIDATIONS.INVOICE_NAME_REQUIRED'));
+      errors.push(
+        this.translate.instant('LOGISTICS.VALIDATIONS.INVOICE_NAME_REQUIRED')
+      );
     }
 
     return errors;
+  }
+
+  getPaymentMethodName(paymentMethod: IPaymentMethodModel): string {
+    if (!paymentMethod || !paymentMethod.name) {
+      return '';
+    }
+
+    const currentLang = this.translate.currentLang || 'es';
+    const lang = currentLang === 'en' ? 'en' : 'es';
+
+    return (
+      paymentMethod.name[lang] ||
+      paymentMethod.name.es ||
+      paymentMethod.name.en ||
+      ''
+    );
   }
 }

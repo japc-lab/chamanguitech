@@ -163,6 +163,9 @@ export const locale = {
       PLEASE_WAIT: 'Por favor, espere...',
       BACK: 'Volver',
       PAYMENTS: 'Pagos',
+      DETAILS: 'Detalles',
+      PAYMENTS_INFO: 'Información de Pago',
+      SHRIMP_FARMS: 'Camaroneras',
     },
     TABLE: {
       ACTIONS: 'Acciones',
@@ -612,6 +615,7 @@ export const locale = {
     SALES: {
       TITLE: 'Ventas',
       STATUS: {
+        DRAFT: 'Borrador',
         NO_PAYMENTS: 'Sin pagos',
         IN_PROGRESS: 'Pendiente',
         COMPLETED: 'Pagado',
@@ -761,7 +765,7 @@ export const locale = {
           GRAND_TOTAL: 'Total General',
         },
         UNITS_CONVERSION: {
-          TITLE: 'Resumen por Clase y Talla',
+          TITLE: 'Tabla de conversión de unidades',
           TABLE: {
             CLASS: 'Clase',
             SIZE: 'Talla',
@@ -882,6 +886,11 @@ export const locale = {
             MERCHANT_ID: 'ID comerciante',
             SELECT: 'Seleccionar',
             NUMBER: 'Número',
+          },
+          PAYMENT_STATUS_OPTIONS: {
+            NO_PAYMENT: 'Sin pagos',
+            PENDING: 'Pendiente',
+            PAID: 'Pagado',
           },
           VALIDATIONS: {
             PAYMENT_METHOD_REQUIRED: 'Método de pago requerido',

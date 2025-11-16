@@ -588,11 +588,11 @@ const seedPaymentMethods = async () => {
     try {
         // Define fixed IDs for catalog payment methods
         const fixedPaymentMethods = [
-            { _id: new mongoose.Types.ObjectId("60f9b7b2c8b3f10ffc2e5a01"), name: "Efectivo" },
-            { _id: new mongoose.Types.ObjectId("60f9b7b2c8b3f10ffc2e5a02"), name: "Transferencia" },
-            { _id: new mongoose.Types.ObjectId("60f9b7b2c8b3f10ffc2e5a03"), name: "Cheque" },
-            { _id: new mongoose.Types.ObjectId("60f9b7b2c8b3f10ffc2e5a04"), name: "Débito" },
-            { _id: new mongoose.Types.ObjectId("60f9b7b2c8b3f10ffc2e5a05"), name: "Otro" },
+            { _id: new mongoose.Types.ObjectId("60f9b7b2c8b3f10ffc2e5a01"), name: { en: "Cash", es: "Efectivo" } },
+            { _id: new mongoose.Types.ObjectId("60f9b7b2c8b3f10ffc2e5a02"), name: { en: "Transfer", es: "Transferencia" } },
+            { _id: new mongoose.Types.ObjectId("60f9b7b2c8b3f10ffc2e5a03"), name: { en: "Check", es: "Cheque" } },
+            { _id: new mongoose.Types.ObjectId("60f9b7b2c8b3f10ffc2e5a04"), name: { en: "Debit", es: "Débito" } },
+            { _id: new mongoose.Types.ObjectId("60f9b7b2c8b3f10ffc2e5a05"), name: { en: "Other", es: "Otro" } },
         ];
 
         // Insert payment methods only if they do not exist
@@ -601,9 +601,9 @@ const seedPaymentMethods = async () => {
                 const existingPaymentMethod = await PaymentMethod.findById(pm._id);
                 if (!existingPaymentMethod) {
                     await PaymentMethod.create(pm);
-                    console.log(`✅ Inserted payment method: ${pm.name}`);
+                    console.log(`✅ Inserted payment method: ${pm.name.es}`);
                 } else {
-                    console.log(`⚠️ Payment Method already exists: ${pm.name}, skipping...`);
+                    console.log(`⚠️ Payment Method already exists: ${pm.name.es}, skipping...`);
                 }
             })
         );

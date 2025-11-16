@@ -18,20 +18,20 @@
       <!-- 🔹 Back Button Tab -->
       <li class="nav-item">
         <a class="nav-link cursor-pointer" (click)="goBack()">
-          <i class="bi bi-arrow-left me-2"></i> Volver
+          <i class="bi bi-arrow-left me-2"></i> {{ 'BUTTONS.BACK' | translate }}
         </a>
       </li>
 
       <li class="nav-item">
         <a class="nav-link cursor-pointer" [ngClass]="{ active: activeTab === 'Details' }"
           (click)="setActiveTab('Details')" role="tab">
-          Detalles
+          {{ 'BUTTONS.DETAILS' | translate }}
         </a>
       </li>
       <li class="nav-item">
         <a class="nav-link cursor-pointer" [ngClass]="{ active: activeTab === 'Payment Info' }"
           (click)="setActiveTab('Payment Info')" role="tab">
-          Informaciòn de pago
+          {{ 'BUTTONS.PAYMENTS_INFO' | translate }}
         </a>
       </li>
     </ul>

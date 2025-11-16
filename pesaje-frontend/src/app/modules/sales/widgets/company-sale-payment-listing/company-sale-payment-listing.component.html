@@ -64,7 +64,7 @@
                   [(ngModel)]="companySalePaymentModel.paymentMethod.id" #paymentMethod="ngModel" required>
                   <option value="" disabled selected>Seleccione una opción</option>
                   <option *ngFor="let paymentMethod of paymentMethods" [value]="paymentMethod.id">
-                    {{ paymentMethod.name }}
+                    {{ getPaymentMethodName(paymentMethod) }}
                   </option>
                 </select>
                 <div

@@ -2,9 +2,15 @@ const { Schema, model } = require('mongoose');
 
 const PaymentMethodSchema = Schema({
   name: {
-    type: String,
-    required: true,
-  }
+    en: {
+      type: String,
+      required: true,
+    },
+    es: {
+      type: String,
+      required: true,
+    }
+  },
 },
   { timestamps: true },
 );

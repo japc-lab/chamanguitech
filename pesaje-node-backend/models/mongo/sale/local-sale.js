@@ -6,7 +6,7 @@ const LocalSaleSchema = Schema({
   sale: {
     type: Schema.Types.ObjectId,
     ref: 'Sale',
-    required: true
+    required: function () { return this.status !== 'DRAFT'; }
   },
   status: {
     type: String,
@@ -15,31 +15,31 @@ const LocalSaleSchema = Schema({
   },
   wholeRejectedPounds: {
     type: Number,
-    required: true
+    required: function () { return this.status !== 'DRAFT'; }
   },
   trashPounds: {
     type: Number,
-    required: true
+    required: function () { return this.status !== 'DRAFT'; }
   },
   totalProcessedPounds: {
     type: Number,
-    required: true,
+    required: function () { return this.status !== 'DRAFT'; },
   },
   wholeTotalPounds: {
     type: Number,
-    required: true
+    required: function () { return this.status !== 'DRAFT'; }
   },
   moneyIncomeForRejectedHeads: {
     type: Number,
   },
   grandTotal: {
     type: Number,
-    required: true,
+    required: function () { return this.status !== 'DRAFT'; },
     min: 0
   },
   seller: {
     type: String,
-    required: true,
+    required: function () { return this.status !== 'DRAFT'; },
   },
   localCompanySaleDetail: {
     type: Schema.Types.ObjectId,
@@ -47,7 +47,7 @@ const LocalSaleSchema = Schema({
   },
   hasInvoice: {
     type: String,
-    required: true,
+    required: function () { return this.status !== 'DRAFT'; },
     enum: ['yes', 'no', 'not-applicable']
   },
   invoiceNumber: {

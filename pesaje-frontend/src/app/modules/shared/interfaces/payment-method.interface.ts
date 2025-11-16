@@ -1,5 +1,8 @@
 export interface IPaymentMethodModel {
-  name: string;
+  name: {
+    en: string;
+    es: string;
+  };
   id: string;
 }
 

@@ -27,6 +27,7 @@ import {
   ILocalCompanySaleDetailPaymentModel,
 } from '../../interfaces/local-company-sale-detail-payment.interface';
 import { LocalCompanySaleDetailPaymentService } from '../../services/local-company-sale-detail-payment.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-local-company-sale-detail-payment-listing',
@@ -65,9 +66,10 @@ export class LocalCompanySaleDetailPaymentListingComponent
     columns: [
       {
         title: 'Tipo de Pago',
-        data: 'paymentMethod.name',
-        render: function (data) {
-          return data ? data : '-';
+        data: 'paymentMethod',
+        render: (data) => {
+          if (!data) return '-';
+          return this.getPaymentMethodName(data);
         },
       },
       {
@@ -118,7 +120,8 @@ export class LocalCompanySaleDetailPaymentListingComponent
     private alertService: AlertService,
     private dateUtils: DateUtilsService,
     private modalService: NgbModal,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -332,6 +335,25 @@ export class LocalCompanySaleDetailPaymentListingComponent
 
   validateNumber(event: KeyboardEvent) {
     this.inputUtils.validateNumber(event);
+  }
+
+  /**
+   * Gets the payment method name based on the current language
+   */
+  getPaymentMethodName(paymentMethod: IPaymentMethodModel): string {
+    if (!paymentMethod || !paymentMethod.name) {
+      return '';
+    }
+
+    const currentLang = this.translate.currentLang || 'es';
+    const lang = currentLang === 'en' ? 'en' : 'es';
+
+    return (
+      paymentMethod.name[lang] ||
+      paymentMethod.name.es ||
+      paymentMethod.name.en ||
+      ''
+    );
   }
 
   ngOnDestroy(): void {

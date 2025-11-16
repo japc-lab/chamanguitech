@@ -10,18 +10,28 @@ const create = async (data) => {
     try {
         const { purchase, wholeDetail, tailDetail, ...companySaleData } = data;
 
-        // Validate referenced purchase exists
-        const purchaseExists = await dbAdapter.purchaseAdapter.getById(purchase);
-        if (!purchaseExists) {
-            throw new Error('Purchase does not exist');
-        }
+        // Determine status - use provided status or default to DRAFT
+        const status = data.status || CompanySaleStatusEnum.DRAFT;
 
-        // Create Sale document
-        const sale = await dbAdapter.saleAdapter.create({
-            purchase,
-            weightSheetNumber: companySaleData.weightSheetNumber,
-            type: SaleTypeEnum.COMPANY
-        }, { session: transaction.session });
+        // Validate referenced purchase exists if provided, and create Sale record
+        let sale = null;
+        if (purchase) {
+            const purchaseExists = await dbAdapter.purchaseAdapter.getById(purchase);
+            if (!purchaseExists) {
+                throw new Error('Purchase does not exist');
+            }
+
+            // Use company sale weightSheetNumber if provided, otherwise use purchase's weightSheetNumber
+            // Fallback to 'DRAFT' if neither is available to satisfy Sale model requirement
+            const weightSheetNumber = companySaleData.weightSheetNumber || purchaseExists.weightSheetNumber || 'DRAFT';
+
+            // Create Sale document (even for DRAFT status to maintain referential integrity)
+            sale = await dbAdapter.saleAdapter.create({
+                purchase,
+                weightSheetNumber: weightSheetNumber,
+                type: SaleTypeEnum.COMPANY
+            }, { session: transaction.session });
+        }
 
         let wholeDetailId = null;
         let tailDetailId = null;
@@ -56,13 +66,11 @@ const create = async (data) => {
             tailDetailId = createdTailDetail.id;
         }
 
-        // Set initial status
-        companySaleData.status = CompanySaleStatusEnum.CREATED;
-
         // Create CompanySale
         const companySale = await dbAdapter.companySaleAdapter.create({
             ...companySaleData,
-            sale: sale.id,
+            status,
+            sale: sale?.id || null,
             wholeDetail: wholeDetailId,
             tailDetail: tailDetailId
         }, { session: transaction.session });
@@ -280,6 +288,11 @@ const getBySaleId = async (saleId) => {
 };
 
 const update = async (id, data) => {
+    // Check if this is a status-only update
+    if (Object.keys(data).length === 1 && data.status) {
+        return await updateStatus(id, data.status);
+    }
+
     const transaction = await dbAdapter.companySaleAdapter.startTransaction();
 
     try {
@@ -291,14 +304,42 @@ const update = async (id, data) => {
             throw new Error('Company sale not found');
         }
 
+        const { purchase, wholeDetail, tailDetail, ...companySaleData } = data;
+        const status = data.status || existingCompanySale.status;
         const saleId = existingCompanySale.sale;
 
-        // 🔸 Update the Sale's weightSheetNumber
-        await dbAdapter.saleAdapter.update(saleId, {
-            weightSheetNumber: data.weightSheetNumber
-        }, { session: transaction.session });
+        // Handle Sale creation/update based on status
+        let finalSaleId = saleId;
+        
+        // Create Sale document if purchase is provided and sale doesn't exist yet
+        if (purchase && !saleId) {
+            // Validate purchase exists
+            const purchaseExists = await dbAdapter.purchaseAdapter.getById(purchase);
+            if (!purchaseExists) {
+                throw new Error('Purchase does not exist');
+            }
 
-        const { wholeDetail, tailDetail, ...companySaleData } = data;
+            // Use company sale weightSheetNumber if provided, otherwise use purchase's weightSheetNumber
+            // Fallback to 'DRAFT' if neither is available to satisfy Sale model requirement
+            const weightSheetNumber = data.weightSheetNumber || purchaseExists.weightSheetNumber || 'DRAFT';
+
+            // Create Sale document (even for DRAFT status to maintain referential integrity)
+            const newSale = await dbAdapter.saleAdapter.create({
+                purchase,
+                weightSheetNumber: weightSheetNumber,
+                type: SaleTypeEnum.COMPANY
+            }, { session: transaction.session });
+            finalSaleId = newSale.id;
+        } else if (status !== CompanySaleStatusEnum.DRAFT && !saleId && !purchase) {
+            // Cannot transition to non-DRAFT without a purchase or existing sale
+            throw new Error('Purchase is required when updating status from DRAFT to non-DRAFT');
+        } else if (saleId && data.weightSheetNumber) {
+            // Update existing Sale's weightSheetNumber if provided
+            await dbAdapter.saleAdapter.update(saleId, {
+                weightSheetNumber: data.weightSheetNumber
+            }, { session: transaction.session });
+        }
+
         let wholeDetailId = existingCompanySale.wholeDetail?._id || null;
         let tailDetailId = existingCompanySale.tailDetail?._id || null;
 
@@ -397,11 +438,9 @@ const update = async (id, data) => {
         }
 
         // ✏️ Update the CompanySale record
-        const updatedCompanySale = await dbAdapter.companySaleAdapter.update(id, {
+        const updateData = {
             batch: companySaleData.batch,
             provider: companySaleData.provider,
-            receptionDate: companySaleData.receptionDate,
-            settleDate: companySaleData.settleDate,
             predominantSize: companySaleData.predominantSize,
             wholeReceivedPounds: companySaleData.wholeReceivedPounds,
             trashPounds: companySaleData.trashPounds,
@@ -415,9 +454,35 @@ const update = async (id, data) => {
             summaryPerformancePercentage: companySaleData.summaryPerformancePercentage,
             summaryRetentionPercentage: companySaleData.summaryRetentionPercentage,
             summaryAdditionalPenalty: companySaleData.summaryAdditionalPenalty,
+            status,
+            sale: finalSaleId,
             wholeDetail: wholeDetailId,
             tailDetail: tailDetailId
-        }, { session: transaction.session });
+        };
+
+        // Handle date fields - only include if not empty for DRAFT status
+        if (companySaleData.receptionDate && companySaleData.receptionDate !== '') {
+            updateData.receptionDate = companySaleData.receptionDate;
+        } else if (status !== CompanySaleStatusEnum.DRAFT && companySaleData.receptionDate !== undefined) {
+            // For non-DRAFT status, include even if empty to allow clearing
+            updateData.receptionDate = companySaleData.receptionDate;
+        }
+
+        if (companySaleData.settleDate && companySaleData.settleDate !== '') {
+            updateData.settleDate = companySaleData.settleDate;
+        } else if (status !== CompanySaleStatusEnum.DRAFT && companySaleData.settleDate !== undefined) {
+            // For non-DRAFT status, include even if empty to allow clearing
+            updateData.settleDate = companySaleData.settleDate;
+        }
+
+        // Remove undefined and null values (but keep empty strings for non-DRAFT if explicitly provided)
+        Object.keys(updateData).forEach(key => {
+            if (updateData[key] === undefined || updateData[key] === null) {
+                delete updateData[key];
+            }
+        });
+
+        const updatedCompanySale = await dbAdapter.companySaleAdapter.update(id, updateData, { session: transaction.session });
 
         await transaction.commit();
         return updatedCompanySale;
@@ -429,9 +494,21 @@ const update = async (id, data) => {
     }
 };
 
+const updateStatus = async (id, status) => {
+    const existingCompanySale = await dbAdapter.companySaleAdapter.getById(id);
+    if (!existingCompanySale) {
+        throw new Error('Company sale not found');
+    }
+
+    // Update only the status field
+    const updatedCompanySale = await dbAdapter.companySaleAdapter.update(id, { status });
+    return updatedCompanySale;
+};
+
 module.exports = {
     create,
     getById,
     getBySaleId,
     update,
+    updateStatus,
 };

@@ -22,7 +22,8 @@
       <div class="d-flex align-items-center gap-4">
         <!-- Control Number Input -->
         <input type="text" id="controlNumber" name="controlNumber" class="form-control form-control-sm text-end"
-          [placeholder]="'SALES.COMPANY_SALE.PLACEHOLDERS.CONTROL_NUMBER' | translate" style="max-width: 180px" [disabled]="!!companySaleId" [(ngModel)]="controlNumber" />
+          [placeholder]="'SALES.COMPANY_SALE.PLACEHOLDERS.CONTROL_NUMBER' | translate" style="max-width: 180px"
+          [disabled]="!!companySaleId" [(ngModel)]="controlNumber" />
 
         <!-- Search Button -->
         <button *ngIf="!companySaleId" class="btn btn-outline-primary btn-sm d-flex align-items-center gap-2"
@@ -32,7 +33,8 @@
       </div>
 
       <!-- Required Message -->
-      <div *ngIf="searchSubmitted && !controlNumber" class="text-danger mt-1 ms-1 small" translate="SALES.COMPANY_SALE.VALIDATIONS.CONTROL_NUMBER_REQUIRED">
+      <div *ngIf="searchSubmitted && !controlNumber" class="text-danger mt-1 ms-1 small"
+        translate="SALES.COMPANY_SALE.VALIDATIONS.CONTROL_NUMBER_REQUIRED">
       </div>
     </div>
 
@@ -57,7 +59,8 @@
     <div class="row g-5 g-xl-8">
       <!-- Purchase Date -->
       <div class="col-md-6">
-        <label for="purchaseDate" class="fw-semibold fs-6 mb-2" translate="SALES.COMPANY_SALE.FIELDS.PURCHASE_DATE"></label>
+        <label for="purchaseDate" class="fw-semibold fs-6 mb-2"
+          translate="SALES.COMPANY_SALE.FIELDS.PURCHASE_DATE"></label>
         <input type="date" class="form-control form-control-sm" id="purchaseDate" name="purchaseDate"
           [(ngModel)]="purchaseDateFormatted" disabled>
       </div>
@@ -92,21 +95,24 @@
 
       <!-- Transportation Method-->
       <div class="col-md-6">
-        <label for="transportationMethod" class="fw-semibold fs-6 mb-2" translate="SALES.COMPANY_SALE.FIELDS.TRANSPORTATION_METHOD"></label>
+        <label for="transportationMethod" class="fw-semibold fs-6 mb-2"
+          translate="SALES.COMPANY_SALE.FIELDS.TRANSPORTATION_METHOD"></label>
         <input type="text" id="transportationMethod" name="transportationMethod" class="form-control form-control-sm"
           [(ngModel)]="transportationMethod" disabled />
       </div>
 
       <!-- Company Name -->
       <div class="col-md-6">
-        <label for="companyName" class="fw-semibold fs-6 mb-2" translate="SALES.COMPANY_SALE.FIELDS.COMPANY_NAME"></label>
+        <label for="companyName" class="fw-semibold fs-6 mb-2"
+          translate="SALES.COMPANY_SALE.FIELDS.COMPANY_NAME"></label>
         <input type="text" id="companyName" name="companyName" class="form-control form-control-sm"
           [(ngModel)]="purchaseModel.company.name" disabled />
       </div>
 
       <!-- Weight Sheet Number -->
       <div class="col-md-6">
-        <label for="weightSheetNumber" class="fw-semibold fs-6 mb-2" translate="SALES.COMPANY_SALE.FIELDS.WEIGHT_SHEET_NUMBER"></label>
+        <label for="weightSheetNumber" class="fw-semibold fs-6 mb-2"
+          translate="SALES.COMPANY_SALE.FIELDS.WEIGHT_SHEET_NUMBER"></label>
         <input type="text" id="weightSheetNumber" name="weightSheetNumber" class="form-control form-control-sm"
           [(ngModel)]="purchaseModel.weightSheetNumber" disabled />
       </div>
@@ -122,9 +128,16 @@
   <div class="card card-xl-stretch mb-xl-8 mt-2">
     <!-- begin::Header -->
     <div class="card-header border-0 pt-8">
-      <h4 class="card-title align-items-start flex-column">
-        <span class="card-label fw-bolder fs-3 mb-1" translate="SALES.COMPANY_SALE.SECTIONS.SALE_INFO"></span>
-      </h4>
+      <div class="d-flex flex-column">
+        <h4 class="card-title align-items-start flex-column">
+          <span class="card-label fw-bolder fs-3 mb-1" translate="SALES.COMPANY_SALE.SECTIONS.SALE_INFO"></span>
+        </h4>
+        <!-- Draft Indicator -->
+        <span *ngIf="isEditMode && companySaleModel.status === CompanySaleStatusEnum.DRAFT"
+          class="badge badge-warning fs-7 mt-1">
+          <i class="bi bi-pencil-square me-1"></i> <span translate="LOGISTICS.STATUS.DRAFT"></span>
+        </span>
+      </div>
     </div>
     <!-- end::Header -->
 
@@ -135,10 +148,13 @@
 
         <!-- Batch -->
         <div class="col-md-4">
-          <label for="batch" class="required fw-semibold fs-6 mb-2" translate="SALES.COMPANY_SALE.FIELDS.BATCH"></label>
+          <label for="batch" class="fw-semibold fs-6 mb-2"
+            [class.required]="companySaleModel.status !== CompanySaleStatusEnum.DRAFT"
+            translate="SALES.COMPANY_SALE.FIELDS.BATCH"></label>
           <input type="text" id="batch" name="batch" [(ngModel)]="companySaleModel.batch" #batch="ngModel"
-            class="form-control form-control-sm" required />
-          <div *ngIf="(saleForm.submitted || batch.dirty || batch.touched) && batch.errors?.['required']"
+            class="form-control form-control-sm" [required]="companySaleModel.status !== CompanySaleStatusEnum.DRAFT" />
+          <div
+            *ngIf="(saleForm.submitted || batch.dirty || batch.touched) && batch.errors?.['required'] && companySaleModel.status !== CompanySaleStatusEnum.DRAFT"
             class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"
             translate="SALES.COMPANY_SALE.VALIDATIONS.BATCH_REQUIRED">
           </div>
@@ -146,10 +162,13 @@
 
         <!-- Provider -->
         <div class="col-md-8">
-          <label for="provider" class="required fw-semibold fs-6 mb-2" translate="SALES.COMPANY_SALE.FIELDS.PROVIDER"></label>
+          <label for="provider" class="fw-semibold fs-6 mb-2"
+            [class.required]="companySaleModel.status !== CompanySaleStatusEnum.DRAFT"
+            translate="SALES.COMPANY_SALE.FIELDS.PROVIDER"></label>
           <input type="text" id="provider" name="provider" [(ngModel)]="companySaleModel.provider" #provider="ngModel"
-            class="form-control form-control-sm" required />
-          <div *ngIf="(saleForm.submitted || provider.dirty || provider.touched) && provider.errors?.['required']"
+            class="form-control form-control-sm" [required]="companySaleModel.status !== CompanySaleStatusEnum.DRAFT" />
+          <div
+            *ngIf="(saleForm.submitted || provider.dirty || provider.touched) && provider.errors?.['required'] && companySaleModel.status !== CompanySaleStatusEnum.DRAFT"
             class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"
             translate="SALES.COMPANY_SALE.VALIDATIONS.PROVIDER_REQUIRED">
           </div>
@@ -157,11 +176,14 @@
 
         <!-- Reception Date -->
         <div class="col-md-6">
-          <label for="receptionDate" class="required fw-semibold fs-6 mb-2" translate="SALES.COMPANY_SALE.FIELDS.RECEPTION_DATE"></label>
+          <label for="receptionDate" class="fw-semibold fs-6 mb-2"
+            [class.required]="companySaleModel.status !== CompanySaleStatusEnum.DRAFT"
+            translate="SALES.COMPANY_SALE.FIELDS.RECEPTION_DATE"></label>
           <input type="date" class="form-control form-control-sm" id="receptionDate" name="receptionDate"
-            [(ngModel)]="companySaleModel.receptionDate" #receptionDateField="ngModel" required>
+            [(ngModel)]="companySaleModel.receptionDate" #receptionDateField="ngModel"
+            [required]="companySaleModel.status !== CompanySaleStatusEnum.DRAFT">
           <div
-            *ngIf="(saleForm.submitted || receptionDateField.dirty || receptionDateField.touched) && receptionDateField.errors?.['required']"
+            *ngIf="(saleForm.submitted || receptionDateField.dirty || receptionDateField.touched) && receptionDateField.errors?.['required'] && companySaleModel.status !== CompanySaleStatusEnum.DRAFT"
             class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"
             translate="SALES.COMPANY_SALE.VALIDATIONS.RECEPTION_DATE_REQUIRED">
           </div>
@@ -169,11 +191,14 @@
 
         <!-- Settle Date -->
         <div class="col-md-6">
-          <label for="settleDate" class="required fw-semibold fs-6 mb-2" translate="SALES.COMPANY_SALE.FIELDS.SETTLE_DATE"></label>
+          <label for="settleDate" class="fw-semibold fs-6 mb-2"
+            [class.required]="companySaleModel.status !== CompanySaleStatusEnum.DRAFT"
+            translate="SALES.COMPANY_SALE.FIELDS.SETTLE_DATE"></label>
           <input type="date" class="form-control form-control-sm" id="settleDate" name="settleDate"
-            [(ngModel)]="companySaleModel.settleDate" #settleDateField="ngModel" required>
+            [(ngModel)]="companySaleModel.settleDate" #settleDateField="ngModel"
+            [required]="companySaleModel.status !== CompanySaleStatusEnum.DRAFT">
           <div
-            *ngIf="(saleForm.submitted || settleDateField.dirty || settleDateField.touched) && settleDateField.errors?.['required']"
+            *ngIf="(saleForm.submitted || settleDateField.dirty || settleDateField.touched) && settleDateField.errors?.['required'] && companySaleModel.status !== CompanySaleStatusEnum.DRAFT"
             class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"
             translate="SALES.COMPANY_SALE.VALIDATIONS.SETTLE_DATE_REQUIRED">
           </div>
@@ -181,12 +206,14 @@
 
         <!-- Weight Sheet Number -->
         <div class="col-md-6">
-          <label for="weightSheetNumber" class="required fw-semibold fs-6 mb-2" translate="SALES.COMPANY_SALE.FIELDS.WEIGHT_SHEET_NUMBER"></label>
+          <label for="weightSheetNumber" class="fw-semibold fs-6 mb-2"
+            [class.required]="companySaleModel.status !== CompanySaleStatusEnum.DRAFT"
+            translate="SALES.COMPANY_SALE.FIELDS.WEIGHT_SHEET_NUMBER"></label>
           <input type="text" id="weightSheetNumber" name="weightSheetNumber"
             [(ngModel)]="companySaleModel.weightSheetNumber" #weightSheetNumber="ngModel"
-            class="form-control form-control-sm" required>
+            class="form-control form-control-sm" [required]="companySaleModel.status !== CompanySaleStatusEnum.DRAFT">
           <div
-            *ngIf="(saleForm.submitted || weightSheetNumber.dirty || weightSheetNumber.touched) && weightSheetNumber.errors?.['required']"
+            *ngIf="(saleForm.submitted || weightSheetNumber.dirty || weightSheetNumber.touched) && weightSheetNumber.errors?.['required'] && companySaleModel.status !== CompanySaleStatusEnum.DRAFT"
             class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"
             translate="SALES.COMPANY_SALE.VALIDATIONS.WEIGHT_SHEET_NUMBER_REQUIRED">
           </div>
@@ -194,11 +221,14 @@
 
         <!-- Predominant Size -->
         <div class="col-md-6">
-          <label for="predominantSize" class="required fw-semibold fs-6 mb-2" translate="SALES.COMPANY_SALE.FIELDS.PREDOMINANT_SIZE"></label>
+          <label for="predominantSize" class="fw-semibold fs-6 mb-2"
+            [class.required]="companySaleModel.status !== CompanySaleStatusEnum.DRAFT"
+            translate="SALES.COMPANY_SALE.FIELDS.PREDOMINANT_SIZE"></label>
           <input type="text" id="predominantSize" name="predominantSize" [(ngModel)]="companySaleModel.predominantSize"
-            #predominantSize="ngModel" class="form-control form-control-sm" required disabled />
+            #predominantSize="ngModel" class="form-control form-control-sm"
+            [required]="companySaleModel.status !== CompanySaleStatusEnum.DRAFT" disabled />
           <div
-            *ngIf="(saleForm.submitted || predominantSize.dirty || predominantSize.touched) && predominantSize.errors?.['required']"
+            *ngIf="(saleForm.submitted || predominantSize.dirty || predominantSize.touched) && predominantSize.errors?.['required'] && companySaleModel.status !== CompanySaleStatusEnum.DRAFT"
             class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"
             translate="SALES.COMPANY_SALE.VALIDATIONS.FIELD_REQUIRED">
           </div>
@@ -206,13 +236,15 @@
 
         <!-- Whole Received Pounds -->
         <div class="col-md-4">
-          <label for="wholeReceivedPounds" class="required fw-semibold fs-6 mb-2" translate="SALES.COMPANY_SALE.FIELDS.WHOLE_RECEIVED_POUNDS"></label>
+          <label for="wholeReceivedPounds" class="fw-semibold fs-6 mb-2"
+            [class.required]="companySaleModel.status !== CompanySaleStatusEnum.DRAFT"
+            translate="SALES.COMPANY_SALE.FIELDS.WHOLE_RECEIVED_POUNDS"></label>
           <input type="text" id="wholeReceivedPounds" name="wholeReceivedPounds"
             [(ngModel)]="companySaleModel.wholeReceivedPounds" #wholeReceivedPounds="ngModel"
-            class="form-control form-control-sm" required (keypress)="validateNumber($event)"
-            (blur)="formatDecimal('wholeReceivedPounds')" />
+            class="form-control form-control-sm" [required]="companySaleModel.status !== CompanySaleStatusEnum.DRAFT"
+            (keypress)="validateNumber($event)" (blur)="formatDecimal('wholeReceivedPounds')" />
           <div
-            *ngIf="(saleForm.submitted || wholeReceivedPounds.dirty || wholeReceivedPounds.touched) && wholeReceivedPounds.errors?.['required']"
+            *ngIf="(saleForm.submitted || wholeReceivedPounds.dirty || wholeReceivedPounds.touched) && wholeReceivedPounds.errors?.['required'] && companySaleModel.status !== CompanySaleStatusEnum.DRAFT"
             class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"
             translate="SALES.COMPANY_SALE.VALIDATIONS.FIELD_REQUIRED">
           </div>
@@ -220,12 +252,15 @@
 
         <!-- Trash Pounds -->
         <div class="col-md-4">
-          <label for="trashPounds" class="required fw-semibold fs-6 mb-2" translate="SALES.COMPANY_SALE.FIELDS.TRASH_POUNDS"></label>
+          <label for="trashPounds" class="fw-semibold fs-6 mb-2"
+            [class.required]="companySaleModel.status !== CompanySaleStatusEnum.DRAFT"
+            translate="SALES.COMPANY_SALE.FIELDS.TRASH_POUNDS"></label>
           <input type="text" id="trashPounds" name="trashPounds" [(ngModel)]="companySaleModel.trashPounds"
-            #trashPounds="ngModel" class="form-control form-control-sm" required (keypress)="validateNumber($event)"
+            #trashPounds="ngModel" class="form-control form-control-sm"
+            [required]="companySaleModel.status !== CompanySaleStatusEnum.DRAFT" (keypress)="validateNumber($event)"
             (blur)="formatDecimal('trashPounds')" />
           <div
-            *ngIf="(saleForm.submitted || trashPounds.dirty || trashPounds.touched) && trashPounds.errors?.['required']"
+            *ngIf="(saleForm.submitted || trashPounds.dirty || trashPounds.touched) && trashPounds.errors?.['required'] && companySaleModel.status !== CompanySaleStatusEnum.DRAFT"
             class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"
             translate="SALES.COMPANY_SALE.VALIDATIONS.FIELD_REQUIRED">
           </div>
@@ -233,13 +268,15 @@
 
         <!-- Net Received Pounds -->
         <div class="col-md-4">
-          <label for="netReceivedPounds" class="required fw-semibold fs-6 mb-2" translate="SALES.COMPANY_SALE.FIELDS.NET_RECEIVED_POUNDS"></label>
+          <label for="netReceivedPounds" class="fw-semibold fs-6 mb-2"
+            [class.required]="companySaleModel.status !== CompanySaleStatusEnum.DRAFT"
+            translate="SALES.COMPANY_SALE.FIELDS.NET_RECEIVED_POUNDS"></label>
           <input type="text" id="netReceivedPounds" name="netReceivedPounds"
             [(ngModel)]="companySaleModel.netReceivedPounds" #netReceivedPounds="ngModel"
-            class="form-control form-control-sm" required (keypress)="validateNumber($event)"
-            (blur)="formatDecimal('netReceivedPounds')" />
+            class="form-control form-control-sm" [required]="companySaleModel.status !== CompanySaleStatusEnum.DRAFT"
+            (keypress)="validateNumber($event)" (blur)="formatDecimal('netReceivedPounds')" />
           <div
-            *ngIf="(saleForm.submitted || netReceivedPounds.dirty || netReceivedPounds.touched) && netReceivedPounds.errors?.['required']"
+            *ngIf="(saleForm.submitted || netReceivedPounds.dirty || netReceivedPounds.touched) && netReceivedPounds.errors?.['required'] && companySaleModel.status !== CompanySaleStatusEnum.DRAFT"
             class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"
             translate="SALES.COMPANY_SALE.VALIDATIONS.FIELD_REQUIRED">
           </div>
@@ -247,12 +284,15 @@
 
         <!-- Processed Pounds -->
         <div class="col-md-6">
-          <label for="processedPounds" class="required fw-semibold fs-6 mb-2" translate="SALES.COMPANY_SALE.FIELDS.PROCESSED_POUNDS"></label>
+          <label for="processedPounds" class="fw-semibold fs-6 mb-2"
+            [class.required]="companySaleModel.status !== CompanySaleStatusEnum.DRAFT"
+            translate="SALES.COMPANY_SALE.FIELDS.PROCESSED_POUNDS"></label>
           <input type="text" id="processedPounds" name="processedPounds" [(ngModel)]="companySaleModel.processedPounds"
-            #processedPounds="ngModel" class="form-control form-control-sm" required (keypress)="validateNumber($event)"
+            #processedPounds="ngModel" class="form-control form-control-sm"
+            [required]="companySaleModel.status !== CompanySaleStatusEnum.DRAFT" (keypress)="validateNumber($event)"
             (blur)="formatDecimal('processedPounds')" />
           <div
-            *ngIf="(saleForm.submitted || processedPounds.dirty || processedPounds.touched) && processedPounds.errors?.['required']"
+            *ngIf="(saleForm.submitted || processedPounds.dirty || processedPounds.touched) && processedPounds.errors?.['required'] && companySaleModel.status !== CompanySaleStatusEnum.DRAFT"
             class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"
             translate="SALES.COMPANY_SALE.VALIDATIONS.FIELD_REQUIRED">
           </div>
@@ -260,15 +300,18 @@
 
         <!-- Performance -->
         <div class="col-md-6">
-          <label for="performance" class="required fw-semibold fs-6 mb-2" translate="SALES.COMPANY_SALE.FIELDS.PERFORMANCE"></label>
+          <label for="performance" class="fw-semibold fs-6 mb-2"
+            [class.required]="companySaleModel.status !== CompanySaleStatusEnum.DRAFT"
+            translate="SALES.COMPANY_SALE.FIELDS.PERFORMANCE"></label>
           <div class="input-group input-group-sm">
             <input type="text" id="performance" name="performance" [(ngModel)]="companySaleModel.performance"
-              #performance="ngModel" class="form-control text-end" required (keypress)="validateNumber($event)"
+              #performance="ngModel" class="form-control text-end"
+              [required]="companySaleModel.status !== CompanySaleStatusEnum.DRAFT" (keypress)="validateNumber($event)"
               (blur)="formatDecimal('performance')" />
             <span class="input-group-text">%</span>
           </div>
           <div
-            *ngIf="(saleForm.submitted || performance.dirty || performance.touched) && performance.errors?.['required']"
+            *ngIf="(saleForm.submitted || performance.dirty || performance.touched) && performance.errors?.['required'] && companySaleModel.status !== CompanySaleStatusEnum.DRAFT"
             class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"
             translate="SALES.COMPANY_SALE.VALIDATIONS.FIELD_REQUIRED">
           </div>
@@ -300,11 +343,13 @@
 <!-- Submit Button inside card footer -->
 <div class="card card-xl-stretch mb-xl-8 mt-2">
   <div class="card-footer d-flex justify-content-end py-6 px-9">
-    <button *ngIf="canSaveCompanySale()" type="button" class="btn btn-primary" (click)="confirmSave()" translate="BUTTONS.SAVE">
+    <button *ngIf="canSaveCompanySale()" type="button" class="btn btn-primary" (click)="confirmSave()"
+      translate="BUTTONS.SAVE">
     </button>
 
     <!-- Payments List Button -->
-    <button *ngIf="canAddPayments()" type="button" (click)="openPaymentsModal()" class="btn btn-secondary ms-3" translate="BUTTONS.PAYMENTS">
+    <button *ngIf="canAddPayments()" type="button" (click)="openPaymentsModal()" class="btn btn-secondary ms-3"
+      translate="BUTTONS.PAYMENTS">
     </button>
   </div>
 </div>

@@ -3,6 +3,8 @@ const { check } = require('express-validator');
 const { validateFields } = require('../middlewares/validate-fields');
 const { validateJWT } = require('../middlewares/validate-jwt');
 const { createLocalSale, getLocalSaleBySaleId, updateLocalSale } = require('../controllers/local-sale.controller');
+const LocalSaleStatusEnum = require('../enums/local-sale-status.enum');
+const SaleStyleEnum = require('../enums/sale-style.enum');
 
 const router = Router();
 
@@ -10,33 +12,109 @@ router.post(
     '/',
     [
         validateJWT,
+        // Default status to DRAFT if not provided, allowing minimal payloads for drafts
+        (req, _res, next) => {
+            if (!req.body.status) req.body.status = LocalSaleStatusEnum.DRAFT;
+            next();
+        },
+        check('status')
+            .optional()
+            .isIn(Object.values(LocalSaleStatusEnum))
+            .withMessage('Invalid status'),
+
         check('purchase', 'Purchase ID is required').isMongoId(),
-        check('saleDate', 'Sale date is required').isISO8601(),
-        check('wholeTotalPounds', 'wholeTotalPounds is required and must be numeric').isNumeric(),
+        check('saleDate', 'Sale date is required')
+            .if((value, { req }) => req.body.status !== LocalSaleStatusEnum.DRAFT)
+            .exists()
+            .isISO8601(),
+        check('wholeTotalPounds', 'wholeTotalPounds is required and must be numeric')
+            .if((value, { req }) => req.body.status !== LocalSaleStatusEnum.DRAFT)
+            .exists()
+            .isNumeric(),
         check('moneyIncomeForRejectedHeads', 'moneyIncomeForRejectedHeads must be numeric').optional().isNumeric(),
-        check('wholeRejectedPounds', 'wholeRejectedPounds is required and must be numeric').isNumeric(),
-        check('trashPounds', 'trashPounds is required and must be numeric').isNumeric(),
-        check('totalProcessedPounds', 'totalProcessedPounds is required and must be numeric').isNumeric(),
-        check('grandTotal', 'Price grand total is required').isNumeric(),
-        check('seller', 'Seller is required').notEmpty(),
-        check('localSaleDetails', 'Local sale details are required').isArray({ min: 1 }),
-        check('localSaleDetails.*.style', 'Style is required').notEmpty(),
-        check('localSaleDetails.*.grandTotal', 'grandTotal is required and must be numeric').isNumeric(),
-        check('localSaleDetails.*.receivedGrandTotal', 'receivedGrandTotal is required and must be numeric').isNumeric(),
-        check('localSaleDetails.*.poundsGrandTotal', 'poundsGrandTotal is required and must be numeric').isNumeric(),
+        check('wholeRejectedPounds', 'wholeRejectedPounds is required and must be numeric')
+            .if((value, { req }) => req.body.status !== LocalSaleStatusEnum.DRAFT)
+            .exists()
+            .isNumeric(),
+        check('trashPounds', 'trashPounds is required and must be numeric')
+            .if((value, { req }) => req.body.status !== LocalSaleStatusEnum.DRAFT)
+            .exists()
+            .isNumeric(),
+        check('totalProcessedPounds', 'totalProcessedPounds is required and must be numeric')
+            .if((value, { req }) => req.body.status !== LocalSaleStatusEnum.DRAFT)
+            .exists()
+            .isNumeric(),
+        check('grandTotal', 'Price grand total is required')
+            .if((value, { req }) => req.body.status !== LocalSaleStatusEnum.DRAFT)
+            .exists()
+            .isNumeric(),
+        check('seller', 'Seller is required')
+            .if((value, { req }) => req.body.status !== LocalSaleStatusEnum.DRAFT)
+            .exists()
+            .notEmpty(),
+        check('localSaleDetails', 'Local sale details are required')
+            .if((value, { req }) => req.body.status !== LocalSaleStatusEnum.DRAFT)
+            .exists()
+            .isArray({ min: 1 }),
+        check('localSaleDetails.*.style', 'Style is required')
+            .if((value, { req }) => req.body.status !== LocalSaleStatusEnum.DRAFT)
+            .exists()
+            .isIn(Object.values(SaleStyleEnum)),
+        check('localSaleDetails.*.grandTotal', 'grandTotal is required and must be numeric')
+            .if((value, { req }) => req.body.status !== LocalSaleStatusEnum.DRAFT)
+            .exists()
+            .isNumeric(),
+        check('localSaleDetails.*.receivedGrandTotal', 'receivedGrandTotal is required and must be numeric')
+            .if((value, { req }) => req.body.status !== LocalSaleStatusEnum.DRAFT)
+            .exists()
+            .isNumeric(),
+        check('localSaleDetails.*.poundsGrandTotal', 'poundsGrandTotal is required and must be numeric')
+            .if((value, { req }) => req.body.status !== LocalSaleStatusEnum.DRAFT)
+            .exists()
+            .isNumeric(),
         check('localSaleDetails.*.retentionPercentage', 'retentionPercentage must be numeric').optional().isNumeric(),
         check('localSaleDetails.*.retentionAmount', 'retentionAmount must be numeric').optional().isNumeric(),
-        check('localSaleDetails.*.netGrandTotal', 'netGrandTotal is required and must be numeric').isNumeric(),
+        check('localSaleDetails.*.netGrandTotal', 'netGrandTotal is required and must be numeric')
+            .if((value, { req }) => req.body.status !== LocalSaleStatusEnum.DRAFT)
+            .exists()
+            .isNumeric(),
         check('localSaleDetails.*.otherPenalties', 'otherPenalties must be numeric').optional().isNumeric(),
-        check('localSaleDetails.*.items', 'Detail must include items').isArray({ min: 1 }),
-        check('localSaleDetails.*.items.*.size', 'Item size is required').notEmpty(),
-        check('localSaleDetails.*.items.*.pounds', 'Item pounds is required and must be numeric').isNumeric(),
-        check('localSaleDetails.*.items.*.price', 'Item price is required and must be numeric').isNumeric(),
-        check('localSaleDetails.*.items.*.total', 'Item total is required and must be numeric').isNumeric(),
-        check('localSaleDetails.*.items.*.merchantName', 'Item merchantName is required').notEmpty(),
-        check('localSaleDetails.*.items.*.merchantId', 'Item merchantId is required').notEmpty(),
-        check('localSaleDetails.*.items.*.paymentStatus', 'Item paymentStatus is required').isIn(['NO_PAYMENT', 'PENDING', 'PAID']),
-        check('localSaleDetails.*.items.*.hasInvoice', 'Item hasInvoice is required').isIn(['yes', 'no', 'not-applicable']),
+        check('localSaleDetails.*.items', 'Detail must include items')
+            .if((value, { req }) => req.body.status !== LocalSaleStatusEnum.DRAFT)
+            .exists()
+            .isArray({ min: 1 }),
+        check('localSaleDetails.*.items.*.size', 'Item size is required')
+            .if((value, { req }) => req.body.status !== LocalSaleStatusEnum.DRAFT)
+            .exists()
+            .notEmpty(),
+        check('localSaleDetails.*.items.*.pounds', 'Item pounds is required and must be numeric')
+            .if((value, { req }) => req.body.status !== LocalSaleStatusEnum.DRAFT)
+            .exists()
+            .isNumeric(),
+        check('localSaleDetails.*.items.*.price', 'Item price is required and must be numeric')
+            .if((value, { req }) => req.body.status !== LocalSaleStatusEnum.DRAFT)
+            .exists()
+            .isNumeric(),
+        check('localSaleDetails.*.items.*.total', 'Item total is required and must be numeric')
+            .if((value, { req }) => req.body.status !== LocalSaleStatusEnum.DRAFT)
+            .exists()
+            .isNumeric(),
+        check('localSaleDetails.*.items.*.merchantName', 'Item merchantName is required')
+            .if((value, { req }) => req.body.status !== LocalSaleStatusEnum.DRAFT)
+            .exists()
+            .notEmpty(),
+        check('localSaleDetails.*.items.*.merchantId', 'Item merchantId is required')
+            .if((value, { req }) => req.body.status !== LocalSaleStatusEnum.DRAFT)
+            .exists()
+            .notEmpty(),
+        check('localSaleDetails.*.items.*.paymentStatus', 'Item paymentStatus is required')
+            .if((value, { req }) => req.body.status !== LocalSaleStatusEnum.DRAFT)
+            .exists()
+            .isIn(['NO_PAYMENT', 'PENDING', 'PAID']),
+        check('localSaleDetails.*.items.*.hasInvoice', 'Item hasInvoice is required')
+            .if((value, { req }) => req.body.status !== LocalSaleStatusEnum.DRAFT)
+            .exists()
+            .isIn(['yes', 'no', 'not-applicable']),
         check('localSaleDetails.*.items.*.paymentOne', 'Item paymentOne must be numeric').optional().isNumeric(),
         check('localSaleDetails.*.items.*.paymentTwo', 'Item paymentTwo must be numeric').optional().isNumeric(),
         check('localSaleDetails.*.items.*.totalPaid', 'Item totalPaid must be numeric').optional().isNumeric(),
@@ -45,7 +123,8 @@ router.post(
                 const pathParts = path.split('.');
                 const detailIndex = pathParts[1];
                 const itemIndex = pathParts[3];
-                return req.body.localSaleDetails?.[detailIndex]?.items?.[itemIndex]?.paymentStatus === 'PAID';
+                return req.body.status !== LocalSaleStatusEnum.DRAFT &&
+                    req.body.localSaleDetails?.[detailIndex]?.items?.[itemIndex]?.paymentStatus === 'PAID';
             })
             .isMongoId(),
         check('localSaleDetails.*.items.*.invoiceNumber', 'Item invoiceNumber is required when hasInvoice is yes')
@@ -53,7 +132,8 @@ router.post(
                 const pathParts = path.split('.');
                 const detailIndex = pathParts[1];
                 const itemIndex = pathParts[3];
-                return req.body.localSaleDetails?.[detailIndex]?.items?.[itemIndex]?.hasInvoice === 'yes';
+                return req.body.status !== LocalSaleStatusEnum.DRAFT &&
+                    req.body.localSaleDetails?.[detailIndex]?.items?.[itemIndex]?.hasInvoice === 'yes';
             })
             .notEmpty(),
         check('localSaleDetails.*.items.*.totalReceived', 'Item totalReceived must be numeric').optional().isNumeric(),
@@ -114,6 +194,10 @@ router.put(
     [
         validateJWT,
         check('id', 'Invalid Local Sale ID').isMongoId(),
+        check('status')
+            .optional()
+            .isIn(Object.values(LocalSaleStatusEnum))
+            .withMessage('Invalid status'),
         check('saleDate', 'Sale date must be a valid ISO 8601 date').optional().isISO8601(),
         check('wholeTotalPounds', 'wholeTotalPounds must be numeric').optional().isNumeric(),
         check('moneyIncomeForRejectedHeads', 'moneyIncomeForRejectedHeads must be numeric').optional().isNumeric(),
@@ -123,7 +207,9 @@ router.put(
         check('grandTotal', 'grandTotal must be numeric').optional().isNumeric(),
         check('seller', 'Seller is required').optional().notEmpty(),
         check('localSaleDetails', 'Local sale details are optional').optional().isArray({ min: 1 }),
-        check('localSaleDetails.*.style', 'Style is required').optional().notEmpty(),
+        check('localSaleDetails.*.style', 'Style is required')
+            .optional()
+            .isIn(Object.values(SaleStyleEnum)),
         check('localSaleDetails.*.grandTotal', 'grandTotal is required and must be numeric').optional().isNumeric(),
         check('localSaleDetails.*.receivedGrandTotal', 'receivedGrandTotal is required and must be numeric').optional().isNumeric(),
         check('localSaleDetails.*.poundsGrandTotal', 'poundsGrandTotal is required and must be numeric').optional().isNumeric(),

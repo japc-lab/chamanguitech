@@ -34,14 +34,14 @@
       <tbody>
         <!-- Logistics Payment rows -->
         <ng-container *ngFor="let payment of logisticsPayments; let i = index">
-          <tr [class.table-light]="payment.isCompleted"
-            [class.border-success]="payment.isCompleted">
+          <tr [class.table-light]="payment.isCompleted" [class.border-success]="payment.isCompleted">
 
             <!-- Description -->
             <td class="ps-4">
               <div class="d-flex align-items-center">
                 <div class="d-flex justify-content-start flex-column">
-                  <span class="text-dark fw-bold text-h6 mb-1">{{ getDescriptionForCategory(payment.financeCategory) }}</span>
+                  <span class="text-dark fw-bold text-h6 mb-1">{{ getDescriptionForCategory(payment.financeCategory)
+                    }}</span>
                 </div>
               </div>
             </td>
@@ -82,10 +82,11 @@
                 [class.is-invalid]="showValidationErrors && !isPaymentMethodValid(payment)">
                 <option value="">{{ 'LOGISTICS.PLACEHOLDERS.SELECT_OPTION' | translate }}</option>
                 <option *ngFor="let method of paymentMethods" [ngValue]="method">
-                  {{ method.name }}
+                  {{ getPaymentMethodName(method) }}
                 </option>
               </select>
-              <div *ngIf="showValidationErrors && !isPaymentMethodValid(payment)" class="invalid-feedback d-block small">
+              <div *ngIf="showValidationErrors && !isPaymentMethodValid(payment)"
+                class="invalid-feedback d-block small">
                 {{ 'LOGISTICS.VALIDATIONS.PAYMENT_METHOD_REQUIRED' | translate }}
               </div>
             </td>
@@ -104,10 +105,10 @@
             <td class="text-center">
               <input type="text" class="form-control form-control-sm" [(ngModel)]="payment.invoiceNumber"
                 (ngModelChange)="onInvoiceNumberChange(payment, $event)"
-                [placeholder]="'LOGISTICS.PLACEHOLDERS.NUMBER' | translate"
-                [disabled]="payment.hasInvoice !== 'yes'"
+                [placeholder]="'LOGISTICS.PLACEHOLDERS.NUMBER' | translate" [disabled]="payment.hasInvoice !== 'yes'"
                 [class.is-invalid]="showValidationErrors && !isInvoiceNumberValid(payment)" />
-              <div *ngIf="showValidationErrors && !isInvoiceNumberValid(payment)" class="invalid-feedback d-block small">
+              <div *ngIf="showValidationErrors && !isInvoiceNumberValid(payment)"
+                class="invalid-feedback d-block small">
                 {{ 'LOGISTICS.VALIDATIONS.INVOICE_NUMBER_REQUIRED' | translate }}
               </div>
             </td>
@@ -116,8 +117,7 @@
             <td class="text-center">
               <input type="text" class="form-control form-control-sm" [(ngModel)]="payment.invoiceName"
                 (ngModelChange)="onInvoiceNameChange(payment, $event)"
-                [placeholder]="'LOGISTICS.PLACEHOLDERS.NAME' | translate"
-                [disabled]="payment.hasInvoice !== 'yes'"
+                [placeholder]="'LOGISTICS.PLACEHOLDERS.NAME' | translate" [disabled]="payment.hasInvoice !== 'yes'"
                 [class.is-invalid]="showValidationErrors && !isInvoiceNameValid(payment)" />
               <div *ngIf="showValidationErrors && !isInvoiceNameValid(payment)" class="invalid-feedback d-block small">
                 {{ 'LOGISTICS.VALIDATIONS.INVOICE_NAME_REQUIRED' | translate }}
@@ -128,10 +128,10 @@
             <td class="text-center">
               <input type="text" class="form-control form-control-sm" [(ngModel)]="payment.personInCharge"
                 (ngModelChange)="onPersonInChargeChange(payment, $event)"
-                [placeholder]="'LOGISTICS.PLACEHOLDERS.NAME' | translate"
-                [disabled]="payment.paymentStatus !== 'PAID'"
+                [placeholder]="'LOGISTICS.PLACEHOLDERS.NAME' | translate" [disabled]="payment.paymentStatus !== 'PAID'"
                 [class.is-invalid]="showValidationErrors && !isPersonInChargeValid(payment)" />
-              <div *ngIf="showValidationErrors && !isPersonInChargeValid(payment)" class="invalid-feedback d-block small">
+              <div *ngIf="showValidationErrors && !isPersonInChargeValid(payment)"
+                class="invalid-feedback d-block small">
                 {{ 'LOGISTICS.VALIDATIONS.PERSON_IN_CHARGE_REQUIRED' | translate }}
               </div>
             </td>
@@ -139,10 +139,12 @@
             <!-- Complete Information -->
             <td class="text-center">
               <span *ngIf="payment.isCompleted" class="badge badge-light-success">
-                <i class="fas fa-check-circle me-1"></i><span translate="LOGISTICS.PAYMENTS.COMPLETE_STATUS.COMPLETE"></span>
+                <i class="fas fa-check-circle me-1"></i><span
+                  translate="LOGISTICS.PAYMENTS.COMPLETE_STATUS.COMPLETE"></span>
               </span>
               <span *ngIf="!payment.isCompleted" class="badge badge-light-warning">
-                <i class="fas fa-exclamation-circle me-1"></i><span translate="LOGISTICS.PAYMENTS.COMPLETE_STATUS.INCOMPLETE"></span>
+                <i class="fas fa-exclamation-circle me-1"></i><span
+                  translate="LOGISTICS.PAYMENTS.COMPLETE_STATUS.INCOMPLETE"></span>
               </span>
             </td>
 
