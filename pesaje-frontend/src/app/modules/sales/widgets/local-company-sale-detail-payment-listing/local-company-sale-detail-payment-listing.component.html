@@ -57,7 +57,7 @@
                   [(ngModel)]="paymentModel.paymentMethod.id" #paymentMethod="ngModel" required>
                   <option value="" disabled selected>Seleccione una opción</option>
                   <option *ngFor="let paymentMethod of paymentMethods" [value]="paymentMethod.id">
-                    {{ paymentMethod.name }}
+                    {{ getPaymentMethodName(paymentMethod) }}
                   </option>
                 </select>
                 <div
@@ -84,9 +84,8 @@
                 <label for="amount" class="required fw-semibold fs-6 mb-2">Monto</label>
                 <div class="input-group">
                   <span class="input-group-text">$</span>
-                  <input type="number" class="form-control" id="amount" name="amount"
-                    [(ngModel)]="paymentModel.amount" (blur)="formatDecimal('amount')"
-                    (keypress)="validateNumber($event)" required #amount="ngModel">
+                  <input type="number" class="form-control" id="amount" name="amount" [(ngModel)]="paymentModel.amount"
+                    (blur)="formatDecimal('amount')" (keypress)="validateNumber($event)" required #amount="ngModel">
                   <div *ngIf="(myForm.submitted || amount.dirty || amount.touched) && amount.errors?.['required']"
                     class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
                     <div>El monto es obligatorio.</div>
@@ -135,4 +134,3 @@
 
   </div>
 </div>
-

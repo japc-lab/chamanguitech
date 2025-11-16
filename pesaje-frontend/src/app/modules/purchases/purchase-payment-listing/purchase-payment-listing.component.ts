@@ -97,9 +97,10 @@ export class PurchasePaymentListingComponent implements OnInit, OnDestroy {
       columns: [
         {
           title: this.translate.instant('PAYMENTS.FIELDS.PAYMENT_TYPE'),
-          data: 'paymentMethod.name',
-          render: function (data) {
-            return data ? data : '-';
+          data: 'paymentMethod',
+          render: (data) => {
+            if (!data) return '-';
+            return this.getPaymentMethodName(data);
           },
         },
         {
@@ -379,6 +380,25 @@ export class PurchasePaymentListingComponent implements OnInit, OnDestroy {
 
   validateNumber(event: KeyboardEvent) {
     this.inputUtils.validateNumber(event);
+  }
+
+  /**
+   * Gets the payment method name based on the current language
+   */
+  getPaymentMethodName(paymentMethod: IPaymentMethodModel): string {
+    if (!paymentMethod || !paymentMethod.name) {
+      return '';
+    }
+
+    const currentLang = this.translate.currentLang || 'es';
+    const lang = currentLang === 'en' ? 'en' : 'es';
+
+    return (
+      paymentMethod.name[lang] ||
+      paymentMethod.name.es ||
+      paymentMethod.name.en ||
+      ''
+    );
   }
 
   ngOnDestroy(): void {

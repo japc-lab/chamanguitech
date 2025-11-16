@@ -25,6 +25,7 @@ import { FormUtilsService } from 'src/app/utils/form-utils.service';
 import { InputUtilsService } from 'src/app/utils/input-utils.service';
 import { PaymentMethodService } from 'src/app/modules/shared/services/payment-method.service';
 import { ICreateUpdateCompanySalePaymentModel } from '../../../shared/interfaces/company-sale-payment.interface';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-company-sale-payment-listing',
@@ -61,9 +62,10 @@ export class CompanySalePaymentListingComponent implements OnInit, OnDestroy {
     columns: [
       {
         title: 'Tipo de Pago',
-        data: 'paymentMethod.name',
-        render: function (data) {
-          return data ? data : '-';
+        data: 'paymentMethod',
+        render: (data) => {
+          if (!data) return '-';
+          return this.getPaymentMethodName(data);
         },
       },
       {
@@ -114,7 +116,8 @@ export class CompanySalePaymentListingComponent implements OnInit, OnDestroy {
     private alertService: AlertService,
     private dateUtils: DateUtilsService,
     private modalService: NgbModal,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -363,6 +366,25 @@ export class CompanySalePaymentListingComponent implements OnInit, OnDestroy {
 
   validateNumber(event: KeyboardEvent) {
     this.inputUtils.validateNumber(event);
+  }
+
+  /**
+   * Gets the payment method name based on the current language
+   */
+  getPaymentMethodName(paymentMethod: IPaymentMethodModel): string {
+    if (!paymentMethod || !paymentMethod.name) {
+      return '';
+    }
+
+    const currentLang = this.translate.currentLang || 'es';
+    const lang = currentLang === 'en' ? 'en' : 'es';
+
+    return (
+      paymentMethod.name[lang] ||
+      paymentMethod.name.es ||
+      paymentMethod.name.en ||
+      ''
+    );
   }
 
   ngOnDestroy(): void {
