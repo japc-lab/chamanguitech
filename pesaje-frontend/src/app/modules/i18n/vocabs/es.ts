@@ -887,6 +887,11 @@ export const locale = {
             SELECT: 'Seleccionar',
             NUMBER: 'Número',
           },
+          PAYMENT_STATUS_OPTIONS: {
+            NO_PAYMENT: 'Sin pagos',
+            PENDING: 'Pendiente',
+            PAID: 'Pagado',
+          },
           VALIDATIONS: {
             PAYMENT_METHOD_REQUIRED: 'Método de pago requerido',
             INVOICE_NUMBER_REQUIRED: 'Número de factura requerido',

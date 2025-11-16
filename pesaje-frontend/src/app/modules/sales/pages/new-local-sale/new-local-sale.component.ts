@@ -3,6 +3,7 @@ import {
   ILocalSaleModel,
   ISaleModel,
   SaleTypeEnum,
+  LocalSaleStatusEnum,
 } from './../../interfaces/sale.interface';
 import {
   ChangeDetectorRef,
@@ -49,6 +50,7 @@ import { LocalCompanySaleDetailPaymentService } from '../../services/local-compa
 export class NewLocalSaleComponent implements OnInit, OnDestroy {
   PERMISSION_ROUTE = PERMISSION_ROUTES.SALES.LOCAL_SALE_FORM;
   SaleStyleEnum = SaleStyleEnum;
+  LocalSaleStatusEnum = LocalSaleStatusEnum;
 
   private modalRef: NgbModalRef | null = null;
 
@@ -80,6 +82,10 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
   companyPaymentTotal: number = 0;
 
   private unsubscribe: Subscription[] = [];
+  /** Stores the form changes subscription */
+  private formChangesSubscription?: Subscription;
+  /** Stores the timeout for delayed autosave */
+  private logTimeout?: any;
 
   /**
    * Public method to refresh company payment total
@@ -172,6 +178,11 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
 
     if (this.saleId) {
       this.loadLocalSaleBySaleId(this.saleId);
+    } else {
+      // Initialize autosave for new local sale (draft mode)
+      setTimeout(() => {
+        this.initializeAutosave();
+      }, 0);
     }
   }
 
@@ -233,6 +244,13 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
           this.purchaseModel = localSale.purchase;
 
           this.cdr.detectChanges();
+
+          // Initialize autosave if loaded sale is in DRAFT status
+          if (this.localSaleModel.status === LocalSaleStatusEnum.DRAFT) {
+            setTimeout(() => {
+              this.initializeAutosave();
+            }, 0);
+          }
         },
         error: (error) => {
           console.error('Error fetching local sale:', error);
@@ -244,7 +262,9 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
   }
 
   initializeModels() {
-    this.localSaleModel = {} as ICreateUpdateLocalSaleModel;
+    this.localSaleModel = {
+      status: LocalSaleStatusEnum.DRAFT,
+    } as ICreateUpdateLocalSaleModel;
     this.localSaleModel.wholeTotalPounds = 0;
 
     // Initialize detail objects as null (will be created when needed)
@@ -260,8 +280,135 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
     this.purchaseModel.shrimpFarm = {} as IReducedShrimpFarmModel;
   }
 
+  /**
+   * Initializes autosave to monitor field changes
+   */
+  private initializeAutosave(): void {
+    if (this.saleForm) {
+      this.formChangesSubscription =
+        this.saleForm.valueChanges?.subscribe((formValue) => {
+          this.autosaveFormFieldChanges(formValue);
+        });
+    }
+  }
+
+  /**
+   * Auto save form changes with a 5-second delay to debounce rapid changes
+   * Saves only when purchase is selected and local sale is new or in DRAFT status
+   */
+  private autosaveFormFieldChanges(formValue: any): void {
+    // Clear existing timeout if it exists
+    if (this.logTimeout) {
+      clearTimeout(this.logTimeout);
+    }
+
+    // Set a new timeout for 5 seconds
+    this.logTimeout = setTimeout(() => {
+      if (this.canSaveAsDraft()) {
+        // Ensure purchase is set
+        this.localSaleModel.purchase = this.purchaseModel.id;
+
+        // Update sale date if present in the form
+        if (formValue.saleDate) {
+          this.localSaleModel.saleDate =
+            this.dateUtils.convertLocalDateToUTC(formValue.saleDate);
+        }
+
+        // Build a clean payload for autosave:
+        // - Remove empty localSaleDetails ([]) so backend optional validators don't fail
+        // - Remove null/undefined localCompanySaleDetail
+        const autosavePayload: ICreateUpdateLocalSaleModel = {
+          ...(this.localSaleModel as ICreateUpdateLocalSaleModel),
+        };
+
+        if (
+          !autosavePayload.localSaleDetails ||
+          autosavePayload.localSaleDetails.length === 0
+        ) {
+          delete (autosavePayload as any).localSaleDetails;
+        }
+
+        if (!autosavePayload.localCompanySaleDetail) {
+          delete (autosavePayload as any).localCompanySaleDetail;
+        }
+
+        if (this.localSaleId) {
+          // Update existing local sale as DRAFT
+          this.localSaleService
+            .updateLocalSale(this.localSaleId, {
+              ...autosavePayload,
+              status: LocalSaleStatusEnum.DRAFT,
+            })
+            .subscribe({
+              next: (response) => {
+                this.localSaleModel.status =
+                  (response as any).status || LocalSaleStatusEnum.DRAFT;
+                this.cdr.detectChanges();
+              },
+              error: (error) => {
+                console.error('Error autosaving local sale (update):', error);
+              },
+            });
+        } else {
+          // Create new local sale as DRAFT
+          this.localSaleService
+            .createLocalSale({
+              ...autosavePayload,
+              status: LocalSaleStatusEnum.DRAFT,
+            })
+            .subscribe({
+              next: (response) => {
+                this.localSaleId = response.id;
+                this.localSaleModel.status =
+                  (response as any).status || LocalSaleStatusEnum.DRAFT;
+
+                // Navigate to edit URL after first draft save if sale reference exists
+                if ((response as any).sale) {
+                  this.saleId = (response as any).sale;
+                  this.router.navigate(['/sales/local', this.saleId]);
+                }
+
+                this.cdr.detectChanges();
+              },
+              error: (error) => {
+                console.error('Error autosaving local sale (create):', error);
+              },
+            });
+        }
+      }
+    }, 5000);
+  }
+
+  /**
+   * Determines if the local sale can be saved as draft
+   * Requires a selected purchase and DRAFT status (or new sale)
+   */
+  private canSaveAsDraft(): boolean {
+    // Require purchase before autosaving
+    if (!this.purchaseModel || !this.purchaseModel.id) {
+      return false;
+    }
+
+    // Allow draft saving for new local sale
+    if (!this.localSaleId) {
+      return true;
+    }
+
+    // Allow draft saving only if current status is DRAFT
+    if (this.localSaleModel.status === LocalSaleStatusEnum.DRAFT) {
+      return true;
+    }
+
+    return false;
+  }
+
   confirmSave() {
-    if (this.saleForm && this.saleForm.invalid) {
+    // Only validate form if status is not DRAFT (drafts can be saved with partial data)
+    if (
+      this.saleForm &&
+      this.localSaleModel.status !== LocalSaleStatusEnum.DRAFT &&
+      this.saleForm.invalid
+    ) {
       // Mark all controls as touched to trigger validation messages
       Object.values(this.saleForm.controls).forEach((control) => {
         control.markAsTouched();
@@ -300,6 +447,11 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
 
     this.alertService.confirm().then((result) => {
       if (result.isConfirmed) {
+        // Unsubscribe from form changes BEFORE making API call to prevent autosave trigger
+        if (this.formChangesSubscription) {
+          this.formChangesSubscription.unsubscribe();
+        }
+
         this.submitLocalSaleForm();
       }
     });
@@ -390,6 +542,14 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
     }
 
     if (this.localSaleId) {
+      // When explicitly saving, transition from DRAFT to CREATED (or keep existing non-draft status)
+      const nextStatus =
+        this.localSaleModel.status === LocalSaleStatusEnum.DRAFT
+          ? LocalSaleStatusEnum.CREATED
+          : this.localSaleModel.status;
+
+      this.localSaleModel.status = nextStatus;
+
       this.localSaleService
         .updateLocalSale(this.localSaleId, this.localSaleModel)
         .subscribe({
@@ -407,6 +567,9 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
           },
         });
     } else {
+      // New local sale: default to CREATED when saving explicitly
+      this.localSaleModel.status = LocalSaleStatusEnum.CREATED;
+
       this.localSaleService.createLocalSale(this.localSaleModel).subscribe({
         next: (response) => {
           this.localSaleId = response.id;
@@ -429,8 +592,24 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
   }
 
   canSaveLocalSale(): boolean {
-    if (this.purchaseModel.id) return false;
-    return true;
+    // Disable button while there is no selected purchase
+    if (!this.saleId) {
+      return !this.purchaseModel.id;
+    }
+
+    // When editing an existing local sale, disable save based on status and role
+    if (this.saleId && this.localSaleModel?.status) {
+      if (this.isOnlyBuyer) {
+        return (
+          this.localSaleModel.status === LocalSaleStatusEnum.COMPLETED ||
+          this.localSaleModel.status === LocalSaleStatusEnum.CLOSED
+        );
+      } else {
+        return this.localSaleModel.status === LocalSaleStatusEnum.CLOSED;
+      }
+    }
+
+    return false;
   }
 
   searchPurchase(): void {
@@ -745,5 +924,15 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.unsubscribe.forEach((sub) => sub.unsubscribe());
+
+    // Unsubscribe from form changes subscription
+    if (this.formChangesSubscription) {
+      this.formChangesSubscription.unsubscribe();
+    }
+
+    // Clear any pending timeout
+    if (this.logTimeout) {
+      clearTimeout(this.logTimeout);
+    }
   }
 }

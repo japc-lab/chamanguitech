@@ -15,6 +15,7 @@ import { SaleStyleEnum } from '../../interfaces/sale.interface';
 import { InputUtilsService } from 'src/app/utils/input-utils.service';
 import { NgModel } from '@angular/forms';
 import { IPaymentMethodModel } from '../../../shared/interfaces/payment-method.interface';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-local-sale-detail',
@@ -30,9 +31,21 @@ export class LocalSaleDetailComponent implements OnInit, OnChanges {
   title = '';
   sizePlaceholder = '';
   paymentStatuses = [
-    { value: 'NO_PAYMENT', label: 'Sin pagos' },
-    { value: 'PENDING', label: 'Pendiente' },
-    { value: 'PAID', label: 'Pagado' },
+    {
+      value: 'NO_PAYMENT',
+      labelKey:
+        'SALES.LOCAL_SALE.DETAIL.PAYMENT_STATUS_OPTIONS.NO_PAYMENT',
+    },
+    {
+      value: 'PENDING',
+      labelKey:
+        'SALES.LOCAL_SALE.DETAIL.PAYMENT_STATUS_OPTIONS.PENDING',
+    },
+    {
+      value: 'PAID',
+      labelKey:
+        'SALES.LOCAL_SALE.DETAIL.PAYMENT_STATUS_OPTIONS.PAID',
+    },
   ];
   invoiceOptions = [
     { value: 'yes', label: 'SÍ' },
@@ -41,7 +54,8 @@ export class LocalSaleDetailComponent implements OnInit, OnChanges {
   ];
 
   constructor(
-    private inputUtils: InputUtilsService
+    private inputUtils: InputUtilsService,
+    private translate: TranslateService
   ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -50,10 +64,16 @@ export class LocalSaleDetailComponent implements OnInit, OnChanges {
       this.localSaleDetail.style = this.style;
 
       // Ensure default values for optional fields
-      if (this.localSaleDetail.retentionPercentage === undefined || this.localSaleDetail.retentionPercentage === null) {
+      if (
+        this.localSaleDetail.retentionPercentage === undefined ||
+        this.localSaleDetail.retentionPercentage === null
+      ) {
         this.localSaleDetail.retentionPercentage = 0;
       }
-      if (this.localSaleDetail.otherPenalties === undefined || this.localSaleDetail.otherPenalties === null) {
+      if (
+        this.localSaleDetail.otherPenalties === undefined ||
+        this.localSaleDetail.otherPenalties === null
+      ) {
         this.localSaleDetail.otherPenalties = 0;
       }
 
@@ -76,10 +96,16 @@ export class LocalSaleDetailComponent implements OnInit, OnChanges {
       this.localSaleDetail.style = this.style;
 
       // Ensure default values for optional fields
-      if (this.localSaleDetail.retentionPercentage === undefined || this.localSaleDetail.retentionPercentage === null) {
+      if (
+        this.localSaleDetail.retentionPercentage === undefined ||
+        this.localSaleDetail.retentionPercentage === null
+      ) {
         this.localSaleDetail.retentionPercentage = 0;
       }
-      if (this.localSaleDetail.otherPenalties === undefined || this.localSaleDetail.otherPenalties === null) {
+      if (
+        this.localSaleDetail.otherPenalties === undefined ||
+        this.localSaleDetail.otherPenalties === null
+      ) {
         this.localSaleDetail.otherPenalties = 0;
       }
 
@@ -266,6 +292,25 @@ export class LocalSaleDetailComponent implements OnInit, OnChanges {
     const payment1 = Number(item.paymentOne) || 0;
     const payment2 = Number(item.paymentTwo) || 0;
     return Number((payment1 + payment2).toFixed(2));
+  }
+
+  /**
+   * Gets the payment method name based on the current language
+   */
+  getPaymentMethodName(paymentMethod: IPaymentMethodModel): string {
+    if (!paymentMethod || !paymentMethod.name) {
+      return '';
+    }
+
+    const currentLang = this.translate.currentLang || 'es';
+    const lang = currentLang === 'en' ? 'en' : 'es';
+
+    return (
+      paymentMethod.name[lang] ||
+      paymentMethod.name.es ||
+      paymentMethod.name.en ||
+      ''
+    );
   }
 
   emitChanges(): void {

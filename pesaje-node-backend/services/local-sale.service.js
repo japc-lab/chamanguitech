@@ -89,8 +89,12 @@ const create = async (data) => {
             invoiceNumber,
             invoiceName,
             localSaleDetails,
-            localCompanySaleDetail
+            localCompanySaleDetail,
+            status: inputStatus
         } = data;
+
+        // Determine initial status - default to CREATED for backward compatibility
+        const initialStatus = inputStatus || LocalSaleStatusEnum.CREATED;
 
         // 🔍 Validate referenced Purchase
         const purchaseExists = await dbAdapter.purchaseAdapter.getById(purchase);
@@ -141,18 +145,21 @@ const create = async (data) => {
         }
 
         // 📦 Create Sale document
+        // Use purchase's weightSheetNumber or fallback to 'DRAFT' to satisfy Sale model requirement
+        const effectiveWeightSheetNumber = weightSheetNumber || purchaseExists.weightSheetNumber || 'DRAFT';
+
         const sale = await dbAdapter.saleAdapter.create({
             purchase,
             saleDate,
-            weightSheetNumber,
+            weightSheetNumber: effectiveWeightSheetNumber,
             type: SaleTypeEnum.LOCAL
         }, { session: transaction.session });
 
-        // Create local sale first with default CREATED status
-        // We'll update it after creating company detail if needed
+        // Create local sale first with initial status (CREATED by default or provided)
+        // We'll update it after creating company detail if needed (for non-DRAFT statuses)
         const localSale = await dbAdapter.localSaleAdapter.create({
             sale: sale.id,
-            status: LocalSaleStatusEnum.CREATED, // Initial status, will be updated after company detail
+            status: initialStatus,
             wholeTotalPounds,
             moneyIncomeForRejectedHeads,
             wholeRejectedPounds,
@@ -228,23 +235,25 @@ const create = async (data) => {
             }, { session: transaction.session });
         }
 
-        // Now recalculate status with all details created (including company detail ID)
-        const createdLocalSaleDetailList = await dbAdapter.localSaleDetailAdapter.getAllWithRelations(
-            { localSale: localSale.id, deletedAt: null },
-            [{ path: 'items' }]
-        );
+        // For non-DRAFT statuses, recalculate status with all details created (including company detail ID)
+        if (initialStatus !== LocalSaleStatusEnum.DRAFT) {
+            const createdLocalSaleDetailList = await dbAdapter.localSaleDetailAdapter.getAllWithRelations(
+                { localSale: localSale.id, deletedAt: null },
+                [{ path: 'items' }]
+            );
 
-        const finalStatus = await determineLocalSaleStatus(
-            createdLocalSaleDetailList,
-            createdCompanySaleDetailId, // Use the created company detail ID (not from localSale object)
-            localCompanySaleDetail?.netGrandTotal || 0
-        );
+            const finalStatus = await determineLocalSaleStatus(
+                createdLocalSaleDetailList,
+                createdCompanySaleDetailId, // Use the created company detail ID (not from localSale object)
+                localCompanySaleDetail?.netGrandTotal || 0
+            );
 
-        // Update status if it changed from initial CREATED
-        if (finalStatus !== LocalSaleStatusEnum.CREATED) {
-            await dbAdapter.localSaleAdapter.update(localSale.id, {
-                status: finalStatus
-            }, { session: transaction.session });
+            // Update status if it changed from initial
+            if (finalStatus !== initialStatus) {
+                await dbAdapter.localSaleAdapter.update(localSale.id, {
+                    status: finalStatus
+                }, { session: transaction.session });
+            }
         }
 
         await transaction.commit();
@@ -432,6 +441,11 @@ const getBySaleId = async (saleId) => {
 };
 
 const update = async (id, data) => {
+    // Allow status-only updates (e.g., switching to/from DRAFT) similar to company-sale.service
+    if (Object.keys(data).length === 1 && data.status) {
+        return await updateStatus(id, data.status);
+    }
+
     let transaction;
 
     try {
@@ -442,7 +456,7 @@ const update = async (id, data) => {
         const sale = await dbAdapter.saleAdapter.getById(existingLocalSale.sale);
         if (!sale) throw new Error('Associated Sale not found');
 
-        const { saleDate, wholeTotalPounds, moneyIncomeForRejectedHeads, wholeRejectedPounds, trashPounds, totalProcessedPounds, grandTotal, seller, weightSheetNumber, hasInvoice, invoiceNumber, invoiceName, localSaleDetails, localCompanySaleDetail } = data;
+        const { saleDate, wholeTotalPounds, moneyIncomeForRejectedHeads, wholeRejectedPounds, trashPounds, totalProcessedPounds, grandTotal, seller, weightSheetNumber, hasInvoice, invoiceNumber, invoiceName, localSaleDetails, localCompanySaleDetail, status: inputStatus } = data;
 
         // 🔍 Validate local sale details if provided
         if (localSaleDetails && localSaleDetails.length > 0) {
@@ -626,9 +640,14 @@ const update = async (id, data) => {
             localCompanySaleDetail?.netGrandTotal || 0
         );
 
+        // Respect explicit DRAFT status if requested; otherwise use calculated status
+        const finalStatus = inputStatus === LocalSaleStatusEnum.DRAFT
+            ? LocalSaleStatusEnum.DRAFT
+            : updatedStatus;
+
         // Update local sale
         const updatedLocalSale = await dbAdapter.localSaleAdapter.update(id, {
-            status: updatedStatus,
+            status: finalStatus,
             wholeTotalPounds,
             moneyIncomeForRejectedHeads,
             wholeRejectedPounds,
@@ -678,6 +697,11 @@ const recalculateAndUpdateStatus = async (localSaleId, session = null) => {
         const localSale = await dbAdapter.localSaleAdapter.getById(localSaleId);
         if (!localSale) throw new Error('Local Sale not found');
 
+        // If sale is in DRAFT, keep it there regardless of payments
+        if (localSale.status === LocalSaleStatusEnum.DRAFT) {
+            return LocalSaleStatusEnum.DRAFT;
+        }
+
         // Get local sale details with items
         const localSaleDetailList = await dbAdapter.localSaleDetailAdapter.getAllWithRelations(
             { localSale: localSaleId, deletedAt: null },
@@ -716,4 +740,20 @@ const recalculateAndUpdateStatus = async (localSaleId, session = null) => {
     }
 };
 
-module.exports = { create, getBySaleId, update, recalculateAndUpdateStatus };
+/**
+ * Updates only the status field of a local sale
+ * Similar to company-sale.service updateStatus
+ * @param {String} id - Local sale ID
+ * @param {String} status - New status
+ */
+const updateStatus = async (id, status) => {
+    const existingLocalSale = await dbAdapter.localSaleAdapter.getById(id);
+    if (!existingLocalSale) {
+        throw new Error('Local Sale not found');
+    }
+
+    const updatedLocalSale = await dbAdapter.localSaleAdapter.update(id, { status });
+    return updatedLocalSale;
+};
+
+module.exports = { create, getBySaleId, update, recalculateAndUpdateStatus, updateStatus };

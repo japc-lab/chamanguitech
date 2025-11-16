@@ -96,6 +96,7 @@ export interface ICreateUpdateLocalSaleModel {
   invoiceNumber?: string;
   invoiceName?: string;
   weightSheetNumber?: string;
+   status?: LocalSaleStatusEnum;
 }
 
 export interface ILocalSaleModel {
@@ -115,6 +116,7 @@ export interface ILocalSaleModel {
   hasInvoice: 'yes' | 'no' | 'not-applicable';
   invoiceNumber?: string;
   invoiceName?: string;
+  status?: LocalSaleStatusEnum;
 }
 
 export enum SaleTypeEnum {
@@ -129,6 +131,14 @@ export enum SaleStyleEnum {
 }
 
 export enum CompanySaleStatusEnum {
+  DRAFT = 'DRAFT',
+  CREATED = 'CREATED',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+  CLOSED = 'CLOSED',
+}
+
+export enum LocalSaleStatusEnum {
   DRAFT = 'DRAFT',
   CREATED = 'CREATED',
   IN_PROGRESS = 'IN_PROGRESS',
