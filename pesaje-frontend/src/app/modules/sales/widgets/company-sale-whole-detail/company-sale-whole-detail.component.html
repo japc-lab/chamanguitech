@@ -28,42 +28,49 @@
         <div class="card-body">
           <div class="row g-3">
             <div class="col-md-4">
-              <label for="wholeBatch" class="required fw-semibold fs-6 mb-2" translate="SALES.COMPANY_SALE.WHOLE_DETAIL.FIELDS.BATCH"></label>
+              <label for="wholeBatch" class="required fw-semibold fs-6 mb-2"
+                translate="SALES.COMPANY_SALE.WHOLE_DETAIL.FIELDS.BATCH"></label>
               <input type="text" id="wholeBatch" name="wholeBatch" [(ngModel)]="wholeDetail.batch"
                 class="form-control form-control-sm" required />
             </div>
 
             <div class="col-md-4">
-              <label for="wholeSettleDate" class="required fw-semibold fs-6 mb-2" translate="SALES.COMPANY_SALE.WHOLE_DETAIL.FIELDS.SETTLE_DATE"></label>
+              <label for="wholeSettleDate" class="required fw-semibold fs-6 mb-2"
+                translate="SALES.COMPANY_SALE.WHOLE_DETAIL.FIELDS.SETTLE_DATE"></label>
               <input type="date" id="wholeSettleDate" name="wholeSettleDate" [(ngModel)]="wholeDetail.settleDate"
                 class="form-control form-control-sm" required />
             </div>
 
             <div class="col-md-4">
-              <label for="wholePredominantSize" class="required fw-semibold fs-6 mb-2" translate="SALES.COMPANY_SALE.WHOLE_DETAIL.FIELDS.PREDOMINANT_SIZE"></label>
+              <label for="wholePredominantSize" class="required fw-semibold fs-6 mb-2"
+                translate="SALES.COMPANY_SALE.WHOLE_DETAIL.FIELDS.PREDOMINANT_SIZE"></label>
               <select [(ngModel)]="wholeDetail.predominantSize" name="wholePredominantSize" id="wholePredominantSize"
                 class="form-select form-select-sm" required>
-                <option value="" disabled selected>{{ 'SALES.COMPANY_SALE.PLACEHOLDERS.SELECT_OPTION' | translate }}</option>
+                <option value="" disabled selected>{{ 'SALES.COMPANY_SALE.PLACEHOLDERS.SELECT_OPTION' | translate }}
+                </option>
                 <option *ngFor="let size of wholeSizes" [value]="size.size">{{ size.size }}</option>
               </select>
             </div>
 
             <div class="col-md-4">
-              <label for="totalWholePounds" class="required fw-semibold fs-6 mb-2" translate="SALES.COMPANY_SALE.WHOLE_DETAIL.FIELDS.TOTAL_WHOLE_POUNDS_PROCESSED"></label>
+              <label for="totalWholePounds" class="required fw-semibold fs-6 mb-2"
+                translate="SALES.COMPANY_SALE.WHOLE_DETAIL.FIELDS.TOTAL_WHOLE_POUNDS_PROCESSED"></label>
               <input type="number" id="totalWholePounds" name="totalWholePounds"
                 [(ngModel)]="wholeDetail.totalWholePoundsProcessed" class="form-control form-control-sm"
                 (keypress)="validateNumber($event)" (blur)="formatDecimal('totalWholePounds')" required />
             </div>
 
             <div class="col-md-4">
-              <label for="totalTrashPounds" class="required fw-semibold fs-6 mb-2" translate="SALES.COMPANY_SALE.WHOLE_DETAIL.FIELDS.TOTAL_TRASH_POUNDS"></label>
+              <label for="totalTrashPounds" class="required fw-semibold fs-6 mb-2"
+                translate="SALES.COMPANY_SALE.WHOLE_DETAIL.FIELDS.TOTAL_TRASH_POUNDS"></label>
               <input type="number" id="totalTrashPounds" name="totalTrashPounds"
                 [(ngModel)]="wholeDetail.totalTrashPounds" class="form-control form-control-sm"
                 (keypress)="validateNumber($event)" (blur)="formatDecimal('totalTrashPounds')" required />
             </div>
 
             <div class="col-md-4">
-              <label for="averagePrice" class="fw-semibold fs-6 mb-2" translate="SALES.COMPANY_SALE.WHOLE_DETAIL.FIELDS.AVERAGE_PRICE"></label>
+              <label for="averagePrice" class="fw-semibold fs-6 mb-2"
+                translate="SALES.COMPANY_SALE.WHOLE_DETAIL.FIELDS.AVERAGE_PRICE"></label>
               <div class="input-group input-group-sm">
                 <span class="input-group-text">$</span>
                 <input type="text" id="averagePrice" name="averagePrice"
@@ -109,7 +116,8 @@
             </tr>
             <tr *ngFor="let item of wholeDetail.items; let itemIndex = index">
               <td class="text-center">
-                <span class="badge badge-light-primary" translate="SALES.COMPANY_SALE.WHOLE_DETAIL.TABLE.WHOLE_BADGE"></span>
+                <span class="badge badge-light-primary"
+                  translate="SALES.COMPANY_SALE.WHOLE_DETAIL.TABLE.WHOLE_BADGE"></span>
               </td>
 
               <td>
@@ -120,7 +128,8 @@
               <td>
                 <select [(ngModel)]="item.size" name="wholeSize{{ itemIndex }}"
                   (ngModelChange)="onSizeChange(item, $event)" class="form-select form-select-sm">
-                  <option value="" disabled selected>{{ 'SALES.COMPANY_SALE.PLACEHOLDERS.SELECT_OPTION' | translate }}</option>
+                  <option value="" disabled selected>{{ 'SALES.COMPANY_SALE.PLACEHOLDERS.SELECT_OPTION' | translate }}
+                  </option>
                   <option *ngFor="let size of wholeSizes" [value]="size.size">{{ size.size }}</option>
                 </select>
               </td>
@@ -130,7 +139,8 @@
               </td>
 
               <td class="text-center">
-                <select [(ngModel)]="item.unit" name="wholeUnit{{ itemIndex }}" class="form-select form-select-sm">
+                <select [(ngModel)]="item.unit" name="wholeUnit{{ itemIndex }}" class="form-select form-select-sm"
+                  (ngModelChange)="onUnitChange()">
                   <option value="lb">lb</option>
                   <option value="kg">kg</option>
                 </select>
@@ -166,7 +176,8 @@
             <!-- Subtotals by Class -->
             <ng-container *ngFor="let className of getUniqueClasses()">
               <tr class="fw-bold bg-light">
-                <td class="text-end" colspan="5">{{ 'SALES.COMPANY_SALE.WHOLE_DETAIL.SUBTOTAL_CLASS' | translate }} {{ className }}</td>
+                <td class="text-end" colspan="5">{{ 'SALES.COMPANY_SALE.WHOLE_DETAIL.SUBTOTAL_CLASS' | translate }} {{
+                  className }}</td>
                 <td class="text-end">{{ getClassSubtotal(className).amount | number: '1.2-2' }}</td>
                 <td></td>
                 <td class="text-end">${{ getClassSubtotal(className).total | number: '1.2-2' }}</td>

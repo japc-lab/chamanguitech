@@ -6,67 +6,67 @@ const CompanySaleSchema = Schema({
   sale: {
     type: Schema.Types.ObjectId,
     ref: 'Sale',
-    required: true
+    required: function () { return this.status !== 'DRAFT'; }
   },
   batch: {
     type: String,
-    required: true
+    required: function () { return this.status !== 'DRAFT'; }
   },
   provider: {
     type: String,
-    required: true
+    required: function () { return this.status !== 'DRAFT'; }
   },
   receptionDate: {
     type: Date,
-    required: true,
+    required: function () { return this.status !== 'DRAFT'; },
   },
   settleDate: {
     type: Date,
-    required: true,
+    required: function () { return this.status !== 'DRAFT'; },
   },
   predominantSize: {
     type: String,
-    required: true,
+    required: function () { return this.status !== 'DRAFT'; },
   },
   wholeReceivedPounds: {
     type: Number,
-    required: true,
+    required: function () { return this.status !== 'DRAFT'; },
   },
   trashPounds: {
     type: Number,
-    required: true,
+    required: function () { return this.status !== 'DRAFT'; },
   },
   netReceivedPounds: {
     type: Number,
-    required: true,
+    required: function () { return this.status !== 'DRAFT'; },
   },
   processedPounds: {
     type: Number,
-    required: true,
+    required: function () { return this.status !== 'DRAFT'; },
   },
   performance: {
     type: Number,
-    required: true,
+    required: function () { return this.status !== 'DRAFT'; },
   },
   poundsGrandTotal: {
     type: Number,
-    required: true,
+    required: function () { return this.status !== 'DRAFT'; },
     min: 0
   },
   grandTotal: {
     type: Number,
-    required: true,
+    required: function () { return this.status !== 'DRAFT'; },
     min: 0
   },
   percentageTotal: {
     type: Number,
-    required: true,
+    required: function () { return this.status !== 'DRAFT'; },
     min: 0
   },
   status: {
     type: String,
     enum: CompanySaleStatusEnum,
-    required: true,
+    required: false,
   },
   wholeDetail: {
     type: Schema.Types.ObjectId,
@@ -78,21 +78,21 @@ const CompanySaleSchema = Schema({
   },
   summaryPoundsReceived: {
     type: Number,
-    required: true,
+    required: function () { return this.status !== 'DRAFT'; },
     min: 0
   },
   summaryPerformancePercentage: {
     type: Number,
-    required: true,
+    required: function () { return this.status !== 'DRAFT'; },
   },
   summaryRetentionPercentage: {
     type: Number,
-    required: true,
+    required: function () { return this.status !== 'DRAFT'; },
     min: 0
   },
   summaryAdditionalPenalty: {
     type: Number,
-    required: true,
+    required: function () { return this.status !== 'DRAFT'; },
     min: 0
   },
   deletedAt: {

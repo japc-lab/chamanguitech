@@ -615,6 +615,7 @@ export const locale = {
     SALES: {
       TITLE: 'Ventas',
       STATUS: {
+        DRAFT: 'Borrador',
         NO_PAYMENTS: 'Sin pagos',
         IN_PROGRESS: 'Pendiente',
         COMPLETED: 'Pagado',
@@ -764,7 +765,7 @@ export const locale = {
           GRAND_TOTAL: 'Total General',
         },
         UNITS_CONVERSION: {
-          TITLE: 'Resumen por Clase y Talla',
+          TITLE: 'Tabla de conversión de unidades',
           TABLE: {
             CLASS: 'Clase',
             SIZE: 'Talla',

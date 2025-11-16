@@ -179,8 +179,20 @@ export class CompanySaleWholeDetailComponent implements OnInit {
     }
   }
 
+  onUnitChange(): void {
+    this.emitChanges();
+  }
+
   emitChanges(): void {
-    this.wholeDetailChange.emit(this.wholeDetail);
+    if (this.wholeDetail) {
+      const clonedDetail: ICompanySaleWholeDetailModel = {
+        ...this.wholeDetail,
+        items: [...this.wholeDetail.items],
+      };
+      this.wholeDetailChange.emit(clonedDetail);
+    } else {
+      this.wholeDetailChange.emit(null);
+    }
   }
 
   // Get unique classes from items

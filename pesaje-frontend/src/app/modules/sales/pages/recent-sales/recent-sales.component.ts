@@ -40,7 +40,7 @@ export class RecentSalesComponent implements OnInit, OnDestroy {
 
   controlNumber = '';
 
-  datatableConfig: Config;
+  datatableConfig: Config = {} as Config;
 
   constructor(
     private authService: AuthService,
@@ -52,28 +52,24 @@ export class RecentSalesComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.initiliazeDatatable();
-    this.isOnlyBuyer = this.authService.isOnlyBuyer;
-    this.loadRecentSales();
+    this.initializeDatatableConfig();
 
     // Subscribe to language changes and reinitialize datatable config with new translations
     const langSub = this.translate.onLangChange.subscribe(() => {
-      this.initiliazeDatatable();
+      this.initializeDatatableConfig();
       this.cdr.detectChanges();
     });
     this.unsubscribe.push(langSub);
+
+    this.isOnlyBuyer = this.authService.isOnlyBuyer;
+    this.loadRecentSales();
   }
 
-  initiliazeDatatable() {
+  // 🔹 Initialize DataTable Configuration with Translations
+  initializeDatatableConfig(): void {
     // Preserve existing data when reinitializing (e.g., during language change)
     const currentData = this.datatableConfig?.data || [];
-
-    // Get translated status labels
-    const statusNoPayments = this.translate.instant('SALES.STATUS.NO_PAYMENTS');
-    const statusInProgress = this.translate.instant('SALES.STATUS.IN_PROGRESS');
-    const statusCompleted = this.translate.instant('SALES.STATUS.COMPLETED');
-    const statusClosed = this.translate.instant('SALES.STATUS.CLOSED');
-    const statusUnknown = this.translate.instant('SALES.STATUS.UNKNOWN');
+    const translate = this.translate;
 
     // Get translated sale types
     const typeCompany = this.translate.instant('SALES.TYPE.COMPANY');
@@ -99,32 +95,41 @@ export class RecentSalesComponent implements OnInit, OnDestroy {
           },
         },
         {
-          title: this.translate.instant('SALES.RECENT_SALES.TABLE.STATUS'),
+          title: this.translate.instant(
+            'SALES.RECENT_SALES.TABLE.STATUS'
+          ),
           data: 'status',
-          render: function (data, type: any, full: any) {
+          render: function (data: CompanySaleStatusEnum, type: any) {
             if (type === 'sort') {
-              if (data === CompanySaleStatusEnum.CREATED) return 1; // No payments
-              if (data === null) return 2; // Empty / No status
-              if (data === CompanySaleStatusEnum.IN_PROGRESS) return 3; // Pending
-              if (data === CompanySaleStatusEnum.COMPLETED) return 4; // Paid
-              if (data === CompanySaleStatusEnum.CLOSED) return 5; // Closed
-              return 6; // Unknown
+              switch (data) {
+                case CompanySaleStatusEnum.DRAFT:
+                  return 1;
+                case CompanySaleStatusEnum.CREATED:
+                  return 2;
+                case CompanySaleStatusEnum.IN_PROGRESS:
+                  return 3;
+                case CompanySaleStatusEnum.COMPLETED:
+                  return 4;
+                case CompanySaleStatusEnum.CLOSED:
+                  return 6;
+                default:
+                  return 99;
+              }
             } else {
               switch (data) {
+                case CompanySaleStatusEnum.DRAFT:
+                  return `<span class="badge bg-secondary">${translate.instant('SALES.STATUS.DRAFT')}</span>`;
                 case CompanySaleStatusEnum.CREATED:
-                  return `<span class="badge bg-secondary">${statusNoPayments}</span>`;
+                  return `<span class="badge bg-info text-light">${translate.instant('SALES.STATUS.NO_PAYMENTS')}</span>`;
                 case CompanySaleStatusEnum.IN_PROGRESS:
-                  return `<span class="badge bg-warning text-dark">${statusInProgress}</span>`;
+                  return `<span class="badge bg-warning text-dark">${translate.instant('SALES.STATUS.IN_PROGRESS')}</span>`;
                 case CompanySaleStatusEnum.COMPLETED:
-                  return `<span class="badge bg-success">${statusCompleted}</span>`;
+                  return `<span class="badge bg-success">${translate.instant('SALES.STATUS.COMPLETED')}</span>`;
                 case CompanySaleStatusEnum.CLOSED:
-                  return `<span class="badge bg-danger">${statusClosed}</span>`;
+                  return `<span class="badge bg-danger">${translate.instant('SALES.STATUS.CLOSED')}</span>`;
                 default:
-                  if (full.type === SaleTypeEnum.COMPANY) {
-                    return `<span class="badge bg-light text-dark">${statusUnknown}</span>`;
-                  }
+                  return `<span class="badge bg-light text-dark">${translate.instant('SALES.STATUS.UNKNOWN')}</span>`;
               }
-              return '-';
             }
           },
         },

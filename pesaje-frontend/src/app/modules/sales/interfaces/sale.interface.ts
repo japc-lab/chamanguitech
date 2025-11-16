@@ -129,6 +129,7 @@ export enum SaleStyleEnum {
 }
 
 export enum CompanySaleStatusEnum {
+  DRAFT = 'DRAFT',
   CREATED = 'CREATED',
   IN_PROGRESS = 'IN_PROGRESS',
   COMPLETED = 'COMPLETED',

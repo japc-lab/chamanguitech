@@ -36,7 +36,7 @@
           </tr>
 
           <!-- Total Row -->
-          <tr class="bg-success text-white" *ngIf="summaryData.length > 0">
+          <tr class="bg-success text-white total-row" *ngIf="summaryData.length > 0">
             <td colspan="2" class="text-end fw-bold py-3 ps-4" translate="SALES.COMPANY_SALE.UNITS_CONVERSION.TABLE.TOTAL">
             </td>
             <td class="text-end fw-bold py-3">{{ totalSummary.quantityKg | number: '1.2-2' }}</td>

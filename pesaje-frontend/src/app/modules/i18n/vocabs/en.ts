@@ -608,6 +608,7 @@ export const locale = {
     SALES: {
       TITLE: 'Sales',
       STATUS: {
+        DRAFT: 'Draft',
         NO_PAYMENTS: 'No payments',
         IN_PROGRESS: 'Pending',
         COMPLETED: 'Paid',
@@ -754,7 +755,7 @@ export const locale = {
           GRAND_TOTAL: 'Grand Total',
         },
         UNITS_CONVERSION: {
-          TITLE: 'Summary by Class and Size',
+          TITLE: 'Units Conversion Table',
           TABLE: {
             CLASS: 'Class',
             SIZE: 'Size',
@@ -1368,10 +1369,14 @@ export const locale = {
           UPDATE_ERROR: 'Error updating asset.',
         },
         HELP: {
-          TOTAL_COST: 'This field is automatically calculated: Unit Cost × Units',
-          PAYMENT_STATUS: 'This field is automatically calculated based on paid amount vs total cost',
-          PENDING_AMOUNT: 'This field is automatically calculated: Total Cost - Paid Amount',
-          ACTIVE_STATUS: 'Check this option to activate the asset, uncheck to deactivate it',
+          TOTAL_COST:
+            'This field is automatically calculated: Unit Cost × Units',
+          PAYMENT_STATUS:
+            'This field is automatically calculated based on paid amount vs total cost',
+          PENDING_AMOUNT:
+            'This field is automatically calculated: Total Cost - Paid Amount',
+          ACTIVE_STATUS:
+            'Check this option to activate the asset, uncheck to deactivate it',
         },
         VALIDATIONS: {
           NAME_REQUIRED: 'Asset name is required.',

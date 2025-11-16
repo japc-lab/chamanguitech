@@ -44,21 +44,28 @@
 
   tbody tr {
     transition: background-color 0.15s ease-in-out;
+  }
 
-    &:hover:not(:last-child) {
-      background-color: #f8f9fa;
+  // Regular rows hover
+  tbody tr:hover:not(.total-row) {
+    background-color: #f8f9fa;
+  }
+
+  // Total row: keep Bootstrap table variables green so hover never turns it gray/white
+  tbody tr.total-row {
+    --bs-table-bg: #198754;
+    --bs-table-hover-bg: #198754;
+    color: #fff;
+
+    > td {
+      background-color: #198754;
+      color: #fff;
     }
 
-    &:last-child {
-      &:hover {
-        background-color: #198754 !important;
-      }
-
-      td {
-        border-bottom: none;
-        font-size: 0.9rem;
-        letter-spacing: 0.025em;
-      }
+    td {
+      border-bottom: none;
+      font-size: 0.9rem;
+      letter-spacing: 0.025em;
     }
   }
 
