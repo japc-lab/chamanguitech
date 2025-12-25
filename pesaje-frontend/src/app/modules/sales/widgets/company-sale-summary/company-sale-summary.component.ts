@@ -61,7 +61,6 @@ export class CompanySaleSummaryComponent implements OnChanges {
     this.grandTotal = wholeSubtotal + tailSubtotal;
 
     // Calculate average purchase price
-    console.log('purchaseModel', this.purchaseModel);
     const poundsBought = this.purchaseModel?.totalPounds || 0;
     if (poundsBought > 0) {
       this.averagePurchasePrice =
