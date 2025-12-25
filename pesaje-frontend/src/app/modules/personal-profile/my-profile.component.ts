@@ -5,9 +5,10 @@ import { UserService } from '../settings/services/user.service';
 import { AuthService } from '../auth/services/auth.service';
 
 @Component({
-  selector: 'app-my-profile',
-  templateUrl: './my-profile.component.html',
-  styleUrls: ['./my-profile.component.scss'],
+    selector: 'app-my-profile',
+    templateUrl: './my-profile.component.html',
+    styleUrls: ['./my-profile.component.scss'],
+    standalone: false
 })
 export class MyProfileComponent implements OnInit, OnDestroy {
   user: UserModel | undefined;

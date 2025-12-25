@@ -8,8 +8,9 @@ import { IReadSizeModel, SizeTypeEnum } from '../../../interfaces/size.interface
 import { SizeService } from '../../../services/size.service';
 
 @Component({
-  selector: 'app-residual-table',
-  templateUrl: './residual-table.component.html'
+    selector: 'app-residual-table',
+    templateUrl: './residual-table.component.html',
+    standalone: false
 })
 export class ResidualTableComponent {
  @Input() sizePrices: IReadSizePriceModel[] = [];

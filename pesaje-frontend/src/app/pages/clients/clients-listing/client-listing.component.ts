@@ -26,8 +26,9 @@ import { DateUtilsService } from 'src/app/utils/date-utils.service';
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({
-  selector: 'app-client-listing',
-  templateUrl: './client-listing.component.html',
+    selector: 'app-client-listing',
+    templateUrl: './client-listing.component.html',
+    standalone: false
 })
 export class ClientListingComponent
   implements OnInit, AfterViewInit, OnDestroy

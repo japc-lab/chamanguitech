@@ -48,9 +48,10 @@ import { CompanySaleTailDetailComponent } from '../../widgets/company-sale-tail-
 import { CompanySaleSummaryComponent } from '../../widgets/company-sale-summary/company-sale-summary.component';
 
 @Component({
-  selector: 'app-new-company-sale',
-  templateUrl: './new-company-sale.component.html',
-  styleUrl: './new-company-sale.component.scss',
+    selector: 'app-new-company-sale',
+    templateUrl: './new-company-sale.component.html',
+    styleUrl: './new-company-sale.component.scss',
+    standalone: false
 })
 export class NewCompanySaleComponent
   implements OnInit, AfterViewInit, OnDestroy

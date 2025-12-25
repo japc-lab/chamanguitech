@@ -5,9 +5,10 @@ import { PeriodService } from 'src/app/modules/shared/services/period.service';
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({
-  selector: 'app-company-best-prices',
-  templateUrl: './company-best-prices.component.html',
-  styleUrl: './company-best-prices.component.scss',
+    selector: 'app-company-best-prices',
+    templateUrl: './company-best-prices.component.html',
+    styleUrl: './company-best-prices.component.scss',
+    standalone: false
 })
 export class CompanyBestPricesComponent {
   periods: string[] = [];

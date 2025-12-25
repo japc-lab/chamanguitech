@@ -43,9 +43,10 @@ import { PaymentMethodService } from '../../../shared/services/payment-method.se
 import { LocalCompanySaleDetailPaymentService } from '../../services/local-company-sale-detail-payment.service';
 
 @Component({
-  selector: 'app-new-local-sale',
-  templateUrl: './new-local-sale.component.html',
-  styleUrl: './new-local-sale.component.scss',
+    selector: 'app-new-local-sale',
+    templateUrl: './new-local-sale.component.html',
+    styleUrl: './new-local-sale.component.scss',
+    standalone: false
 })
 export class NewLocalSaleComponent implements OnInit, OnDestroy {
   PERMISSION_ROUTE = PERMISSION_ROUTES.SALES.LOCAL_SALE_FORM;

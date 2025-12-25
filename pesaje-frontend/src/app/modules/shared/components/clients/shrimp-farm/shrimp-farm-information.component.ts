@@ -28,8 +28,9 @@ import { IReadUserModel } from 'src/app/modules/settings/interfaces/user.interfa
 import { AlertService } from 'src/app/utils/alert.service';
 
 @Component({
-  selector: 'app-shrimp-farm-information',
-  templateUrl: './shrimp-farm-information.component.html',
+    selector: 'app-shrimp-farm-information',
+    templateUrl: './shrimp-farm-information.component.html',
+    standalone: false
 })
 export class ShrimpFarmInformationComponent
   implements OnInit, AfterViewInit, OnChanges, OnDestroy

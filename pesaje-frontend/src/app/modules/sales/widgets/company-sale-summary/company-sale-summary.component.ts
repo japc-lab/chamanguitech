@@ -14,9 +14,10 @@ import { InputUtilsService } from 'src/app/utils/input-utils.service';
 import { FormUtilsService } from 'src/app/utils/form-utils.service';
 
 @Component({
-  selector: 'app-company-sale-summary',
-  templateUrl: './company-sale-summary.component.html',
-  styleUrls: ['./company-sale-summary.component.scss'],
+    selector: 'app-company-sale-summary',
+    templateUrl: './company-sale-summary.component.html',
+    styleUrls: ['./company-sale-summary.component.scss'],
+    standalone: false
 })
 export class CompanySaleSummaryComponent implements OnChanges {
   @Input() purchaseModel: IReducedDetailedPurchaseModel | null = null;

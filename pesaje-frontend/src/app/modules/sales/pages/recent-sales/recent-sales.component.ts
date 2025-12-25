@@ -21,9 +21,10 @@ import { AlertService } from 'src/app/utils/alert.service';
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({
-  selector: 'app-recent-sales',
-  templateUrl: './recent-sales.component.html',
-  styleUrl: './recent-sales.component.scss',
+    selector: 'app-recent-sales',
+    templateUrl: './recent-sales.component.html',
+    styleUrl: './recent-sales.component.scss',
+    standalone: false
 })
 export class RecentSalesComponent implements OnInit, OnDestroy {
   PERMISSION_ROUTE = PERMISSION_ROUTES.SALES.RECENT_SALES;

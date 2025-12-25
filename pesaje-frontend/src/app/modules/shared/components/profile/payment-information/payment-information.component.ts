@@ -22,8 +22,9 @@ import { ActivatedRoute, ROUTES } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({
-  selector: 'app-payment-information',
-  templateUrl: './payment-information.component.html',
+    selector: 'app-payment-information',
+    templateUrl: './payment-information.component.html',
+    standalone: false
 })
 export class PaymentInformationComponent
   implements OnInit, AfterViewInit, OnChanges, OnDestroy

@@ -16,9 +16,10 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { LocalCompanySaleDetailPaymentListingComponent } from '../local-company-sale-detail-payment-listing/local-company-sale-detail-payment-listing.component';
 
 @Component({
-  selector: 'app-local-company-sale-detail',
-  templateUrl: './local-company-sale-detail.component.html',
-  styleUrls: ['./local-company-sale-detail.component.scss'],
+    selector: 'app-local-company-sale-detail',
+    templateUrl: './local-company-sale-detail.component.html',
+    styleUrls: ['./local-company-sale-detail.component.scss'],
+    standalone: false
 })
 export class LocalCompanySaleDetailComponent implements OnInit {
   @Input() localCompanySaleDetail: ILocalCompanySaleDetailModel | null = null;

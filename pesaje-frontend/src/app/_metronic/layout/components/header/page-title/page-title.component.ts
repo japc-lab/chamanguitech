@@ -4,8 +4,9 @@ import { PageInfoService, PageLink } from '../../../core/page-info.service';
 import { TranslationService } from 'src/app/modules/i18n/translation.service';
 
 @Component({
-  selector: 'app-page-title',
-  templateUrl: './page-title.component.html',
+    selector: 'app-page-title',
+    templateUrl: './page-title.component.html',
+    standalone: false
 })
 export class PageTitleComponent implements OnInit, OnDestroy {
   private unsubscribe: Subscription[] = [];

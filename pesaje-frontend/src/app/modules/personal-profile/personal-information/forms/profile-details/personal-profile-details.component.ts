@@ -16,8 +16,9 @@ import { IUpdateUserModel } from 'src/app/modules/settings/interfaces/user.inter
 import { AlertService } from 'src/app/utils/alert.service';
 
 @Component({
-  selector: 'app-personal-profile-details',
-  templateUrl: './personal-profile-details.component.html',
+    selector: 'app-personal-profile-details',
+    templateUrl: './personal-profile-details.component.html',
+    standalone: false
 })
 export class PersonalProfileDetailsComponent implements OnInit, OnDestroy {
   @ViewChild('profileForm') profileForm!: NgForm;

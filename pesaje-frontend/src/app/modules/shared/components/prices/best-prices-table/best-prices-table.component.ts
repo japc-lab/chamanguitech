@@ -3,9 +3,10 @@ import { SizeTypeEnum } from '../../../interfaces/size.interface';
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({
-  selector: 'app-best-prices-table',
-  templateUrl: './best-prices-table.component.html',
-  styleUrl: './best-prices-table.component.scss',
+    selector: 'app-best-prices-table',
+    templateUrl: './best-prices-table.component.html',
+    styleUrl: './best-prices-table.component.scss',
+    standalone: false
 })
 export class BestPricesTableComponent implements OnInit {
   @Input() typeSize: any;

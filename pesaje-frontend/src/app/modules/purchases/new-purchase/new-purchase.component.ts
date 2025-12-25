@@ -42,9 +42,10 @@ import { FishermanService } from '../../settings/services/fisherman.service';
 type Tabs = 'Details' | 'Payment Info';
 
 @Component({
-  selector: 'app-new-purchase',
-  templateUrl: './new-purchase.component.html',
-  styleUrls: ['./new-purchase.component.scss'],
+    selector: 'app-new-purchase',
+    templateUrl: './new-purchase.component.html',
+    styleUrls: ['./new-purchase.component.scss'],
+    standalone: false
 })
 export class NewPurchaseComponent implements OnInit, OnDestroy {
   PERMISSION_ROUTE = PERMISSION_ROUTES.PURCHASES.PURCHASE_FORM;

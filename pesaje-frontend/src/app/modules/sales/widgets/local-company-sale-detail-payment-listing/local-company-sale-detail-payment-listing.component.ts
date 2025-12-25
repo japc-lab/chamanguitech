@@ -30,9 +30,10 @@ import { LocalCompanySaleDetailPaymentService } from '../../services/local-compa
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({
-  selector: 'app-local-company-sale-detail-payment-listing',
-  templateUrl: './local-company-sale-detail-payment-listing.component.html',
-  styleUrls: ['./local-company-sale-detail-payment-listing.component.scss'],
+    selector: 'app-local-company-sale-detail-payment-listing',
+    templateUrl: './local-company-sale-detail-payment-listing.component.html',
+    styleUrls: ['./local-company-sale-detail-payment-listing.component.scss'],
+    standalone: false
 })
 export class LocalCompanySaleDetailPaymentListingComponent
   implements OnInit, OnDestroy

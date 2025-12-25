@@ -10,9 +10,10 @@ import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 
 @Component({
-  selector: 'app-logistics-items-listing',
-  templateUrl: './logistics-items-listing.component.html',
-  styleUrl: './logistics-items-listing.component.scss',
+    selector: 'app-logistics-items-listing',
+    templateUrl: './logistics-items-listing.component.html',
+    styleUrl: './logistics-items-listing.component.scss',
+    standalone: false
 })
 export class LogisticsItemsListingComponent implements OnInit, OnChanges, OnDestroy {
   @Input() title: string = '';

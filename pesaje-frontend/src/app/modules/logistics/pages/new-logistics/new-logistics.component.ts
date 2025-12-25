@@ -34,9 +34,10 @@ import { InputUtilsService } from 'src/app/utils/input-utils.service';
 import { ILogisticsPaymentModel } from '../../interfaces/logistics-payment.interface';
 
 @Component({
-  selector: 'app-new-logistics',
-  templateUrl: './new-logistics.component.html',
-  styleUrl: './new-logistics.component.scss',
+    selector: 'app-new-logistics',
+    templateUrl: './new-logistics.component.html',
+    styleUrl: './new-logistics.component.scss',
+    standalone: false
 })
 export class NewLogisticsComponent implements OnInit, OnDestroy {
   PERMISSION_ROUTE = PERMISSION_ROUTES.LOGISTICS.LOGISTICS_FORM;

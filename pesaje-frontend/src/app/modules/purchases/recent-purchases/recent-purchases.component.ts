@@ -25,9 +25,10 @@ import { CompanyService } from '../../settings/services/company.service';
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({
-  selector: 'app-recent-purchases',
-  templateUrl: './recent-purchases.component.html',
-  styleUrl: './recent-purchases.component.scss',
+    selector: 'app-recent-purchases',
+    templateUrl: './recent-purchases.component.html',
+    styleUrl: './recent-purchases.component.scss',
+    standalone: false
 })
 export class RecentPurchasesComponent implements OnInit {
   PERMISSION_ROUTE = PERMISSION_ROUTES.PURCHASES.RECENT_PRUCHASES;

@@ -4,9 +4,10 @@ import { ICompany } from '../../interfaces/company.interfaces';
 import { Observable } from 'rxjs';
 
 @Component({
-  selector: 'app-company-prices',
-  templateUrl: './company-prices.component.html',
-  styleUrls: ['./company-prices.component.scss'],
+    selector: 'app-company-prices',
+    templateUrl: './company-prices.component.html',
+    styleUrls: ['./company-prices.component.scss'],
+    standalone: false
 })
 export class CompanyPricesComponent implements OnInit {
   companies: ICompany[] = [];

@@ -2,7 +2,8 @@ import { Directive, Input, TemplateRef, ViewContainerRef } from '@angular/core';
 import { PermissionService } from '../modules/shared/services/permission.service';
 
 @Directive({
-  selector: '[appCanDelete]',
+    selector: '[appCanDelete]',
+    standalone: false
 })
 export class CanDeleteDirective {
   private route: string;

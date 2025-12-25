@@ -25,9 +25,10 @@ import { UserService } from 'src/app/modules/settings/services/user.service';
 type Tabs = 'Details' | 'Payment Info';
 
 @Component({
-  selector: 'app-broker-details',
-  templateUrl: './broker-details.component.html',
-  styleUrls: ['./broker-details.component.scss'],
+    selector: 'app-broker-details',
+    templateUrl: './broker-details.component.html',
+    styleUrls: ['./broker-details.component.scss'],
+    standalone: false
 })
 export class BrokerDetailsComponent
   implements OnInit, AfterViewInit, OnDestroy

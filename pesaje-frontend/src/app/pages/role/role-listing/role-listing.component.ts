@@ -8,9 +8,10 @@ import { DataTablesResponse, IRoleModel, RoleService } from 'src/app/_fake/servi
 import { SweetAlertOptions } from 'sweetalert2';
 
 @Component({
-  selector: 'app-role-listing',
-  templateUrl: './role-listing.component.html',
-  styleUrls: ['./role-listing.component.scss']
+    selector: 'app-role-listing',
+    templateUrl: './role-listing.component.html',
+    styleUrls: ['./role-listing.component.scss'],
+    standalone: false
 })
 export class RoleListingComponent implements OnInit, AfterViewInit, OnDestroy {
 

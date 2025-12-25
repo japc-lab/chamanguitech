@@ -10,8 +10,9 @@ import { Router } from '@angular/router';
 type Tabs = 'New Company' | 'Details';
 
 @Component({
-  selector: 'app-new-company',
-  templateUrl: './new-company.component.html',
+    selector: 'app-new-company',
+    templateUrl: './new-company.component.html',
+    standalone: false
 })
 export class NewCompanyComponent implements OnInit, OnDestroy {
   PERMISSION_ROUTE = PERMISSION_ROUTES.SETTINGS.COMPANIES;

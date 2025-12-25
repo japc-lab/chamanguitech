@@ -4,9 +4,10 @@ import { IPermissionModel } from 'src/app/modules/auth/interfaces/permission.int
 import { TranslationService } from 'src/app/modules/i18n/translation.service';
 
 @Component({
-  selector: 'app-sidebar-dynamic-menu',
-  templateUrl: './sidebar-dynamic-menu.component.html',
-  styleUrls: ['./sidebar-dynamic-menu.component.scss'],
+    selector: 'app-sidebar-dynamic-menu',
+    templateUrl: './sidebar-dynamic-menu.component.html',
+    styleUrls: ['./sidebar-dynamic-menu.component.scss'],
+    standalone: false
 })
 export class SidebarDynamicMenuComponent implements OnInit {
   @Input() menuOptions: IPermissionModel[];

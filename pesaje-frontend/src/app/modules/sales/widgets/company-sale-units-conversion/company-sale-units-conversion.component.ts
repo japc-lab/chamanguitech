@@ -2,9 +2,10 @@ import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { ICompanySaleWholeDetailModel } from '../../interfaces/company-sale-whole-detail.interface';
 
 @Component({
-  selector: 'app-company-sale-units-conversion',
-  templateUrl: './company-sale-units-conversion.component.html',
-  styleUrls: ['./company-sale-units-conversion.component.scss'],
+    selector: 'app-company-sale-units-conversion',
+    templateUrl: './company-sale-units-conversion.component.html',
+    styleUrls: ['./company-sale-units-conversion.component.scss'],
+    standalone: false
 })
 export class CompanySaleUnitsConversionComponent implements OnChanges {
   @Input() wholeDetail: ICompanySaleWholeDetailModel | null = null;

@@ -2,7 +2,8 @@ import { Directive, Input, TemplateRef, ViewContainerRef } from '@angular/core';
 import { PermissionService } from '../modules/shared/services/permission.service';
 
 @Directive({
-  selector: '[appCanRead]',
+    selector: '[appCanRead]',
+    standalone: false
 })
 export class CanReadDirective {
   private route: string;

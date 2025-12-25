@@ -14,9 +14,10 @@ import { AuthService } from 'src/app/modules/auth';
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({
-  selector: 'app-economic-report',
-  templateUrl: './economic-report.component.html',
-  styleUrl: './economic-report.component.scss',
+    selector: 'app-economic-report',
+    templateUrl: './economic-report.component.html',
+    styleUrl: './economic-report.component.scss',
+    standalone: false
 })
 export class EconomicReportComponent implements OnInit, OnDestroy {
   PERMISSION_ROUTE = PERMISSION_ROUTES.REPORTS.ECONOMIC;

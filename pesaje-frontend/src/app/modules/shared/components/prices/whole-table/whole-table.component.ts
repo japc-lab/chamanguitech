@@ -18,8 +18,9 @@ import { FormUtilsService } from 'src/app/utils/form-utils.service';
 import { InputUtilsService } from 'src/app/utils/input-utils.service';
 
 @Component({
-  selector: 'app-whole-table',
-  templateUrl: './whole-table.component.html',
+    selector: 'app-whole-table',
+    templateUrl: './whole-table.component.html',
+    standalone: false
 })
 export class WholeTableComponent implements OnInit, OnChanges, OnDestroy {
   @Input() sizePrices: IReadSizePriceModel[] = [];

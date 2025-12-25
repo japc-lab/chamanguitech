@@ -19,9 +19,10 @@ import { Observable, Subscription } from 'rxjs';
 type Tabs = 'Details' | 'Payment Info';
 
 @Component({
-  selector: 'app-fisherman-details',
-  templateUrl: './fisherman-details.component.html',
-  styleUrls: ['./fisherman-details.component.scss'],
+    selector: 'app-fisherman-details',
+    templateUrl: './fisherman-details.component.html',
+    styleUrls: ['./fisherman-details.component.scss'],
+    standalone: false
 })
 export class FishermanDetailsComponent
   implements OnInit, AfterViewInit, OnDestroy

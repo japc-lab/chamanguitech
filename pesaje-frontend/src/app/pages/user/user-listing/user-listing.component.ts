@@ -9,9 +9,10 @@ import { IRoleModel, RoleService } from 'src/app/_fake/services/role.service';
 import { Config } from 'datatables.net';
 
 @Component({
-  selector: 'app-user-listing',
-  templateUrl: './user-listing.component.html',
-  styleUrls: ['./user-listing.component.scss']
+    selector: 'app-user-listing',
+    templateUrl: './user-listing.component.html',
+    styleUrls: ['./user-listing.component.scss'],
+    standalone: false
 })
 export class UserListingComponent implements OnInit, AfterViewInit, OnDestroy {
 
