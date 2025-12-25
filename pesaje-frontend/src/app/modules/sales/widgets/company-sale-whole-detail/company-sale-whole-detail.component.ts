@@ -23,9 +23,10 @@ import { IReadPeriodModel } from 'src/app/modules/shared/interfaces/period.inter
 import { ICompanySaleWholeDetailModel } from '../../interfaces/company-sale-whole-detail.interface';
 
 @Component({
-  selector: 'app-company-sale-whole-detail',
-  templateUrl: './company-sale-whole-detail.component.html',
-  styleUrls: ['./company-sale-whole-detail.component.scss'],
+    selector: 'app-company-sale-whole-detail',
+    templateUrl: './company-sale-whole-detail.component.html',
+    styleUrls: ['./company-sale-whole-detail.component.scss'],
+    standalone: false
 })
 export class CompanySaleWholeDetailComponent implements OnInit, OnChanges {
   @Input() wholeDetail: ICompanySaleWholeDetailModel | null = null;

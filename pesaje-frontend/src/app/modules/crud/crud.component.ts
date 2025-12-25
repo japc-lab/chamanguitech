@@ -28,9 +28,10 @@ import { PermissionService } from '../shared/services/permission.service';
 import { TranslateService, LangChangeEvent } from '@ngx-translate/core';
 
 @Component({
-  selector: 'app-crud',
-  templateUrl: './crud.component.html',
-  styleUrls: ['./crud.component.scss'],
+    selector: 'app-crud',
+    templateUrl: './crud.component.html',
+    styleUrls: ['./crud.component.scss'],
+    standalone: false
 })
 export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() datatableConfig: Config = {};

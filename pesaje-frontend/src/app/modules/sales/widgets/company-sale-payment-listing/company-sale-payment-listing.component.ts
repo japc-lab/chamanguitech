@@ -28,9 +28,10 @@ import { ICreateUpdateCompanySalePaymentModel } from '../../../shared/interfaces
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({
-  selector: 'app-company-sale-payment-listing',
-  templateUrl: './company-sale-payment-listing.component.html',
-  styleUrls: ['./company-sale-payment-listing.component.scss'],
+    selector: 'app-company-sale-payment-listing',
+    templateUrl: './company-sale-payment-listing.component.html',
+    styleUrls: ['./company-sale-payment-listing.component.scss'],
+    standalone: false
 })
 export class CompanySalePaymentListingComponent implements OnInit, OnDestroy {
   PERMISSION_ROUTE = PERMISSION_ROUTES.SALES.COMPANY_SALE_FORM;

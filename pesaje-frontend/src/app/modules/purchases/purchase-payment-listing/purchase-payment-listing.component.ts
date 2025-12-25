@@ -30,9 +30,10 @@ import { DateUtilsService } from 'src/app/utils/date-utils.service';
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({
-  selector: 'app-purchase-payment-listing',
-  templateUrl: './purchase-payment-listing.component.html',
-  styleUrls: ['./purchase-payment-listing.component.scss'],
+    selector: 'app-purchase-payment-listing',
+    templateUrl: './purchase-payment-listing.component.html',
+    styleUrls: ['./purchase-payment-listing.component.scss'],
+    standalone: false
 })
 export class PurchasePaymentListingComponent implements OnInit, OnDestroy {
   PERMISSION_ROUTE = PERMISSION_ROUTES.PURCHASES.PURCHASE_FORM;

@@ -7,9 +7,10 @@ import { AuthService } from 'src/app/modules/auth';
 import { IPermissionModel } from 'src/app/modules/auth/interfaces/permission.interface';
 
 @Component({
-  selector: 'app-sidebar',
-  templateUrl: './sidebar.component.html',
-  styleUrls: ['./sidebar.component.scss'],
+    selector: 'app-sidebar',
+    templateUrl: './sidebar.component.html',
+    styleUrls: ['./sidebar.component.scss'],
+    standalone: false
 })
 export class SidebarComponent implements OnInit, OnDestroy {
   private unsubscribe: Subscription[] = [];

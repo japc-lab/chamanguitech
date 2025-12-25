@@ -6,8 +6,9 @@ import { AuthService } from '../../auth/services/auth.service'; // import AuthSe
 import { Observable } from 'rxjs';
 
 @Component({
-  selector: 'app-personal-information',
-  templateUrl: './personal-information.component.html',
+    selector: 'app-personal-information',
+    templateUrl: './personal-information.component.html',
+    standalone: false
 })
 export class PersonalInformationComponent implements OnInit {
   PERMISSION_ROUTE = PERMISSION_ROUTES.PERSONAL_PROFILE.MY_PROFILE;

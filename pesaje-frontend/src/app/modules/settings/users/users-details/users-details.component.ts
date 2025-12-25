@@ -24,8 +24,9 @@ import { AlertService } from 'src/app/utils/alert.service';
 type Tabs = 'Details' | 'Payment Info';
 
 @Component({
-  selector: 'app-user-details',
-  templateUrl: './users-details.component.html',
+    selector: 'app-user-details',
+    templateUrl: './users-details.component.html',
+    standalone: false
 })
 export class UsersDetailsComponent implements OnInit, AfterViewInit, OnDestroy {
   PERMISSION_ROUTE = PERMISSION_ROUTES.SETTINGS.PEOPLE;

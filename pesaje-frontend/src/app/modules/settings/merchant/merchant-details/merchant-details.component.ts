@@ -22,9 +22,10 @@ import { Observable, Subscription } from 'rxjs';
 type Tabs = 'Details' | 'Payment Info';
 
 @Component({
-  selector: 'app-merchant-details',
-  templateUrl: './merchant-details.component.html',
-  styleUrls: ['./merchant-details.component.scss'],
+    selector: 'app-merchant-details',
+    templateUrl: './merchant-details.component.html',
+    styleUrls: ['./merchant-details.component.scss'],
+    standalone: false
 })
 export class MerchantDetailsComponent
   implements OnInit, AfterViewInit, OnDestroy

@@ -24,8 +24,9 @@ import {
 import { DateUtilsService } from 'src/app/utils/date-utils.service';
 
 @Component({
-  selector: 'app-assets-listing',
-  templateUrl: './assets-listing.component.html',
+    selector: 'app-assets-listing',
+    templateUrl: './assets-listing.component.html',
+    standalone: false
 })
 export class AssetsListingComponent implements OnInit, OnDestroy {
   PERMISSION_ROUTE = PERMISSION_ROUTES.SETTINGS.ASSETS;

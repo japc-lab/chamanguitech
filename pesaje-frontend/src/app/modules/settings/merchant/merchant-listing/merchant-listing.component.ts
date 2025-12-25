@@ -24,8 +24,9 @@ import { DateUtilsService } from 'src/app/utils/date-utils.service';
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({
-  selector: 'app-merchant-listing',
-  templateUrl: './merchant-listing.component.html',
+    selector: 'app-merchant-listing',
+    templateUrl: './merchant-listing.component.html',
+    standalone: false
 })
 export class MerchantListingComponent implements OnInit, AfterViewInit, OnDestroy {
   PERMISSION_ROUTE = PERMISSION_ROUTES.SETTINGS.PEOPLE;

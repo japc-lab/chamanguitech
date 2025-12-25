@@ -18,9 +18,10 @@ import { IPaymentMethodModel } from '../../../shared/interfaces/payment-method.i
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({
-  selector: 'app-local-sale-detail',
-  templateUrl: './local-sale-detail.component.html',
-  styleUrls: ['./local-sale-detail.component.scss'],
+    selector: 'app-local-sale-detail',
+    templateUrl: './local-sale-detail.component.html',
+    styleUrls: ['./local-sale-detail.component.scss'],
+    standalone: false
 })
 export class LocalSaleDetailComponent implements OnInit, OnChanges {
   @Input() style: SaleStyleEnum;

@@ -2,7 +2,8 @@ import { Directive, Input, TemplateRef, ViewContainerRef } from '@angular/core';
 import { PermissionService } from '../modules/shared/services/permission.service';
 
 @Directive({
-  selector: '[appCanEdit]',
+    selector: '[appCanEdit]',
+    standalone: false
 })
 export class CanEditDirective {
   private route: string;

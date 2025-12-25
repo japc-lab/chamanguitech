@@ -23,9 +23,10 @@ import { IReadPeriodModel } from 'src/app/modules/shared/interfaces/period.inter
 import { ICompanySaleTailDetailModel } from '../../interfaces/company-sale-tail-detail.interface';
 
 @Component({
-  selector: 'app-company-sale-tail-detail',
-  templateUrl: './company-sale-tail-detail.component.html',
-  styleUrls: ['./company-sale-tail-detail.component.scss'],
+    selector: 'app-company-sale-tail-detail',
+    templateUrl: './company-sale-tail-detail.component.html',
+    styleUrls: ['./company-sale-tail-detail.component.scss'],
+    standalone: false
 })
 export class CompanySaleTailDetailComponent implements OnInit, OnChanges {
   @Input() tailDetail: ICompanySaleTailDetailModel | null = null;

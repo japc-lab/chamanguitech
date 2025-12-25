@@ -25,8 +25,9 @@ import { AuthService } from 'src/app/modules/auth';
 type Tabs = 'Details' | 'Shrimp Farms' | 'Payment Info';
 
 @Component({
-  selector: 'app-client-details',
-  templateUrl: './client-details.component.html',
+    selector: 'app-client-details',
+    templateUrl: './client-details.component.html',
+    standalone: false
 })
 export class ClientDetailsComponent
   implements OnInit, AfterViewInit, OnDestroy

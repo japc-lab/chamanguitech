@@ -15,9 +15,10 @@ import {
 } from '../../interfaces/total-report.interface';
 
 @Component({
-  selector: 'app-total-report',
-  templateUrl: './total-report.component.html',
-  styleUrl: './total-report.component.scss',
+    selector: 'app-total-report',
+    templateUrl: './total-report.component.html',
+    styleUrl: './total-report.component.scss',
+    standalone: false
 })
 export class TotalReportComponent implements OnInit, OnDestroy {
   PERMISSION_ROUTE = PERMISSION_ROUTES.REPORTS.TOTAL;

@@ -18,9 +18,10 @@ import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 
 @Component({
-  selector: 'app-logistics-payments-tracking',
-  templateUrl: './logistics-payments-tracking.component.html',
-  styleUrls: ['./logistics-payments-tracking.component.scss'],
+    selector: 'app-logistics-payments-tracking',
+    templateUrl: './logistics-payments-tracking.component.html',
+    styleUrls: ['./logistics-payments-tracking.component.scss'],
+    standalone: false
 })
 export class LogisticsPaymentsTrackingComponent
   implements OnInit, OnChanges, OnDestroy

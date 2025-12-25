@@ -26,8 +26,9 @@ import { DateUtilsService } from 'src/app/utils/date-utils.service';
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({
-  selector: 'app-broker-listing',
-  templateUrl: './users-listing.component.html',
+    selector: 'app-broker-listing',
+    templateUrl: './users-listing.component.html',
+    standalone: false
 })
 export class UsersListingComponent implements OnInit, AfterViewInit, OnDestroy {
   PERMISSION_ROUTE = PERMISSION_ROUTES.SETTINGS.PEOPLE;

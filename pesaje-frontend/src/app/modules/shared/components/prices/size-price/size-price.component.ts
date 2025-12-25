@@ -34,8 +34,9 @@ import { ICompany } from 'src/app/modules/settings/interfaces/company.interfaces
 import { CompanyService } from 'src/app/modules/settings/services/company.service';
 
 @Component({
-  selector: 'app-size-price',
-  templateUrl: './size-price.component.html',
+    selector: 'app-size-price',
+    templateUrl: './size-price.component.html',
+    standalone: false
 })
 export class SizePriceComponent implements OnInit, OnDestroy {
   PERMISSION_ROUTE = PERMISSION_ROUTES.PRICES.BY_COMPANY;

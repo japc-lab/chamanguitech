@@ -2,8 +2,9 @@ import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { BehaviorSubject, Subscription } from 'rxjs';
 
 @Component({
-  selector: 'app-sign-in-method',
-  templateUrl: './sign-in-method.component.html',
+    selector: 'app-sign-in-method',
+    templateUrl: './sign-in-method.component.html',
+    standalone: false
 })
 export class SignInMethodComponent implements OnInit, OnDestroy {
   showChangeEmailForm: boolean = false;

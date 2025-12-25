@@ -2,8 +2,9 @@ import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { BehaviorSubject, Subscription } from 'rxjs';
 
 @Component({
-  selector: 'app-profile-details',
-  templateUrl: './profile-details.component.html',
+    selector: 'app-profile-details',
+    templateUrl: './profile-details.component.html',
+    standalone: false
 })
 export class ProfileDetailsComponent implements OnInit, OnDestroy {
   isLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);

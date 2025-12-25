@@ -2,7 +2,8 @@ import { Directive, Input, TemplateRef, ViewContainerRef } from '@angular/core';
 import { PermissionService } from '../modules/shared/services/permission.service';
 
 @Directive({
-  selector: '[appCanCreate]',
+    selector: '[appCanCreate]',
+    standalone: false
 })
 export class CanCreateDirective {
   private route: string;

@@ -24,8 +24,9 @@ import { DateUtilsService } from 'src/app/utils/date-utils.service';
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({
-  selector: 'app-fisherman-listing',
-  templateUrl: './fisherman-listing.component.html',
+    selector: 'app-fisherman-listing',
+    templateUrl: './fisherman-listing.component.html',
+    standalone: false
 })
 export class FishermanListingComponent implements OnInit, AfterViewInit, OnDestroy {
   PERMISSION_ROUTE = PERMISSION_ROUTES.SETTINGS.PEOPLE;

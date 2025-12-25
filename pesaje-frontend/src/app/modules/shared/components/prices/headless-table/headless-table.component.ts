@@ -18,8 +18,9 @@ import { FormUtilsService } from 'src/app/utils/form-utils.service';
 import { InputUtilsService } from 'src/app/utils/input-utils.service';
 
 @Component({
-  selector: 'app-headless-table',
-  templateUrl: './headless-table.component.html',
+    selector: 'app-headless-table',
+    templateUrl: './headless-table.component.html',
+    standalone: false
 })
 export class HeadlessTableComponent implements OnInit, OnChanges, OnDestroy {
   SizeTypeEnum = SizeTypeEnum;

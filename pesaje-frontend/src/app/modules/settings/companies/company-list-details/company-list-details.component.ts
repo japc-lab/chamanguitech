@@ -8,9 +8,10 @@ import { FormUtilsService } from '../../../../utils/form-utils.service';
 import { InputUtilsService } from 'src/app/utils/input-utils.service';
 
 @Component({
-  selector: 'app-company-list-details',
-  templateUrl: './company-list-details.component.html',
-  styleUrls: ['./company-list-details.component.scss'],
+    selector: 'app-company-list-details',
+    templateUrl: './company-list-details.component.html',
+    styleUrls: ['./company-list-details.component.scss'],
+    standalone: false
 })
 export class CompanyListDetailsComponent implements OnInit {
   @ViewChild('companyForm') companyForm!: NgForm;

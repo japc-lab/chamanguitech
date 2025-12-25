@@ -29,7 +29,7 @@ export class AlertService {
       },
     };
 
-    return Swal.fire({ ...defaultOptions, ...options });
+    return Swal.fire({ ...defaultOptions, ...options } as SweetAlertOptions);
   }
 
   /**

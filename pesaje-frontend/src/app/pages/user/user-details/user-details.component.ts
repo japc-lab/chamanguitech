@@ -3,9 +3,10 @@ import { ActivatedRoute } from '@angular/router';
 import { IUserModel, UserService } from 'src/app/_fake/services/user-service';
 
 @Component({
-  selector: 'app-user-details',
-  templateUrl: './user-details.component.html',
-  styleUrls: ['./user-details.component.scss']
+    selector: 'app-user-details',
+    templateUrl: './user-details.component.html',
+    styleUrls: ['./user-details.component.scss'],
+    standalone: false
 })
 export class UserDetailsComponent implements OnInit, AfterViewInit {
 

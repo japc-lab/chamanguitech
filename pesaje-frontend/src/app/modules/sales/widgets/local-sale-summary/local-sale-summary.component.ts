@@ -8,9 +8,10 @@ import {
 } from '../../interfaces/sale.interface';
 
 @Component({
-  selector: 'app-local-sale-summary',
-  templateUrl: './local-sale-summary.component.html',
-  styleUrls: ['./local-sale-summary.component.scss'],
+    selector: 'app-local-sale-summary',
+    templateUrl: './local-sale-summary.component.html',
+    styleUrls: ['./local-sale-summary.component.scss'],
+    standalone: false
 })
 export class LocalSaleSummaryComponent implements OnChanges, DoCheck {
   @Input() purchaseModel: IReducedDetailedPurchaseModel | null = null;

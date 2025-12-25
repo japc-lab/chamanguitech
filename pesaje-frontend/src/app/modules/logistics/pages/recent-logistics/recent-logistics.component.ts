@@ -20,9 +20,10 @@ import { PurchaseStatusEnum } from 'src/app/modules/purchases/interfaces/purchas
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({
-  selector: 'app-recent-logistics',
-  templateUrl: './recent-logistics.component.html',
-  styleUrl: './recent-logistics.component.scss',
+    selector: 'app-recent-logistics',
+    templateUrl: './recent-logistics.component.html',
+    styleUrl: './recent-logistics.component.scss',
+    standalone: false
 })
 export class RecentLogisticsComponent implements OnInit {
   PERMISSION_ROUTE = PERMISSION_ROUTES.LOGISTICS.RECENT_LOGISTICS;

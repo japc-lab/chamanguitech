@@ -26,9 +26,10 @@ import { DateUtilsService } from 'src/app/utils/date-utils.service';
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({
-  selector: 'app-broker-listing',
-  templateUrl: './broker-listing.component.html',
-  styleUrls: ['./broker-listing.component.scss'],
+    selector: 'app-broker-listing',
+    templateUrl: './broker-listing.component.html',
+    styleUrls: ['./broker-listing.component.scss'],
+    standalone: false
 })
 export class BrokerListingComponent
   implements OnInit, AfterViewInit, OnDestroy

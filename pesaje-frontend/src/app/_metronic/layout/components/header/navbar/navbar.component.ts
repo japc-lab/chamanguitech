@@ -10,9 +10,10 @@ import { AuthService, UserModel } from 'src/app/modules/auth';
 import { Subscription } from 'rxjs';
 
 @Component({
-  selector: 'app-navbar',
-  templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.scss'],
+    selector: 'app-navbar',
+    templateUrl: './navbar.component.html',
+    styleUrls: ['./navbar.component.scss'],
+    standalone: false
 })
 export class NavbarComponent implements OnInit, AfterViewInit {
   @Input() appHeaderDefaulMenuDisplay: boolean;
