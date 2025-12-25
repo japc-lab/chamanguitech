@@ -42,8 +42,8 @@ $primary-inverse-dark: 				$white !default;
 $secondary-dark: 					$gray-300-dark !default;
 $secondary-active-dark: 			$gray-400-dark !default;
 $secondary-light-dark: 				$gray-300-dark !default;
-$secondary-clarity-dark:			rgba($gray-300-dark, 0.2) !default; 
-$secondary-inverse-dark:			$white !default; 
+$secondary-clarity-dark:			rgba($gray-300-dark, 0.2) !default;
+$secondary-inverse-dark:			$white !default;
 
 // Light colors
 $light-dark: 						$gray-100-dark !default;
@@ -53,28 +53,28 @@ $light-clarity-dark: 				rgba(31, 33, 42, 0.20) !default;
 $light-inverse-dark:				$gray-600-dark !default;
 
 // Success colors
-$success-dark: 						#00A261 !default; 
+$success-dark: 						#00A261 !default;
 $success-active-dark: 				#01BF73 !default;
 $success-light-dark: 				#1F212A !default;
 $success-clarity-dark: 				rgba(#00A261, 0.2) !default;
 $success-inverse-dark: 				$white !default;
 
 // Info colors
-$info-dark: 						#883FFF !default; 
+$info-dark: 						#883FFF !default;
 $info-active-dark: 					#9E63FF !default;
 $info-light-dark: 					#272134 !default;
 $info-clarity-dark: 				rgba(#883FFF, 0.2) !default;
 $info-inverse-dark: 				$white !default;
 
 // Warning colors
-$warning-dark: 						#C59A00 !default; 
+$warning-dark: 						#C59A00 !default;
 $warning-active-dark: 				#D9AA00 !default;
 $warning-light-dark: 				#242320 !default;
 $warning-clarity-dark: 				rgba(#C59A00, 0.2) !default;
 $warning-inverse-dark: 				$white !default;
 
 // Danger colors
-$danger-dark: 						#E42855 !default; 
+$danger-dark: 						#E42855 !default;
 $danger-active-dark: 				#FF3767 !default;
 $danger-light-dark: 				#302024 !default;
 $danger-clarity-dark: 				rgba(#E42855, 0.2) !default;
@@ -98,7 +98,7 @@ $theme-colors-dark: (
 	"danger": $danger-dark,
 	"dark": $dark-dark
 ) !default;
-	
+
 // Contextual active state colors
 $theme-active-colors-dark: (
 	"primary": $primary-active-dark,
@@ -109,7 +109,7 @@ $theme-active-colors-dark: (
 	"warning": $warning-active-dark,
 	"danger":  $danger-active-dark,
 	"dark":    $dark-active-dark
-) !default; 
+) !default;
 
 // Contextual inverse state colors
 $theme-inverse-colors-dark: (
@@ -121,7 +121,7 @@ $theme-inverse-colors-dark: (
 	"warning": $warning-inverse-dark,
 	"danger":  $danger-inverse-dark,
 	"dark":    $dark-inverse-dark
-) !default; 
+) !default;
 
 // Contextual light state colors
 $theme-light-colors-dark: (
@@ -133,7 +133,7 @@ $theme-light-colors-dark: (
 	"danger":  $danger-light-dark,
 	"dark":    $dark-light-dark,
 	"light":   $light-light-dark
-) !default; 
+) !default;
 
 // Contextual light state colors
 $theme-clarity-colors-dark: (
@@ -145,7 +145,7 @@ $theme-clarity-colors-dark: (
 	"danger":  $danger-clarity-dark,
 	"dark":    $dark-clarity-dark,
 	"light":   $light-clarity-dark,
-) !default; 
+) !default;
 
 // Text colors
 $theme-text-colors-dark: (
@@ -168,7 +168,7 @@ $theme-text-colors-dark: (
 	"gray-700":   $gray-700-dark,
 	"gray-800":   $gray-800-dark,
 	"gray-900":   $gray-900-dark
-) !default; 
+) !default;
 
 
 // Body
@@ -189,7 +189,7 @@ $link-color-dark:           $primary-dark !default;
 //
 // Define common padding and border radius sizes and more.
 $border-color-dark:             $gray-200-dark !default;
-$border-dashed-color-dark:      $gray-300-dark !default; 
+$border-dashed-color-dark:      $gray-300-dark !default;
 
 // Keenthemes hover states
 $component-hover-color-dark: 	$primary-dark !default;
@@ -222,7 +222,7 @@ $card-border-color-dark:     						$border-color-dark !default;
 // Tables
 $table-striped-bg-dark:         					rgba($gray-100-dark, 0.75) !default;
 $table-loading-message-box-shadow-dark:        		0px 0px 30px rgba(0, 0, 0, 0.3) !default;
-	
+
 // Forms
 $form-select-indicator-color-dark:                  $gray-600-dark !default;
 $form-select-indicator-dark:                        url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='#{$form-select-indicator-color-dark}' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/></svg>") !default;
@@ -289,7 +289,7 @@ $drawer-box-shadow-dark: 0px 0px 30px rgba(0, 0, 0, 0.1) !default;
 $drawer-bg-color-dark: $body-bg-dark !default;
 $drawer-overlay-bg-color-dark: rgba($black, 0.4) !default;
 
-// Keenthemes menu component   
+// Keenthemes menu component
 $menu-dropdown-box-shadow-dark: $dropdown-box-shadow-dark !default;
 $menu-dropdown-bg-color-dark: $dropdown-bg-dark !default;
 $menu-link-color-hover-dark: $component-hover-color-dark !default;
@@ -301,24 +301,24 @@ $menu-link-bg-color-show-dark: $component-hover-bg-dark !default;
 $menu-link-bg-color-here-dark: $component-hover-bg-dark !default;
 $menu-link-bg-color-active-dark: $component-hover-bg-dark !default;
 $menu-heading-color-dark: $text-muted-dark !default;
-	
-// Keenthemes scrollbar component 
+
+// Keenthemes scrollbar component
 $scrollbar-color-dark: $gray-200-dark !default;
 $scrollbar-hover-color-dark: $gray-300-dark !default;
 
-// Keenthemes overlay component 
+// Keenthemes overlay component
 $overlay-bg-dark: rgba($white, 0.05) !default;
 
-// Keenthemes blockui component 
+// Keenthemes blockui component
 $blockui-overlay-bg-dark: rgba($white, 0.05) !default;
 $blockui-message-bg-dark: $tooltip-bg-dark !default;
 $blockui-message-box-shadow-dark: $tooltip-box-shadow-dark !default;
 
-// Keenthemes rating component 
+// Keenthemes rating component
 $rating-color-default-dark: $gray-400-dark !default;
 $rating-color-active-dark: #FFAD0F !default;
 
-// Keenthemes ribbon component 
+// Keenthemes ribbon component
 $ribbon-label-box-shadow-dark: 0px -1px 5px 0px rgba($white, 0.1) !default;
 $ribbon-label-bg-dark: $primary !default;
 $ribbon-label-border-color-dark: darken($primary, 20%) !default;
