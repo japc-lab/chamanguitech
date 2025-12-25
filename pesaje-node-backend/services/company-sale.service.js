@@ -281,7 +281,8 @@ const getBySaleId = async (saleId) => {
             id: purchase.period._id,
             name: purchase.period.name
         } : null,
-        totalPounds: purchase.totalPounds
+        totalPounds: purchase.totalPounds,
+        grandTotal: purchase.grandTotal
     };
 
     return result;

@@ -2,8 +2,10 @@ import {
   Component,
   EventEmitter,
   Input,
+  OnChanges,
   OnInit,
   Output,
+  SimpleChanges,
   ViewChild,
 } from '@angular/core';
 import { NgForm } from '@angular/forms';
@@ -25,7 +27,7 @@ import { ICompanySaleWholeDetailModel } from '../../interfaces/company-sale-whol
   templateUrl: './company-sale-whole-detail.component.html',
   styleUrls: ['./company-sale-whole-detail.component.scss'],
 })
-export class CompanySaleWholeDetailComponent implements OnInit {
+export class CompanySaleWholeDetailComponent implements OnInit, OnChanges {
   @Input() wholeDetail: ICompanySaleWholeDetailModel | null = null;
   @Input() periodId: string;
   @Output() wholeDetailChange =
@@ -56,6 +58,12 @@ export class CompanySaleWholeDetailComponent implements OnInit {
     }
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['periodId'] && !changes['periodId'].firstChange && this.periodId) {
+      this.loadPeriod();
+    }
+  }
+
   loadSizes(): void {
     this.sizeService.getSizes(SizeTypeEnum.WHOLE).subscribe({
       next: (sizes) => {
@@ -71,6 +79,8 @@ export class CompanySaleWholeDetailComponent implements OnInit {
     this.periodService.getPeriodById(this.periodId).subscribe({
       next: (period) => {
         this.periodModel = period;
+        // Populate referencePrice for existing items when period loads
+        this.populateReferencePricesForExistingItems();
       },
       error: (err) => {
         console.error('Error loading period', err);
@@ -157,15 +167,34 @@ export class CompanySaleWholeDetailComponent implements OnInit {
   }
 
   onSizeChange(item: ICompanySaleItemModel, size: string): void {
-    if (this.periodModel && this.periodModel.sizePrices) {
+    this.populateReferencePrice(item, size);
+    this.recalculateTotals();
+  }
+
+  populateReferencePrice(item: ICompanySaleItemModel, size: string): void {
+    if (this.periodModel && this.periodModel.sizePrices && size) {
       const sizePrice = this.periodModel.sizePrices.find(
         (x) => x.size.size === size && x.size.type === SizeTypeEnum.WHOLE
       );
       if (sizePrice) {
         item.referencePrice = sizePrice.price;
+      } else {
+        item.referencePrice = 0;
       }
     }
-    this.recalculateTotals();
+  }
+
+  populateReferencePricesForExistingItems(): void {
+    if (!this.wholeDetail || !this.wholeDetail.items || !this.periodModel || !this.periodModel.sizePrices) {
+      return;
+    }
+
+    this.wholeDetail.items.forEach((item) => {
+      if (item.size) {
+        this.populateReferencePrice(item, item.size);
+      }
+    });
+    this.emitChanges();
   }
 
   validateNumber(event: KeyboardEvent) {
@@ -233,3 +262,4 @@ export class CompanySaleWholeDetailComponent implements OnInit {
   }
 
 }
+

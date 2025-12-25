@@ -2,8 +2,10 @@ import {
   Component,
   EventEmitter,
   Input,
+  OnChanges,
   OnInit,
   Output,
+  SimpleChanges,
   ViewChild,
 } from '@angular/core';
 import { NgForm } from '@angular/forms';
@@ -25,7 +27,7 @@ import { ICompanySaleTailDetailModel } from '../../interfaces/company-sale-tail-
   templateUrl: './company-sale-tail-detail.component.html',
   styleUrls: ['./company-sale-tail-detail.component.scss'],
 })
-export class CompanySaleTailDetailComponent implements OnInit {
+export class CompanySaleTailDetailComponent implements OnInit, OnChanges {
   @Input() tailDetail: ICompanySaleTailDetailModel | null = null;
   @Input() periodId: string;
   @Output() tailDetailChange =
@@ -53,6 +55,12 @@ export class CompanySaleTailDetailComponent implements OnInit {
   ngOnInit(): void {
     this.loadSizes();
     if (this.periodId) {
+      this.loadPeriod();
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['periodId'] && !changes['periodId'].firstChange && this.periodId) {
       this.loadPeriod();
     }
   }
@@ -85,6 +93,8 @@ export class CompanySaleTailDetailComponent implements OnInit {
     this.periodService.getPeriodById(this.periodId).subscribe({
       next: (period) => {
         this.periodModel = period;
+        // Populate referencePrice for existing items when period loads
+        this.populateReferencePricesForExistingItems();
       },
       error: (err) => {
         console.error('Error loading period', err);
@@ -162,21 +172,47 @@ export class CompanySaleTailDetailComponent implements OnInit {
   }
 
   onClassChange(item: ICompanySaleItemModel): void {
+    const previousSize = item.size;
     item.size = '';
     item.referencePrice = 0;
+    
+    // If size was already selected, try to populate referencePrice after class is set
+    // Note: size is cleared above, so we need to check if we should restore it
+    // For now, we'll just clear it and let user select size again
     this.recalculateTotals();
   }
 
   onSizeChange(item: ICompanySaleItemModel, size: string): void {
-    if (this.periodModel && this.periodModel.sizePrices && item.class) {
+    this.populateReferencePrice(item, size);
+    this.recalculateTotals();
+  }
+
+  populateReferencePrice(item: ICompanySaleItemModel, size: string): void {
+    if (this.periodModel && this.periodModel.sizePrices && item.class && size) {
       const sizePrice = this.periodModel.sizePrices.find(
         (x) => x.size.size === size && x.size.type === item.class
       );
       if (sizePrice) {
         item.referencePrice = sizePrice.price;
+      } else {
+        item.referencePrice = 0;
       }
+    } else {
+      item.referencePrice = 0;
     }
-    this.recalculateTotals();
+  }
+
+  populateReferencePricesForExistingItems(): void {
+    if (!this.tailDetail || !this.tailDetail.items || !this.periodModel || !this.periodModel.sizePrices) {
+      return;
+    }
+
+    this.tailDetail.items.forEach((item) => {
+      if (item.size && item.class) {
+        this.populateReferencePrice(item, item.size);
+      }
+    });
+    this.emitChanges();
   }
 
   getSizesForClass(classType: string): IReadSizeModel[] {
